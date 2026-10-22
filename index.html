@@ -156,7 +156,7 @@ textarea { min-height: 96px; resize: vertical; }
 /* Room plan */
 .plan { background: var(--sunk); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
 .plan .room, .plan .foot { display: grid; grid-template-columns: .6fr 1fr .3fr 1fr .25fr .75fr; gap: 6px; }
-.plan .room { grid-template-rows: 48px 1fr; min-height: 250px; }
+.plan .room { grid-template-rows: 58px 1fr; min-height: 260px; }
 .plan .foot { font-size: .7rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
 .plan .bed {
   border-radius: 6px; padding: 8px; color: var(--bed-fg); text-align: left;
@@ -164,15 +164,15 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .plan .bed[aria-pressed="true"] { outline: 4px solid var(--accent); outline-offset: 2px; }
 .plan .bed b { font-size: .82rem; line-height: 1.2; }
-.plan .pc3 b, .plan .pc4 b { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: start; white-space: nowrap; }
-.plan .pc3, .plan .pc4 { justify-items: center; padding-inline: 2px; }
+.plan .pc2 b, .plan .pc5 b { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: start; white-space: nowrap; }
+.plan .pc2, .plan .pc5 { justify-items: center; padding-inline: 2px; }
 .plan .bed small { font-size: .72rem; opacity: .85; overflow-wrap: anywhere; }
 .plan .bed .n { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .plan .pc1 { grid-column: 2; grid-row: 2; }
-.plan .pc4 { grid-column: 1; grid-row: 1 / 3; align-self: start; min-height: 96px; }
-.plan .pc2 { grid-column: 4; grid-row: 2; }
-.plan .pc3 { grid-column: 6; grid-row: 2; align-self: center; min-height: 96px; }
-.plan .curve { grid-column: 2 / 5; grid-row: 1; background: var(--bed); border: 5px solid var(--brick); border-bottom: 0; border-radius: 8px 8px 0 0; color: var(--bed-fg); font-size: .72rem; display: grid; place-items: center; }
+.plan .pc2 { grid-column: 1; grid-row: 1 / 3; align-self: start; min-height: 120px; }
+.plan .pc3 { grid-column: 2 / 5; grid-row: 1; grid-auto-flow: column; align-items: center; justify-content: space-between; border-radius: 8px 8px 0 0; padding-block: 4px; }
+.plan .pc4 { grid-column: 4; grid-row: 2; }
+.plan .pc5 { grid-column: 6; grid-row: 2; align-self: center; min-height: 110px; }
 .plan .walk { font-size: .8rem; color: var(--fg); }
 .plan .door { font-size: .72rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
 
@@ -243,7 +243,7 @@ textarea { min-height: 96px; resize: vertical; }
       <button id="m-spot" aria-pressed="true">Posto per posto</button>
       <button id="m-run" aria-pressed="false">Tratto intero</button>
     </div>
-    <div class="chips" id="cap-lanes" role="group" aria-label="Corsia"></div>
+    <div class="chips" id="cap-lanes" role="group" aria-label="Zona"></div>
     <div id="mode-spot" class="stack">
     <div class="stepper">
       <button id="p-minus" aria-label="Posto precedente">−</button>
@@ -305,7 +305,7 @@ textarea { min-height: 96px; resize: vertical; }
     <div class="field">
       <div class="labelrow"><label for="q">Dov'è? C'è già?</label><span data-mic="q"></span></div>
       <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Lactarius blennius">
-      <p class="hint">Per spostare una specie detta: "sposta Russula virescens in corsia 2 posto 4".</p>
+      <p class="hint">Per spostare una specie detta: "sposta Russula virescens in zona 4 posto 2". Vale anche "all'angolo polipori" o "alla parete".</p>
     </div>
     <div id="results" class="list"></div>
     <div id="ai-out" class="list"></div>
@@ -348,14 +348,14 @@ textarea { min-height: 96px; resize: vertical; }
         <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani.</li>
         <li><b>Tradizionale morfologica</b>, per imenoforo e colore delle spore: lamelle bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e ascomiceti.</li>
       </ol>
-      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono corsia e posto registrati.</p>
+      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono zona e posto registrati.</p>
     </div>
     <div id="sectors" class="stack"></div>
-    <h2>Corsie</h2>
-    <p class="hint">Le corsie sono in ordine di visita. Il posto 1 è l'inizio della corsia nel senso di visita.</p>
+    <h2>Zone</h2>
+    <p class="hint">Le zone sono numerate in ordine di visita. Il posto 1 è l'inizio della zona nel senso di visita.</p>
     <div id="lanes-edit" class="stack"></div>
     <div class="row">
-      <button class="btn primary" id="save-layout">Salva schema e corsie</button>
+      <button class="btn primary" id="save-layout">Salva schema e zone</button>
       <button class="btn ghost" id="reset-layout">Ripristina predefinito</button>
     </div>
   </section>
@@ -412,12 +412,13 @@ const ALL_FAMILIES = SECTORS.flatMap(s => s.fam);
 const DEFAULT_LAYOUT = {
   /* in ordine di visita */
   corsie: [
-    { id: "c1", nome: "Corsia 1", dove: "U centrale, braccio sinistro: dall'ingresso verso il fondo" },
-    { id: "c4", nome: "Polipori", dove: "Angolo in fondo a sinistra, vicino alla finestra" },
-    { id: "c2", nome: "Corsia 2", dove: "U centrale, curva in fondo e braccio destro" },
-    { id: "c3", nome: "Parete destra", dove: "Tratto corto di circa 3 metri sulla parete destra" },
+    { id: "c1", nome: "Zona 1 · U sinistra", dove: "U centrale, braccio sinistro: dall'ingresso verso il fondo" },
+    { id: "c2", nome: "Zona 2 · Polipori", dove: "Angolo della finestra, in fondo a sinistra" },
+    { id: "c3", nome: "Zona 3 · U fondo", dove: "U centrale, la curva in fondo, da sinistra a destra" },
+    { id: "c4", nome: "Zona 4 · U destra", dove: "U centrale, braccio destro: dal fondo verso l'uscita" },
+    { id: "c5", nome: "Zona 5 · Parete", dove: "Parete destra, tratto di circa 3 metri prima dell'uscita" },
   ],
-  assegna: { bol: "c1", rus: "c1", ama: "c1", agr: "c1", pol: "c4", tri: "c2", ent: "c2", ocr: "c2", ner: "c2", can: "c2", gom: "c3", gel: "c3", asc: "c3", alt: "c3" },
+  assegna: { bol: "c1", rus: "c1", pol: "c2", ama: "c3", agr: "c3", tri: "c3", ent: "c4", ocr: "c4", ner: "c4", can: "c4", gom: "c5", gel: "c5", asc: "c5", alt: "c5" },
 };
 
 /* ---------- Riferimento ----------
@@ -942,7 +943,7 @@ const state = {
   mode: "attesa",
 };
 const cap = { corsia: "c1", posto: 1, file: null, blob: null, previewUrl: null, rows: [] };
-const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v1", LS_CAP = "funghi.cap.v1";
+const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v2", LS_CAP = "funghi.cap.v1";
 function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 function loadLocal() {
@@ -1003,7 +1004,7 @@ function where(it) { return it.posto ? `${laneName(it.corsia)} · posto ${it.pos
 function suggestion(it) {
   const lane = it.corsia || laneFor(it.settore || sectorOf(it.famiglia));
   const placed = allItems().filter(x => x.corsia === lane && x.posto && x.id !== it.id).sort(cmp);
-  if (!placed.length) return `Proposta: ${laneName(lane)}, è la prima specie della corsia`;
+  if (!placed.length) return `Proposta: ${laneName(lane)}, è la prima specie della zona`;
   const probe = { ...it, settore: it.settore || sectorOf(it.famiglia) };
   let prev = null, next = null;
   for (const x of placed) { if (cmp(x, probe) <= 0) prev = x; else { next = x; break; } }
@@ -1201,7 +1202,7 @@ function renderCapture() {
   const last = maxPosto(cap.corsia);
   $("#slot-now").replaceChildren(el("div", { class: "slotnow" + (ph ? "" : " nophoto") },
     ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0", onclick: () => openSlot(cap.corsia, cap.posto) }, photoThumb(ph)) : null,
-    el("div", {}, ...txt, last ? el("div", { class: "hint" }, `Ultimo posto registrato in questa corsia: ${last}`) : null)));
+    el("div", {}, ...txt, last ? el("div", { class: "hint" }, `Ultimo posto registrato in questa zona: ${last}`) : null)));
   $("#cap-photo-label").textContent = cap.blob ? "Rifai foto" : "Scatta foto";
   const prev = $("#cap-prev");
   prev.hidden = !cap.previewUrl; if (cap.previewUrl) prev.src = cap.previewUrl;
@@ -1468,15 +1469,18 @@ document.querySelectorAll("[data-mic]").forEach(s => { const b = micButton(docum
 
 /* ---------- CERCA ---------- */
 const NUMW = { uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, ventuno: 21, ventidue: 22, ventitre: 23, ventiquattro: 24, venticinque: 25, trenta: 30 };
-const toNum = t => /^\d+$/.test(t) ? +t : NUMW[norm(t).replace(/ /g, "")] ?? null;
+const toNum = t => /^\d+$/.test(t) ? +t : NUMW[String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f\s]/g, "")] ?? null;
 function parseMove(text) {
-  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:in|nella|alla|al|a)\s+(mezza(?:\s+corsia)?|(?:corsia\s+(?:dei\s+)?)?(?:parete\s+destra|\S+))(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
+  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:(?:in|nella|nel|alla|al|a)\s+|all['’]\s*)((?:(?:zona|corsia|sezione|tavolo)\s+(?:dei\s+|della\s+)?)?(?:parete(?:\s+destra)?|angolo(?:\s+(?:della\s+)?(?:finestra|dei\s+polipori|polipori))?|u\s+(?:sinistra|fondo|destra)|\S+))(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
   if (!m) return null;
-  const lt = m[2].toLowerCase().replace(/^corsia\s+/, "");
+  const lt = m[2].toLowerCase().replace(/^(zona|corsia|sezione|tavolo)\s+((dei|della)\s+)?/, "");
+  const byName = re => lanes().find(c => re.test(c.nome))?.id || lanes().find(c => re.test(c.dove))?.id;
   let lane = null;
-  if (/^(mezza|polipor|finestr|angolo)/.test(lt)) lane = lanes().find(c => /mezza|polipor|finestr|angolo/i.test(c.nome + " " + c.dove))?.id;
-  else if (/^parete/.test(lt)) lane = lanes().find(c => /parete/i.test(c.nome + " " + c.dove))?.id;
-  else { const n = toNum(lt); if (n) lane = (lanes().find(c => c.nome.trim().toLowerCase().replace(/\s+/g, " ") === "corsia " + n) || laneById("c" + n))?.id; }
+  if (/^(mezza|polipor|finestr|angolo)/.test(lt)) lane = byName(/polipor|finestr|angolo/i);
+  else if (/^parete/.test(lt)) lane = byName(/parete/i);
+  else if (/^(u\s+)?(fondo|curva)/.test(lt)) lane = byName(/fondo|curva/i);
+  else if (/^u\s+(sinistr|destr)/.test(lt)) lane = byName(new RegExp("u " + lt.split(/\s+/)[1].slice(0, 6), "i"));
+  else { const n = toNum(lt); if (n) lane = (lanes().find(c => new RegExp("^(zona|corsia|sezione|tavolo)\\s+" + n + "\\b", "i").test(c.nome.trim())) || laneById("c" + n))?.id; }
   if (!lane) return null;
   return { specie: m[1], corsia: lane, posto: m[3] ? toNum(m[3]) : null };
 }
@@ -1551,7 +1555,7 @@ function openPlace(r) {
   const ls = laneSelect("pl-lane", it.corsia, false);
   const ps = el("input", { type: "number", id: "pl-posto", inputmode: "numeric", min: "1", placeholder: "vuoto = senza posto" });
   const close = sheet(el("h2", { class: "sci" }, it.scientifico), el("p", { class: "hint" }, suggestion(it)),
-    el("div", { class: "field" }, el("label", { for: "pl-lane" }, "Corsia"), ls),
+    el("div", { class: "field" }, el("label", { for: "pl-lane" }, "Zona"), ls),
     el("div", { class: "field" }, el("label", { for: "pl-posto" }, "Posto"), ps),
     el("div", { class: "row" }, el("button", { class: "btn primary", onclick: async () => {
       if (findExisting(it.scientifico)) { close(); toast(`${it.scientifico} è già in mostra`); return; }
@@ -1593,7 +1597,7 @@ function openEdit(it) {
     el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
     el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
     el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
-    el("div", { class: "row" }, el("div", { class: "field", style: "flex:2 1 200px" }, el("label", { for: "e-lane" }, "Corsia"), ls),
+    el("div", { class: "row" }, el("div", { class: "field", style: "flex:2 1 200px" }, el("label", { for: "e-lane" }, "Zona"), ls),
       el("div", { class: "field", style: "flex:1 1 100px" }, el("label", { for: "e-posto" }, "Posto"), ps)),
     el("div", { class: "field" }, el("label", { for: "e-note" }, "Note"), note),
     el("div", { class: "row" }, el("button", { class: "btn primary", onclick: save }, "Salva"), el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi"), delBtn));
@@ -1621,13 +1625,12 @@ function openSlot(c, p) {
 let selLane = "c1", hlSlot = null;
 function renderMap() {
   if (!laneById(selLane)) selLane = lanes()[0].id;
-  const spot = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4" };
-  $("#room").replaceChildren(el("div", { class: "curve" }, "curva della U"),
-    ...lanes().filter(c => spot[c.id]).map(c => el("button", { class: "bed " + spot[c.id], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
-      el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length))));
+  const spot = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4", c5: "pc5" };
+  $("#room").replaceChildren(...lanes().filter(c => spot[c.id]).map(c => el("button", { class: "bed " + spot[c.id], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
+      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length))));
   $("#walk").textContent = "Percorso: " + lanes().map(c => c.nome).join(" → ") + " → uscita";
   const c = laneById(selLane), items = laneItems(selLane), max = maxPosto(selLane);
-  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = inizio della corsia nel senso di visita. Tocca una foto per ingrandirla.")];
+  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = inizio della zona nel senso di visita. Tocca una foto per ingrandirla.")];
   const runs = new Map();
   for (const f of state.photos.values()) if (f.corsia === selLane && f.tratto) { if (!runs.has(f.tratto)) runs.set(f.tratto, []); runs.get(f.tratto).push(f); }
   for (const frames of [...runs.values()].sort((a, b) => Math.min(...a.flatMap(photoSpots)) - Math.min(...b.flatMap(photoSpots)))) {
@@ -1647,7 +1650,7 @@ function renderMap() {
                                                : el("span", { class: "hint" }, "vuoto"))));
     }
     kids.push(strip);
-  } else kids.push(el("div", { class: "empty" }, "Nessun posto registrato in questa corsia. Usa Registra: scegli la corsia, detta le specie del posto 1, scatta la foto e salva."));
+  } else kids.push(el("div", { class: "empty" }, "Nessun posto registrato in questa zona. Usa Registra: scegli la zona, detta le specie del posto 1, scatta la foto e salva."));
   const loose = items.filter(i => !i.posto);
   if (loose.length) {
     kids.push(el("h3", {}, `Senza posto (${loose.length})`));
@@ -1662,7 +1665,7 @@ function renderCatalog() {
   const f = norm($("#filter").value), box = $("#catalog");
   let list = allItems().sort(cmp);
   if (f) list = list.filter(i => [i.scientifico, i.italiano, i.famiglia, i.genere].some(x => norm(x).includes(f)));
-  if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Inizia da Registra: una corsia alla volta, posto per posto.")); return; }
+  if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Inizia da Registra: una zona alla volta, posto per posto.")); return; }
   if (!list.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna specie corrisponde al filtro.")); return; }
   const groups = [];
   for (const s of SECTORS) {
@@ -1684,7 +1687,7 @@ function renderSchema(from = state.layout) {
   $("#sectors").replaceChildren(...SECTORS.map((s, i) => el("div", { class: "sector" },
     el("div", { class: "head" }, el("span", { class: "idx" }, i + 1), el("h2", {}, s.nome)),
     el("p", { class: "desc" }, s.desc),
-    el("select", { id: "sec-" + s.id, "aria-label": "Corsia per " + s.nome, onchange: e => { draft.assegna[s.id] = e.target.value; } },
+    el("select", { id: "sec-" + s.id, "aria-label": "Zona per " + s.nome, onchange: e => { draft.assegna[s.id] = e.target.value; } },
       ...draft.corsie.map(c => el("option", { value: c.id, selected: (draft.assegna || {})[s.id] === c.id }, c.nome))))));
   $("#lanes-edit").replaceChildren(...draft.corsie.map((c, i) => el("div", { class: "sector" },
     el("div", { class: "field" }, el("label", { for: "ln-" + c.id }, "Nome"), el("input", { type: "text", id: "ln-" + c.id, value: c.nome, oninput: e => { draft.corsie[i].nome = e.target.value; } })),
@@ -1716,7 +1719,7 @@ function goTab(v) {
 /* ---------- Esportazione ---------- */
 function csv() {
   const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = [["Corsia","Posto","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunta il"]];
+  const rows = [["Zona","Posto","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunta il"]];
   for (const c of lanes()) laneItems(c.id).forEach(it => rows.push([c.nome, it.posto ?? "", SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
   return "﻿" + rows.map(r => r.map(q).join(";")).join("\r\n");
 }
@@ -1759,7 +1762,7 @@ $("#save-layout").addEventListener("click", async () => {
     const oldAuto = (before.assegna || {})[it.settore], newAuto = laneFor(it.settore);
     if (!it.posto && it.corsia === oldAuto && oldAuto !== newAuto) await putItem({ ...it, corsia: newAuto, aggiornato: new Date().toISOString() });
   }
-  renderSchema(); toast("Schema e corsie salvati");
+  renderSchema(); toast("Schema e zone salvati");
 });
 $("#reset-layout").addEventListener("click", () => { renderSchema(DEFAULT_LAYOUT); toast("Predefinito caricato. Tocca Salva per confermare."); });
 $("#export").addEventListener("click", async () => {
@@ -1776,7 +1779,7 @@ $("#copy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(t); toast("Elenco copiato"); }
   catch {
     const ta = el("textarea", { id: "copy-area", readonly: true, style: "min-height:50vh" }, t);
-    sheet(el("h2", {}, "Elenco per corsia"), el("p", { class: "hint" }, "Tieni premuto per selezionare e copiare."), ta); ta.select();
+    sheet(el("h2", {}, "Elenco per zona"), el("p", { class: "hint" }, "Tieni premuto per selezionare e copiare."), ta); ta.select();
   }
 });
 /* Da un link con #c2-5 si apre la mappa su quel posto */
