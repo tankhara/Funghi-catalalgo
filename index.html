@@ -974,6 +974,10 @@ REF_RAW.trim().split("\n").forEach(line => {
 });
 const ALIAS2ID = new Map();
 REF.forEach(r => r.aliases.forEach(a => ALIAS2ID.set(norm(a), slug(r.scientifico))));
+/* sinonimi latini con la loro grafia: il nome scritto o dettato resta quello, il riferimento serve solo per doppioni, ricerca, italiano e famiglia */
+const ALIAS_SPELL = new Map(); REF.forEach(r => r.aliases.forEach(a => { if (/^[A-Z][a-z]+ [a-z]/.test(a)) ALIAS_SPELL.set(norm(a), a); }));
+const refOf = sci => REF_BY_ID.get(slug(sci)) || REF_BY_ID.get(ALIAS2ID.get(norm(sci)));
+const canonId = sci => REF_BY_ID.has(slug(sci)) ? slug(sci) : ALIAS2ID.get(norm(sci)) || slug(sci);
 const GENUS_FAM = {}; REF.forEach(r => { GENUS_FAM[r.scientifico.split(" ")[0]] ??= r.famiglia; });
 
 /* ---------- Stato e archiviazione ---------- */
@@ -1056,20 +1060,23 @@ function suggestion(it) {
 function findExisting(sci) {
   const id = slug(sci);
   if (state.items.has(id)) return state.items.get(id);
-  const viaAlias = ALIAS2ID.get(norm(sci)); if (viaAlias && state.items.has(viaAlias)) return state.items.get(viaAlias);
+  const cid = canonId(sci); /* sinonimi: è la stessa specie anche se in catalogo ha un altro nome */
+  for (const it of state.items.values()) if (canonId(it.scientifico) === cid) return it;
   return null;
 }
+/* Sistema solo ortografia e maiuscole: un sinonimo resta sinonimo, mai sostituito dal nome accettato. */
 function tidySci(s) {
   s = s.trim().replace(/\s+/g, " ");
-  const accepted = ALIAS2ID.get(norm(s)); /* sinonimo → nome accettato */
-  if (accepted && REF_BY_ID.has(accepted)) return REF_BY_ID.get(accepted).scientifico;
   const ref = REF_BY_ID.get(slug(s)); if (ref) return ref.scientifico;
+  const syn = ALIAS_SPELL.get(norm(s)); if (syn) return syn;
+  const vern = ALIAS2ID.get(norm(s)); /* nome volgare scritto al posto dello scientifico */
+  if (vern && REF_BY_ID.has(vern)) return REF_BY_ID.get(vern).scientifico;
   const parts = s.split(" ");
   return parts.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : (/^(var|subsp|f|fo|sp|spp)\.?$/i.test(w) ? w.toLowerCase() : w.toLowerCase())).join(" ");
 }
 function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, posto = null, note = "" }) {
   scientifico = tidySci(scientifico);
-  const ref = REF_BY_ID.get(slug(scientifico));
+  const ref = refOf(scientifico); /* anche da sinonimo: italiano e famiglia della voce di riferimento */
   if (ref) { italiano = italiano || ref.italiano; famiglia = famiglia || ref.famiglia; }
   if (!famiglia) famiglia = GENUS_FAM[scientifico.split(" ")[0]] || "";
   const settore = sectorOf(famiglia, scientifico);
@@ -1083,14 +1090,17 @@ function search(qRaw, limit = 8) {
   const q = norm(qRaw); if (q.length < 2) return [];
   const out = [];
   for (const it of state.items.values()) {
-    const keys = [it.scientifico, it.italiano, ...(REF_BY_ID.get(it.id)?.aliases || [])].filter(Boolean).map(norm);
+    const r0 = refOf(it.scientifico); /* un sinonimo in catalogo si trova anche col nome accettato */
+    const keys = [it.scientifico, it.italiano, ...(r0 ? [r0.scientifico, ...r0.aliases] : [])].filter(Boolean).map(norm);
     const s = Math.max(0, ...keys.map(k => score(q, k)));
     if (s >= 0.5) out.push({ s: s + 0.03, item: it });
   }
+  const have = new Set([...state.items.values()].map(it => canonId(it.scientifico)));
   for (const r of REF) {
-    if (state.items.has(slug(r.scientifico))) continue;
-    const s = Math.max(...r.keys.map(k => score(q, k)));
-    if (s >= 0.5) out.push({ s, ref: r });
+    if (have.has(slug(r.scientifico))) continue;
+    const s = Math.max(...r.keys.map(k => score(q, k))); if (s < 0.5) continue;
+    const syn = score(q, norm(r.scientifico)) < s && r.aliases.find(a => ALIAS_SPELL.has(norm(a)) && score(q, norm(a)) === s); /* cercato col sinonimo: si propone il sinonimo */
+    out.push({ s, ref: syn ? { ...r, scientifico: syn } : r });
   }
   return out.sort((a, b) => b.s - a.s).slice(0, limit);
 }
@@ -1107,7 +1117,7 @@ function claudeError(e) {
        : "Claude non ha risposto: " + (e?.message || e);
 }
 const NAME_RULES = `Regole:
-- Scrivi il nome scientifico oggi accettato (Species Fungorum) con l'ortografia esatta: genere con maiuscola, epiteto minuscolo. Se è dettato un sinonimo, restituisci il nome accettato e metti il sinonimo in "nota".
+- Scrivi il nome scientifico esattamente come è dettato o come è scritto sul cartellino, correggendo solo ortografia e maiuscole: genere con maiuscola, epiteto minuscolo. Non aggiornarlo alla nomenclatura moderna e non sostituire i sinonimi con il nome oggi accettato: se è detto "Boletus erythropus", scrivi Boletus erythropus.
 - Il testo viene dal riconoscimento vocale italiano: i nomi latini arrivano storpiati foneticamente. Esempi: "russula chanoxanta" o "cianossanta" = Russula cyanoxantha; "lactarius blemius" = Lactarius blennius; "russula fetens" = Russula foetens; "lattarius" = Lactarius; "licoperdon perlatum" = Lycoperdon perlatum; "igroforus" = Hygrophorus; "serocomus" = Xerocomus.
 - Mantieni varietà e forme se dette (es. "Amanita muscaria var. aureola").
 - Se è detto solo il genere scrivi "Genere sp.". Ignora parole che non sono funghi.
