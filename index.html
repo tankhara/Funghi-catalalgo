@@ -105,8 +105,9 @@ textarea { min-height: 96px; resize: vertical; }
 .btn:disabled { opacity: .5; cursor: default; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 
-/* Capture: lane chips + spot stepper */
+/* Capture: room plan as zone picker (+ chips for zones not on the plan) + spot stepper */
 .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.chips:empty { display: none; }
 .chips button { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 4px; font-weight: 700; font-size: .9rem; }
 .chips button[aria-pressed="true"] { background: var(--bed); color: var(--bed-fg); border-color: var(--brick); }
 .stepper { display: grid; grid-template-columns: 64px 1fr 64px; gap: 8px; align-items: stretch; }
@@ -173,6 +174,12 @@ textarea { min-height: 96px; resize: vertical; }
 .plan .pc3 { grid-column: 2 / 5; grid-row: 1; grid-auto-flow: column; align-items: center; justify-content: space-between; border-radius: 8px 8px 0 0; padding-block: 4px; }
 .plan .pc4 { grid-column: 4; grid-row: 2; }
 .plan .pc5 { grid-column: 6; grid-row: 2; align-self: center; min-height: 110px; }
+.plan.compact { padding: 10px; gap: 6px; }
+.plan.compact .room { grid-template-rows: 46px 1fr; min-height: 180px; }
+.plan.compact .pc2 { min-height: 90px; }
+.plan.compact .pc5 { min-height: 80px; }
+.plan.compact .bed { padding: 6px; border-width: 4px; }
+.plan.compact .bed .n { font-size: 1.15rem; }
 .plan .walk { font-size: .8rem; color: var(--fg); }
 .plan .door { font-size: .72rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
 
@@ -243,7 +250,8 @@ textarea { min-height: 96px; resize: vertical; }
       <button id="m-spot" aria-pressed="true">Posto per posto</button>
       <button id="m-run" aria-pressed="false">Tratto intero</button>
     </div>
-    <div class="chips" id="cap-lanes" role="group" aria-label="Zona"></div>
+    <div class="plan compact" id="cap-plan" role="group" aria-label="Zona: tocca la pianta della sala"></div>
+    <div class="chips" id="cap-lanes" role="group" aria-label="Altre zone"></div>
     <div id="mode-spot" class="stack">
     <div class="stepper">
       <button id="p-minus" aria-label="Posto precedente">−</button>
@@ -317,12 +325,8 @@ textarea { min-height: 96px; resize: vertical; }
 
   <!-- MAPPA -->
   <section class="view" id="v-map" hidden>
-    <div class="plan">
-      <div class="door">Fondo sala</div>
-      <div class="room" id="room"></div>
-      <div class="foot"><span></span><span style="grid-column: 2 / 4">Ingresso · entra e gira a sinistra</span><span></span><span style="grid-column: 5 / 7; text-align: right">Uscita · banco vendita</span></div>
-      <p class="walk" id="walk"></p>
-    </div>
+    <div class="plan" id="map-plan"></div>
+    <p class="hint" id="walk"></p>
     <div id="lane-view" class="stack"></div>
   </section>
 
@@ -1195,7 +1199,8 @@ async function undo() {
 function persistCap() { lsSet(LS_CAP, { corsia: cap.corsia, posto: cap.posto }); }
 function setSlot(corsia, posto) { if (corsia !== cap.corsia) run.startTouched = false; cap.corsia = corsia; cap.posto = Math.max(1, posto | 0 || 1); persistCap(); clearCapReview(); renderCapture(); }
 function renderCapture() {
-  $("#cap-lanes").replaceChildren(...lanes().map(c => el("button", { "aria-pressed": String(c.id === cap.corsia), onclick: () => setSlot(c.id, maxPosto(c.id) || 1) }, c.nome)));
+  $("#cap-plan").replaceChildren(...planEls(cap.corsia, id => setSlot(id, maxPosto(id) || 1)));
+  $("#cap-lanes").replaceChildren(...lanes().filter(c => !PLAN_SPOT[c.id]).map(c => el("button", { "aria-pressed": String(c.id === cap.corsia), onclick: () => setSlot(c.id, maxPosto(c.id) || 1) }, c.nome)));
   const pn = $("#p-num"); if (document.activeElement !== pn) pn.value = cap.posto;
   const here = slotItems(cap.corsia, cap.posto), ph = slotPhotos(cap.corsia, cap.posto)[0];
   const txt = here.length ? [el("b", {}, "Qui ora: "), here.map(i => i.scientifico).join(", ")] : [`${laneName(cap.corsia)}, posto ${cap.posto}: ancora vuoto.`];
@@ -1622,12 +1627,20 @@ function openSlot(c, p) {
 }
 
 /* ---------- MAPPA ---------- */
+const PLAN_SPOT = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4", c5: "pc5" };
+// Room plan (used on Registra as the zone picker and on Mappa): back wall on top, entrance bottom left, exit bottom right.
+function planEls(sel, pick) {
+  return [
+    el("div", { class: "door" }, "Fondo sala"),
+    el("div", { class: "room" }, ...lanes().filter(c => PLAN_SPOT[c.id]).map(c => el("button", { class: "bed " + PLAN_SPOT[c.id], "aria-pressed": String(sel === c.id), "aria-label": c.nome, onclick: () => pick(c.id) },
+      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length)))),
+    el("div", { class: "foot" }, el("span"), el("span", { style: "grid-column: 2 / 4" }, "Ingresso · entra e gira a sinistra"), el("span"), el("span", { style: "grid-column: 5 / 7; text-align: right" }, "Uscita · banco vendita")),
+  ];
+}
 let selLane = "c1", hlSlot = null;
 function renderMap() {
   if (!laneById(selLane)) selLane = lanes()[0].id;
-  const spot = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4", c5: "pc5" };
-  $("#room").replaceChildren(...lanes().filter(c => spot[c.id]).map(c => el("button", { class: "bed " + spot[c.id], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
-      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length))));
+  $("#map-plan").replaceChildren(...planEls(selLane, id => { selLane = id; hlSlot = null; renderMap(); }));
   $("#walk").textContent = "Percorso: " + lanes().map(c => c.nome).join(" → ") + " → uscita";
   const c = laneById(selLane), items = laneItems(selLane), max = maxPosto(selLane);
   const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = inizio della zona nel senso di visita. Tocca una foto per ingrandirla.")];
