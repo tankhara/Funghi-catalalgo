@@ -350,12 +350,12 @@ textarea { min-height: 96px; resize: vertical; }
     <p class="hint" id="walk"></p>
     <div class="salabox stack" id="sala-box" hidden>
       <h3>Invia un video a Claude</h3>
-      <p class="hint">Scegli il video o la registrazione. Il telefono invia la tua voce e circa 40 fotogrammi dei cartellini. Puoi inviarne più di uno di fila: ogni video resta salvato. Poi scrivi a Claude in chat "video inviato": ascolta i nomi detti, li controlla sui cartellini e aggiorna il catalogo.</p>
+      <p class="hint">Scegli il video o la registrazione. Il telefono invia la tua voce e circa 40 fotogrammi dei cartellini. Puoi sceglierne più di uno insieme: ogni video resta salvato e quelli già ricevuti vengono saltati. Poi scrivi a Claude in chat "video inviati": ascolta i nomi detti, li controlla sui cartellini e aggiorna il catalogo.</p>
       <div class="row">
-        <label class="btn primary wide" for="sala-video">Scegli video</label>
+        <label class="btn primary wide" for="sala-video">Scegli video (anche più di uno)</label>
       </div>
-      <input id="sala-video" type="file" accept="video/*,audio/*" hidden>
-      <p class="hint" id="sala-status"></p>
+      <input id="sala-video" type="file" accept="video/*,audio/*" multiple hidden>
+      <p class="hint" id="sala-status" style="white-space:pre-line"></p>
     </div>
     <div id="lane-view" class="stack"></div>
   </section>
@@ -1947,26 +1947,41 @@ document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("cl
 $("#m-spot").addEventListener("click", () => setCapMode("spot"));
 $("#m-run").addEventListener("click", () => setCapMode("run"));
 $("#run-video").addEventListener("change", e => onRunFiles(e.target.files, "video"));
-// One pick sends both: the card frames first (so the big audio decode cannot block them), then the voice (dictation)
+// One pick can hold many videos, sent one at a time in name order (phone names are timestamps, so filming order)
+// Each is checked against invii/ first, so picking the same videos again only sends what Claude has not received
+// Per video: the card frames first (so the big audio decode cannot block them), then the voice (dictation)
 $("#sala-video").addEventListener("change", async e => {
-  const f = e.target.files[0], st = $("#sala-status"); if (!f) return;
-  const isVid = !/^audio\//.test(f.type), keep = " Tieni aperta questa pagina finché non leggi \"Tutto inviato\".";
-  const tick = setInterval(() => { if (!/Tieni aperta|Tutto inviato|non inviat|incompleto/i.test(st.textContent)) st.textContent += keep; }, 500);
-  const guard = async fn => { try { return await fn(f); } catch (err) { return { ok: false, msg: String(err && err.message || err) }; } };
-  let img = null, aud = null;
+  const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })), st = $("#sala-status");
+  if (!files.length) return;
+  const keep = " Tieni aperta questa pagina finché non leggi \"Fatto\".";
+  let pre = "";
+  // sendRoomVideo/sendRoomAudio write their own steps: prefix each with the position in the batch and keep the warning on
+  const mo = new MutationObserver(() => {
+    const s = st.textContent; if (s.startsWith(pre) && s.endsWith(keep)) return;
+    const core = s.replace(keep, ""); st.textContent = (core.startsWith(pre) ? core : pre + core) + keep;
+  });
+  const has = async (f, part) => { try { return !!(state.db && (await state.db.doc("invii/" + uploadId(f) + part).get()).exists); } catch { return false; } };
+  const guard = async (fn, f) => { try { return await fn(f); } catch (err) { return { ok: false, msg: String(err && err.message || err) }; } };
+  const out = [];
+  mo.observe(st, { childList: true, characterData: true, subtree: true });
   try {
-    if (isVid) img = await guard(sendRoomVideo);
-    aud = await guard(sendRoomAudio);
-  } finally { clearInterval(tick); $("#sala-video").value = ""; }
-  if ((!isVid || img.ok) && aud.ok) {
-    st.textContent = `Tutto inviato. ${isVid ? img.msg + " " : ""}${aud.msg} Ora scrivi a Claude in chat "video inviato".`;
-    return;
-  }
-  const parts = [];
-  if (isVid) parts.push(img.ok ? img.msg : `Immagini dei cartellini NON inviate: ${img.msg}.`);
-  parts.push(aud.ok ? aud.msg : `Voce NON inviata: ${aud.msg}.`);
-  st.textContent = `Invio incompleto. ${parts.join(" ")} Riprova con lo stesso video; se si ripete, scrivi a Claude in chat questo messaggio.`;
-  toast("Invio incompleto: leggi il messaggio sotto \"Scegli video\".", null, 10000);
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i], isVid = !/^audio\//.test(f.type);
+      pre = `Video ${i + 1} di ${files.length} (${f.name}): `;
+      st.textContent = "controllo se è già arrivato…";
+      const [hasImg, hasAud] = await Promise.all([isVid ? has(f, "-img") : true, has(f, "-audio")]);
+      if (hasImg && hasAud) { out.push({ name: f.name, esito: "già ricevuto, saltato" }); continue; }
+      const bad = [];
+      if (!hasImg) { const r = await guard(sendRoomVideo, f); if (!r.ok) bad.push(`immagini non inviate (${r.msg})`); }
+      if (!hasAud) { const r = await guard(sendRoomAudio, f); if (!r.ok) bad.push(`voce non inviata (${r.msg})`); }
+      out.push({ name: f.name, ko: bad.length > 0, esito: bad.length ? "incompleto: " + bad.join(", ") : "inviato" });
+    }
+  } finally { mo.disconnect(); $("#sala-video").value = ""; }
+  const ko = out.filter(r => r.ko).length;
+  st.textContent = ["Risultato:", ...out.map(r => `- ${r.name}: ${r.esito}`),
+    ko ? "Riprova scegliendo di nuovo gli stessi video: quelli già ricevuti vengono saltati." : "",
+    "Fatto. Scrivi a Claude in chat \"video inviati\"."].filter(Boolean).join("\n");
+  if (ko) toast(`Invio incompleto per ${ko} video: leggi l'elenco sotto "Scegli video".`, null, 10000);
 });
 $("#run-photos").addEventListener("change", e => onRunFiles(e.target.files, "foto"));
 $("#run-start").addEventListener("input", () => { run.startTouched = true; });
