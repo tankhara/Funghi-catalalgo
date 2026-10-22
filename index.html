@@ -369,7 +369,7 @@ textarea { min-height: 96px; resize: vertical; }
         <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani.</li>
         <li><b>Tradizionale morfologica</b>, per imenoforo e colore delle spore: lamelle bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e ascomiceti.</li>
       </ol>
-      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono zona e posto registrati.</p>
+      <p>Lo schema qui sotto segue per ora l'ordine classico delle guide tradizionali: si parte da Igroforacee e Tricolomatacee, si passa per Amanite, Agaricacee e le famiglie a spore colorate, poi boleti e russule, gli Afilloforali, i gasteromiceti, i gelatinosi e gli ascomiceti. È provvisorio, in attesa dello schema ufficiale della mostra. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono zona e posto registrati.</p>
     </div>
     <div id="sectors" class="stack"></div>
     <h2>Zone</h2>
@@ -397,34 +397,42 @@ textarea { min-height: 96px; resize: vertical; }
 "use strict";
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
-  { id: "bol", nome: "Boletales", desc: "Porcini e boleti, pinaroli, Gyroporus, poi Paxillus, Gomphidius, falso gallinaccio, Scleroderma e Astraeus",
-    fam: ["Boletaceae","Suillaceae","Gyroporaceae","Paxillaceae","Gomphidiaceae","Hygrophoropsidaceae","Tapinellaceae","Sclerodermataceae","Diplocystidiaceae","Rhizopogonaceae"] },
-  { id: "rus", nome: "Russulales", desc: "Russule, lattari, Lactifluus e affini (Auriscalpium, Stereum, Hericium)",
-    fam: ["Russulaceae","Auriscalpiaceae","Bondarzewiaceae","Stereaceae","Hericiaceae"] },
-  { id: "ama", nome: "Agaricales: Amanite e Plutei", desc: "Amanita, Limacella, Pluteus, Volvopluteus, Volvariella",
-    fam: ["Amanitaceae","Pluteaceae"] },
-  { id: "agr", nome: "Agaricales: Agaricacee", desc: "Prataioli, lepiote, mazze di tamburo, coprino chiomato, vesce",
-    fam: ["Agaricaceae"] },
-  { id: "tri", nome: "Agaricales: spore bianche", desc: "Tricholoma, Clitocybe, Lepista, Calocybe, Armillaria, Pleurotus, Hygrophorus, Mycena, Laccaria",
-    fam: ["Tricholomataceae","Clitocybaceae","Lyophyllaceae","Physalacriaceae","Marasmiaceae","Omphalotaceae","Mycenaceae","Pleurotaceae","Hygrophoraceae","Hydnangiaceae","Porotheleaceae","Biannulariaceae","Callistosporiaceae"] },
-  { id: "ent", nome: "Agaricales: spore rosa", desc: "Entoloma, Clitopilus",
+  { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
+    fam: ["Hygrophoraceae"] },
+  { id: "tri", nome: "Tricolomatacee", desc: "Tricholoma, Clitocybe, Lepista, Calocybe, Lyophyllum, Armillaria, Oudemansiella, Marasmius, Collybia, Omphalotus, Mycena, Pleurotus, Laccaria",
+    fam: ["Tricholomataceae","Clitocybaceae","Lyophyllaceae","Biannulariaceae","Callistosporiaceae","Physalacriaceae","Marasmiaceae","Omphalotaceae","Porotheleaceae","Mycenaceae","Pleurotaceae","Hydnangiaceae"] },
+  { id: "ent", nome: "Entolomatacee", desc: "Entoloma, Clitopilus",
     fam: ["Entolomataceae"] },
-  { id: "ocr", nome: "Agaricales: spore ocra e brune", desc: "Cortinarius, Inocybe, Hebeloma, Gymnopilus, Pholiota, Hypholoma, Agrocybe, pioppino",
-    fam: ["Cortinariaceae","Inocybaceae","Hymenogastraceae","Crepidotaceae","Tubariaceae","Bolbitiaceae","Strophariaceae"] },
-  { id: "ner", nome: "Agaricales: spore nere", desc: "Coprinellus, Coprinopsis, Psathyrella, Panaeolus",
-    fam: ["Psathyrellaceae","Galeropsidaceae"] },
-  { id: "can", nome: "Cantharellales", desc: "Gallinacci, trombette dei morti, steccherini, Clavulina",
-    fam: ["Cantharellaceae","Hydnaceae","Clavulinaceae"] },
-  { id: "gom", nome: "Gomphales, Phallales, Geastrales", desc: "Ramarie, Gomphus, Clavariadelphus, satirione, clatro, geastri",
-    fam: ["Gomphaceae","Clavariadelphaceae","Phallaceae","Clathraceae","Geastraceae"] },
-  { id: "pol", nome: "Polipori e lignicoli", desc: "Polyporales, Hymenochaetales, Gloeophyllales, Thelephorales, Fistulina, Schizophyllum",
-    fam: ["Fistulinaceae","Polyporaceae","Ganodermataceae","Fomitopsidaceae","Laetiporaceae","Meripilaceae","Grifolaceae","Sparassidaceae","Meruliaceae","Podoscyphaceae","Phanerochaetaceae","Irpicaceae","Gloeophyllaceae","Schizophyllaceae","Hymenochaetaceae","Thelephoraceae","Bankeraceae"] },
-  { id: "gel", nome: "Clavarie e gelatinosi", desc: "Clavaria, Clavulinopsis, Auricularia, Exidia, Tremella, Calocera",
-    fam: ["Clavariaceae","Auriculariaceae","Exidiaceae","Tremellaceae","Phaeotremellaceae","Dacrymycetaceae"] },
-  { id: "asc", nome: "Ascomycota", desc: "Spugnole, elvelle, pezize, tartufi, Xylaria, Daldinia",
+  { id: "ama", nome: "Amanitacee", desc: "Amanita, Limacella",
+    fam: ["Amanitaceae"] },
+  { id: "agr", nome: "Lepiotacee e Agaricacee", desc: "Lepiota, Macrolepiota, Chlorophyllum, Leucoagaricus, Agaricus, Coprinus comatus",
+    fam: ["Agaricaceae"] },
+  { id: "plu", nome: "Plutacee", desc: "Pluteus, Volvopluteus, Volvariella",
+    fam: ["Pluteaceae"] },
+  { id: "ner", nome: "Strofariacee, Coprinacee, Bolbitiacee", desc: "Stropharia, Hypholoma, Pholiota, Psilocybe, Coprinellus, Coprinopsis, Psathyrella, Panaeolus, Agrocybe, Cyclocybe (pioppino), Bolbitius",
+    fam: ["Strophariaceae","Psathyrellaceae","Galeropsidaceae","Bolbitiaceae"] },
+  { id: "cor", nome: "Cortinariacee e Crepidotacee", desc: "Cortinarius, Inocybe, Hebeloma, Gymnopilus, Galerina, Crepidotus, Tubaria",
+    fam: ["Cortinariaceae","Inocybaceae","Hymenogastraceae","Crepidotaceae","Tubariaceae"] },
+  { id: "pax", nome: "Paxillacee e Gomphidiacee", desc: "Paxillus, Tapinella, falso gallinaccio, Gomphidius, Chroogomphus",
+    fam: ["Paxillaceae","Tapinellaceae","Hygrophoropsidaceae","Gomphidiaceae"] },
+  { id: "bol", nome: "Boletacee", desc: "Porcini e boleti, Leccinum, Xerocomus, pinaroli (Suillus), Gyroporus",
+    fam: ["Boletaceae","Suillaceae","Gyroporaceae"] },
+  { id: "rus", nome: "Russulacee", desc: "Russule, lattari, Lactifluus",
+    fam: ["Russulaceae"] },
+  { id: "can", nome: "Afilloforali: gallinacci, idni e clavarie", desc: "Gallinacci, trombette dei morti, steccherini, Hericium, ramarie, Gomphus, Clavariadelphus, Clavaria, Clavulina, Thelephora",
+    fam: ["Cantharellaceae","Hydnaceae","Clavulinaceae","Auriscalpiaceae","Hericiaceae","Bankeraceae","Thelephoraceae","Gomphaceae","Clavariadelphaceae","Clavariaceae"] },
+  { id: "pol", nome: "Afilloforali: polipori e lignicoli", desc: "Polyporales, Hymenochaetales, Ganoderma, Fomes, Laetiporus, Grifola, Sparassis, Fistulina, Stereum, Schizophyllum",
+    fam: ["Fistulinaceae","Polyporaceae","Ganodermataceae","Fomitopsidaceae","Laetiporaceae","Meripilaceae","Grifolaceae","Sparassidaceae","Bondarzewiaceae","Stereaceae","Meruliaceae","Podoscyphaceae","Phanerochaetaceae","Irpicaceae","Gloeophyllaceae","Schizophyllaceae","Hymenochaetaceae"] },
+  { id: "gas", nome: "Gasteromiceti", desc: "Vesce (Lycoperdon, Calvatia, Bovista), Tulostoma, Battarrea, Scleroderma, Astraeus, geastri, satirione, clatro, Rhizopogon",
+    fam: ["Sclerodermataceae","Diplocystidiaceae","Rhizopogonaceae","Geastraceae","Phallaceae","Clathraceae"] },
+  { id: "gel", nome: "Eterobasidiomiceti (gelatinosi)", desc: "Auricularia, Exidia, Tremella, Calocera",
+    fam: ["Auriculariaceae","Exidiaceae","Tremellaceae","Phaeotremellaceae","Dacrymycetaceae"] },
+  { id: "asc", nome: "Ascomiceti", desc: "Spugnole, elvelle, pezize, tartufi, Xylaria, Daldinia, Cordyceps",
     fam: ["Morchellaceae","Helvellaceae","Discinaceae","Pezizaceae","Pyronemataceae","Sarcoscyphaceae","Sarcosomataceae","Tuberaceae","Elaphomycetaceae","Rhizinaceae","Xylariaceae","Hypoxylaceae","Hypocreaceae","Nectriaceae","Cordycipitaceae","Ophiocordycipitaceae","Leotiaceae","Chlorociboriaceae","Geoglossaceae"] },
   { id: "alt", nome: "Da collocare", desc: "Famiglia non riconosciuta o da verificare", fam: [] },
 ];
+/* generi che la sistematica moderna mette in Agaricaceae ma lo schema classico espone tra i gasteromiceti */
+const GEN2SEC = Object.fromEntries(["Lycoperdon","Apioperdon","Calvatia","Langermannia","Bovista","Vascellum","Handkea","Lycoperdaceae","Tulostoma","Battarrea","Podaxis","Cyathus","Crucibulum","Nidularia","Mycenastrum","Disciseda"].map(g => [g, "gas"]));
 const SEC_IDX = Object.fromEntries(SECTORS.map((s, i) => [s.id, i]));
 const FAM2SEC = {}; const FAM_IDX = {};
 SECTORS.forEach(s => s.fam.forEach((f, i) => { FAM2SEC[f] = s.id; FAM_IDX[f] = i; }));
@@ -439,7 +447,7 @@ const DEFAULT_LAYOUT = {
     { id: "c4", nome: "Zona 4 · U destra", dove: "U centrale, braccio destro: dal fondo verso l'uscita" },
     { id: "c5", nome: "Zona 5 · Parete", dove: "Parete destra, tratto di circa 3 metri prima dell'uscita" },
   ],
-  assegna: { bol: "c1", rus: "c1", pol: "c2", ama: "c3", agr: "c3", tri: "c3", ent: "c4", ocr: "c4", ner: "c4", can: "c4", gom: "c5", gel: "c5", asc: "c5", alt: "c5" },
+  assegna: { igr: "c1", tri: "c1", ent: "c1", pol: "c2", ama: "c3", agr: "c3", plu: "c3", ner: "c3", cor: "c3", pax: "c4", bol: "c4", rus: "c4", can: "c5", gas: "c5", gel: "c5", asc: "c5", alt: "c5" },
 };
 
 /* ---------- Riferimento ----------
@@ -964,7 +972,7 @@ const state = {
   mode: "attesa",
 };
 const cap = { corsia: "c1", posto: 1, file: null, blob: null, previewUrl: null, rows: [] };
-const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v2", LS_CAP = "funghi.cap.v1";
+const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v3", LS_CAP = "funghi.cap.v1";
 function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 function loadLocal() {
@@ -1004,8 +1012,8 @@ async function putLayout(layout) {
 const lanes = () => state.layout.corsie;
 const laneById = id => lanes().find(c => c.id === id);
 const laneName = id => (laneById(id) || { nome: "Da collocare" }).nome;
-const sectorOf = fam => FAM2SEC[fam] || "alt";
-function laneFor(sec) { return (state.layout.assegna || {})[sec] || lanes()[lanes().length - 1].id; }
+const sectorOf = (fam, sci) => GEN2SEC[String(sci || "").split(" ")[0]] || FAM2SEC[fam] || "alt";
+function laneFor(sec) { const a = (state.layout.assegna || {})[sec], d = DEFAULT_LAYOUT.assegna[sec]; return laneById(a) ? a : laneById(d) ? d : lanes()[lanes().length - 1].id; }
 function sortKey(it) { return [SEC_IDX[it.settore] ?? 99, FAM_IDX[it.famiglia] ?? 99, it.scientifico.toLowerCase()]; }
 function cmp(a, b) { const A = sortKey(a), B = sortKey(b); for (let i = 0; i < A.length; i++) { if (A[i] < B[i]) return -1; if (A[i] > B[i]) return 1; } return 0; }
 const allItems = () => [...state.items.values()];
@@ -1023,10 +1031,10 @@ const imgUrl = p => "/_blob/" + p.asset;
 function where(it) { return it.posto ? `${laneName(it.corsia)} · posto ${it.posto}` : `${laneName(it.corsia)} · senza posto`; }
 /* Dove andrebbe secondo l'ordine sistematico, rispetto alle specie già collocate nella corsia */
 function suggestion(it) {
-  const lane = it.corsia || laneFor(it.settore || sectorOf(it.famiglia));
+  const lane = it.corsia || laneFor(it.settore || sectorOf(it.famiglia, it.scientifico));
   const placed = allItems().filter(x => x.corsia === lane && x.posto && x.id !== it.id).sort(cmp);
   if (!placed.length) return `Proposta: ${laneName(lane)}, è la prima specie della zona`;
-  const probe = { ...it, settore: it.settore || sectorOf(it.famiglia) };
+  const probe = { ...it, settore: it.settore || sectorOf(it.famiglia, it.scientifico) };
   let prev = null, next = null;
   for (const x of placed) { if (cmp(x, probe) <= 0) prev = x; else { next = x; break; } }
   const ref = prev || next;
@@ -1051,7 +1059,7 @@ function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, po
   const ref = REF_BY_ID.get(slug(scientifico));
   if (ref) { italiano = italiano || ref.italiano; famiglia = famiglia || ref.famiglia; }
   if (!famiglia) famiglia = GENUS_FAM[scientifico.split(" ")[0]] || "";
-  const settore = sectorOf(famiglia);
+  const settore = sectorOf(famiglia, scientifico);
   const now = new Date().toISOString();
   return { id: slug(scientifico), scientifico, italiano, genere: scientifico.split(" ")[0], famiglia, settore,
            corsia: corsia || laneFor(settore), posto: posto || null, note, creato: now, aggiornato: now };
@@ -1236,7 +1244,7 @@ function names(it) {
   return el("div", { class: "names" },
     el("span", { class: "sci" }, it.scientifico),
     it.italiano ? el("span", { class: "ita" }, it.italiano) : null,
-    el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia)]] || {}).nome].filter(Boolean).join(" · ")));
+    el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia, it.scientifico)]] || {}).nome].filter(Boolean).join(" · ")));
 }
 function pinned(p) {
   const clamp = v => Math.min(0.97, Math.max(0.03, +v || 0.5));
@@ -1296,7 +1304,7 @@ function renderCapReview() {
     const detail = [`Detto: "${r.testo}"`, r.stato === "sposta" ? `ora in ${where(r.ex)}` : null, r.via !== "elenco" ? `da ${r.via}` : null, r.nota || null].filter(Boolean).join(" · ");
     return el("label", { class: "card" + (r.stato === "sposta" ? " move" : r.stato === "qui" ? " present" : ""), for: "cr" + i },
       el("input", { type: "checkbox", id: "cr" + i, checked: r.on, disabled: r.stato === "qui", onchange: e => { r.on = e.target.checked; } }),
-      names({ ...r, settore: sectorOf(r.famiglia) }), label, el("span", { class: "src" }, detail));
+      names({ ...r, settore: sectorOf(r.famiglia, r.scientifico) }), label, el("span", { class: "src" }, detail));
   }));
 }
 function clearCapReview() { cap.rows = []; cap.pendingPhotoOnly = false; $("#cap-status").textContent = ""; }
@@ -1460,7 +1468,7 @@ function renderRun() {
     const detail = [`Posto ${r.posto}`, r.testo ? `"${r.testo}"` : null, r.stato === "sposta" ? `ora in ${where(r.ex)}` : null, r.nota || null].filter(Boolean).join(" · ");
     return el("label", { class: "card" + (r.stato === "sposta" ? " move" : r.stato === "qui" ? " present" : ""), for: "rr" + i },
       el("input", { type: "checkbox", id: "rr" + i, checked: r.on, disabled: r.stato === "qui", onchange: e => { r.on = e.target.checked; } }),
-      names({ ...r, settore: sectorOf(r.famiglia) }), label, el("span", { class: "src" }, detail));
+      names({ ...r, settore: sectorOf(r.famiglia, r.scientifico) }), label, el("span", { class: "src" }, detail));
   }));
 }
 async function onRunCommit() {
@@ -1569,7 +1577,7 @@ function presentCard(it) {
     el("span", { class: "pos" }, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))));
 }
 function refCard(r) {
-  const probe = { ...r, settore: sectorOf(r.famiglia) };
+  const probe = { ...r, settore: sectorOf(r.famiglia, r.scientifico) };
   return el("div", { class: "card" }, names(probe),
     el("button", { class: "btn primary", onclick: () => openPlace(r) }, "Aggiungi"),
     el("span", { class: "pos hint" }, "Non ancora in mostra · " + suggestion(probe)));
@@ -1653,7 +1661,7 @@ function openEdit(it) {
   async function save() {
     const s = sci.value.trim(); if (!s) { sci.focus(); return; }
     const fam = famSel.value;
-    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: ls.value || laneFor(sectorOf(fam)), posto: ps.value ? +ps.value : null, note: note.value.trim() });
+    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: ls.value || laneFor(sectorOf(fam, s)), posto: ps.value ? +ps.value : null, note: note.value.trim() });
     if (isNew) { if (findExisting(s)) { toast(`${s} è già in mostra`); return; } await putItem(base); }
     else { base.creato = it.creato || base.creato; if (base.id !== it.id) await removeItem(it.id); await putItem(base); }
     close(); toast(`Salvata · ${where(base)}`);

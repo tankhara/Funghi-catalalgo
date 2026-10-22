@@ -16,15 +16,15 @@ Zones are numbered in the order a visitor walks them. Spot 1 is where each zone 
 
 | Zone | Where | Default sectors |
 |---|---|---|
-| Zona 1 · U sinistra | Left arm of the central U, from the entrance to the back | Boletales, Russulales |
-| Zona 2 · Polipori | Back-left corner by the window | Polypores |
-| Zona 3 · U fondo | The bend of the U at the back, left to right | Amanita, Agaricus, white-spored gilled fungi |
-| Zona 4 · U destra | Right arm of the U, from the back towards the exit | Pink-, brown- and dark-spored gilled fungi, chanterelles |
-| Zona 5 · Parete | About 3 m on the right wall, before the door | Corals, jelly fungi, Ascomycota, others |
+| Zona 1 · U sinistra | Left arm of the central U, from the entrance to the back | Hygrophoraceae, Tricholomataceae, Entolomataceae |
+| Zona 2 · Polipori | Back-left corner by the window | Polypores and other wood-rotting fungi |
+| Zona 3 · U fondo | The bend of the U at the back, left to right | Amanitaceae, Lepiotaceae and Agaricaceae, Pluteaceae, Strophariaceae, Coprinaceae and Bolbitiaceae, Cortinariaceae |
+| Zona 4 · U destra | Right arm of the U, from the back towards the exit | Paxillaceae and Gomphidiaceae, Boletaceae, Russulaceae |
+| Zona 5 · Parete | About 3 m on the right wall, before the door | Chanterelles, hedgehogs and corals, gasteromycetes, jelly fungi, Ascomycota, others |
 
 One door at the front serves as both entrance and exit, with the souvenir stand next to it. A table of logs before the window corner is decoration only and holds no species.
 
-The sector assignment is provisional until the official ordering scheme is in. Names and assignments can be changed in Schema.
+The display order follows, for now, the classic order of the traditional field guides: Hygrophoraceae and Tricholomataceae first, then Entolomataceae, Amanitaceae, Agaricaceae, Pluteaceae and the coloured-spored families, then Boletaceae and Russulaceae, the Aphyllophorales, gasteromycetes (puffballs included), jelly fungi and Ascomycota. The sector assignment is provisional until the official ordering scheme is in. Names and assignments can be changed in Schema.
 
 Dictated names are matched against a reference list of about 830 species, including synonyms and the phonetic distortions of Italian speech recognition (e.g. "chanoxanta" becomes *cyanoxantha*). Names that don't match with certainty go to Claude.
 
