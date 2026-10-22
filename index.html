@@ -43,6 +43,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { background: var(--bg); color: var(--fg); }
 body { font-family: var(--sans); font-size: 16px; line-height: 1.45; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
@@ -154,19 +155,25 @@ textarea { min-height: 96px; resize: vertical; }
 
 /* Room plan */
 .plan { background: var(--sunk); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
-.plan .room { display: grid; grid-template-columns: 1fr 1.15fr .75fr; grid-template-rows: auto 1fr; gap: 8px; min-height: 240px; }
+.plan .room, .plan .foot { display: grid; grid-template-columns: .6fr 1fr .3fr 1fr .25fr .75fr; gap: 6px; }
+.plan .room { grid-template-rows: 48px 1fr; min-height: 250px; }
+.plan .foot { font-size: .7rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
 .plan .bed {
   border-radius: 6px; padding: 8px; color: var(--bed-fg); text-align: left;
   background: var(--bed); border: 5px solid var(--brick); display: grid; align-content: space-between; gap: 4px; min-width: 0;
 }
 .plan .bed[aria-pressed="true"] { outline: 4px solid var(--accent); outline-offset: 2px; }
-.plan .bed b { font-size: .9rem; }
+.plan .bed b { font-size: .82rem; line-height: 1.2; }
+.plan .pc3 b, .plan .pc4 b { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: start; white-space: nowrap; }
+.plan .pc3, .plan .pc4 { justify-items: center; padding-inline: 2px; }
 .plan .bed small { font-size: .72rem; opacity: .85; overflow-wrap: anywhere; }
 .plan .bed .n { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.plan .p4 { grid-column: 1 / 3; grid-row: 1; min-height: 64px; }
-.plan .p1 { grid-column: 1; grid-row: 2; }
-.plan .p2 { grid-column: 2; grid-row: 2; }
-.plan .p3 { grid-column: 3; grid-row: 1 / 3; }
+.plan .pc1 { grid-column: 2; grid-row: 2; }
+.plan .pc4 { grid-column: 1; grid-row: 2; align-self: center; min-height: 110px; }
+.plan .pc2 { grid-column: 4; grid-row: 2; }
+.plan .pc3 { grid-column: 6; grid-row: 1 / 3; }
+.plan .curve { grid-column: 2 / 5; grid-row: 1; background: var(--bed); border: 5px solid var(--brick); border-bottom: 0; border-radius: 8px 8px 0 0; color: var(--bed-fg); font-size: .72rem; display: grid; place-items: center; }
+.plan .walk { font-size: .8rem; color: var(--fg); }
 .plan .door { font-size: .72rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
 
 /* Lane strip: one row per spot */
@@ -182,6 +189,19 @@ textarea { min-height: 96px; resize: vertical; }
 .spot .ph .thumb { width: 72px; height: 72px; }
 .spot .noimg { width: 72px; height: 72px; border-radius: 8px; border: 1.5px dashed var(--line); display: grid; place-items: center; font-size: .7rem; color: var(--muted); text-align: center; }
 
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: none; padding: 9px 10px; border-radius: 999px; font-size: .92rem; color: var(--muted); font-weight: 700; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.labelrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.btn.mic { padding: 8px 14px; border-color: var(--accent); color: var(--accent); }
+.btn.mic.on { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+.framesprev { display: flex; gap: 6px; overflow-x: auto; }
+.framesprev img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; flex: 0 0 auto; }
+.film { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+.film .fr { flex: 0 0 86%; scroll-snap-align: start; display: grid; gap: 4px; }
+.pinwrap { position: relative; }
+.pinwrap img { width: 100%; display: block; border-radius: var(--r); }
+.pin { position: absolute; transform: translate(-50%, -50%); background: var(--accent); color: var(--accent-ink); font-family: var(--serif); font-style: italic; font-size: .78rem; font-weight: 600; padding: 2px 7px; border-radius: 6px; border: 0; white-space: nowrap; max-width: 48%; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
 .sector { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; }
 .sector .head { display: flex; gap: 10px; align-items: baseline; }
 .sector .idx { font-family: var(--serif); font-weight: 700; color: var(--brick); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
@@ -219,7 +239,12 @@ textarea { min-height: 96px; resize: vertical; }
 <main>
   <!-- REGISTRA: posto per posto -->
   <section class="view" id="v-cap">
+    <div class="seg" role="group" aria-label="Modo di registrazione">
+      <button id="m-spot" aria-pressed="true">Posto per posto</button>
+      <button id="m-run" aria-pressed="false">Tratto intero</button>
+    </div>
     <div class="chips" id="cap-lanes" role="group" aria-label="Corsia"></div>
+    <div id="mode-spot" class="stack">
     <div class="stepper">
       <button id="p-minus" aria-label="Posto precedente">−</button>
       <div class="val"><small>Posto</small><input id="p-num" type="number" inputmode="numeric" min="1" value="1" aria-label="Numero del posto"></div>
@@ -227,9 +252,9 @@ textarea { min-height: 96px; resize: vertical; }
     </div>
     <div id="slot-now"></div>
     <div class="field">
-      <label for="cap-text">Specie in questo posto</label>
-      <textarea id="cap-text" class="big" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Detta i nomi, es. Russula cyanoxantha, Lactarius deterrimus"></textarea>
-      <p class="hint">Tocca il microfono della tastiera e detta. Più specie vanno separate con "virgola" o "poi".</p>
+      <div class="labelrow"><label for="cap-text">Specie in questo posto</label><span data-mic="cap-text"></span></div>
+      <textarea id="cap-text" class="big" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Russula cyanoxantha, Lactarius deterrimus"></textarea>
+      <p class="hint">Tocca Detta e pronuncia i nomi con una pausa tra una specie e l'altra.</p>
     </div>
     <div class="row">
       <label class="btn wide" for="cap-photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="cap-photo-label">Scatta foto</span></label>
@@ -247,12 +272,38 @@ textarea { min-height: 96px; resize: vertical; }
       <button class="btn primary wide" id="cap-confirm">Conferma e vai avanti</button>
       <button class="btn ghost" id="cap-cancel">Annulla</button>
     </div>
+    </div>
+    <div id="mode-run" class="stack" hidden>
+      <p class="hint">Un video girato camminando lungo il tratto, una foto larga o più foto in sequenza. Claude divide le immagini in piatti e assegna i posti in ordine. Con i cartellini visibili, o dettando prima i nomi in ordine, il risultato è molto più affidabile.</p>
+      <div class="field">
+        <label for="run-start">Primo posto del tratto</label>
+        <input id="run-start" type="number" inputmode="numeric" min="1" value="1">
+      </div>
+      <div class="field">
+        <div class="labelrow"><label for="run-text">Specie del tratto, in ordine (facoltativo)</label><span data-mic="run-text"></span></div>
+        <textarea id="run-text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Boletus aereus, Boletus edulis, Leccinellum lepidum"></textarea>
+      </div>
+      <div class="row">
+        <label class="btn wide" for="run-video"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>Video</label>
+        <input id="run-video" type="file" accept="video/*" hidden>
+        <label class="btn wide" for="run-photos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Foto</label>
+        <input id="run-photos" type="file" accept="image/*" multiple hidden>
+      </div>
+      <div id="run-frames" class="framesprev"></div>
+      <button class="btn primary" id="run-analyze">Analizza tratto</button>
+      <div id="run-status" class="hint"></div>
+      <div id="run-review" class="review"></div>
+      <div class="row" id="run-actions" hidden>
+        <button class="btn primary wide" id="run-commit">Conferma tratto</button>
+        <button class="btn ghost" id="run-cancel">Annulla</button>
+      </div>
+    </div>
   </section>
 
   <!-- CERCA -->
   <section class="view" id="v-find" hidden>
     <div class="field">
-      <label for="q">Dov'è? C'è già?</label>
+      <div class="labelrow"><label for="q">Dov'è? C'è già?</label><span data-mic="q"></span></div>
       <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Lactarius blennius">
       <p class="hint">Per spostare una specie detta: "sposta Russula virescens in corsia 2 posto 4".</p>
     </div>
@@ -267,9 +318,10 @@ textarea { min-height: 96px; resize: vertical; }
   <!-- MAPPA -->
   <section class="view" id="v-map" hidden>
     <div class="plan">
-      <div class="door">Fondo sala · porta</div>
+      <div class="door">Fondo sala</div>
       <div class="room" id="room"></div>
-      <div class="door">Ingresso · punto della foto</div>
+      <div class="foot"><span></span><span style="grid-column: 2 / 4">Ingresso · entra e gira a sinistra</span><span></span><span style="grid-column: 5 / 7; text-align: right">Uscita · banco vendita</span></div>
+      <p class="walk" id="walk"></p>
     </div>
     <div id="lane-view" class="stack"></div>
   </section>
@@ -300,7 +352,7 @@ textarea { min-height: 96px; resize: vertical; }
     </div>
     <div id="sectors" class="stack"></div>
     <h2>Corsie</h2>
-    <p class="hint">Il posto 1 di ogni corsia è il lato verso l'ingresso.</p>
+    <p class="hint">Le corsie sono in ordine di visita. Il posto 1 è l'inizio della corsia nel senso di visita.</p>
     <div id="lanes-edit" class="stack"></div>
     <div class="row">
       <button class="btn primary" id="save-layout">Salva schema e corsie</button>
@@ -358,13 +410,14 @@ SECTORS.forEach(s => s.fam.forEach((f, i) => { FAM2SEC[f] = s.id; FAM_IDX[f] = i
 const ALL_FAMILIES = SECTORS.flatMap(s => s.fam);
 
 const DEFAULT_LAYOUT = {
+  /* in ordine di visita */
   corsie: [
-    { id: "c1", nome: "Corsia 1", dove: "Aiuola lunga a sinistra" },
-    { id: "c2", nome: "Corsia 2", dove: "Aiuola centrale" },
-    { id: "c3", nome: "Corsia 3", dove: "Aiuola lungo la parete destra" },
-    { id: "c4", nome: "Mezza corsia", dove: "Tratto corto in fondo (da confermare)" },
+    { id: "c1", nome: "Corsia 1", dove: "Braccio sinistro della U, dall'ingresso verso il fondo" },
+    { id: "c4", nome: "Polipori", dove: "Tratto piccolo accanto alla finestra, a sinistra" },
+    { id: "c2", nome: "Corsia 2", dove: "Curva della U e braccio destro, verso l'uscita" },
+    { id: "c3", nome: "Corsia 3", dove: "Ultimo tratto verso l'uscita e il banco vendita" },
   ],
-  assegna: { bol: "c1", rus: "c1", ama: "c1", agr: "c1", tri: "c2", ent: "c2", ocr: "c2", ner: "c2", can: "c3", gom: "c3", pol: "c3", gel: "c3", asc: "c4", alt: "c4" },
+  assegna: { bol: "c1", rus: "c1", ama: "c1", agr: "c1", pol: "c4", tri: "c2", ent: "c2", ocr: "c2", ner: "c2", can: "c3", gom: "c3", gel: "c3", asc: "c3", alt: "c3" },
 };
 
 /* ---------- Riferimento ----------
@@ -936,11 +989,12 @@ function cmp(a, b) { const A = sortKey(a), B = sortKey(b); for (let i = 0; i < A
 const allItems = () => [...state.items.values()];
 function laneItems(c) { return allItems().filter(i => i.corsia === c).sort((a, b) => (a.posto ?? 1e9) - (b.posto ?? 1e9) || cmp(a, b)); }
 function slotItems(c, p) { return allItems().filter(i => i.corsia === c && i.posto === p).sort(cmp); }
-function slotPhotos(c, p) { return [...state.photos.values()].filter(f => f.corsia === c && f.posto === p).sort((a, b) => (b.creato || "").localeCompare(a.creato || "")); }
+const photoSpots = f => Array.isArray(f.posti) ? f.posti : (f.posto ? [f.posto] : []);
+function slotPhotos(c, p) { return [...state.photos.values()].filter(f => f.corsia === c && photoSpots(f).includes(p)).sort((a, b) => (b.creato || "").localeCompare(a.creato || "")); }
 function maxPosto(c) {
   let m = 0;
   for (const i of state.items.values()) if (i.corsia === c && i.posto > m) m = i.posto;
-  for (const f of state.photos.values()) if (f.corsia === c && f.posto > m) m = f.posto;
+  for (const f of state.photos.values()) if (f.corsia === c) for (const p of photoSpots(f)) if (p > m) m = p;
   return m;
 }
 const imgUrl = p => "/_blob/" + p.asset;
@@ -1116,6 +1170,12 @@ function names(it) {
     it.italiano ? el("span", { class: "ita" }, it.italiano) : null,
     el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia)]] || {}).nome].filter(Boolean).join(" · ")));
 }
+function pinned(p) {
+  const clamp = v => Math.min(0.97, Math.max(0.03, +v || 0.5));
+  return el("div", { class: "pinwrap" }, el("img", { src: imgUrl(p), alt: `Foto ${laneName(p.corsia)}, posti ${photoSpots(p).join(", ")}`, loading: "lazy" }),
+    ...(p.pins || []).map(pin => { const it = state.items.get(pin.id); if (!it) return null;
+      return el("button", { class: "pin", style: `left:${clamp(pin.x) * 100}%;top:${clamp(pin.y) * 100}%`, onclick: () => { $("#sheet-root").replaceChildren(); openEdit(it); } }, `${it.posto ?? ""} ${it.scientifico}`.trim()); }));
+}
 function photoThumb(p, cls = "thumb") { return el("img", { class: cls, src: imgUrl(p), alt: `Foto ${laneName(p.corsia)} posto ${p.posto}`, loading: "lazy" }); }
 
 /* ---------- Annulla ultima operazione ---------- */
@@ -1125,13 +1185,14 @@ async function undo() {
   for (const id of a.created) await removeItem(id);
   for (const prev of a.moved) await putItem(prev);
   if (a.photo) await removePhoto(a.photo);
+  for (const ph of a.photos || []) await removePhoto(ph);
   if (a.slot) { cap.corsia = a.slot.corsia; cap.posto = a.slot.posto; }
   toast("Annullato"); renderCapture();
 }
 
 /* ---------- REGISTRA ---------- */
 function persistCap() { lsSet(LS_CAP, { corsia: cap.corsia, posto: cap.posto }); }
-function setSlot(corsia, posto) { cap.corsia = corsia; cap.posto = Math.max(1, posto | 0 || 1); persistCap(); clearCapReview(); renderCapture(); }
+function setSlot(corsia, posto) { if (corsia !== cap.corsia) run.startTouched = false; cap.corsia = corsia; cap.posto = Math.max(1, posto | 0 || 1); persistCap(); clearCapReview(); renderCapture(); }
 function renderCapture() {
   $("#cap-lanes").replaceChildren(...lanes().map(c => el("button", { "aria-pressed": String(c.id === cap.corsia), onclick: () => setSlot(c.id, maxPosto(c.id) || 1) }, c.nome)));
   const pn = $("#p-num"); if (document.activeElement !== pn) pn.value = cap.posto;
@@ -1146,7 +1207,8 @@ function renderCapture() {
   prev.hidden = !cap.previewUrl; if (cap.previewUrl) prev.src = cap.previewUrl;
   $("#cap-photo-actions").hidden = !cap.blob;
   $("#cap-from-photo").hidden = !(state.sample && state.canImages);
-  renderCapReview();
+  const rs = $("#run-start"); if (!run.startTouched && document.activeElement !== rs) rs.value = maxPosto(cap.corsia) + 1;
+  renderCapReview(); renderRun();
 }
 function classify(r) {
   const ex = findExisting(r.scientifico);
@@ -1216,7 +1278,7 @@ async function commitCapture() {
     $("#cap-status").replaceChildren(el("span", { class: "spin" }), " Carico la foto…");
     try {
       const asset = await uploadPhoto(cap.blob);
-      if (asset) { const ph = { id: asset, asset, corsia: c, posto: p, specie: ids, creato: now }; await putPhoto(ph); action.photo = ph; photoMsg = " e foto"; }
+      if (asset) { const ph = { id: asset, asset, corsia: c, posti: [p], specie: ids, creato: now }; await putPhoto(ph); action.photo = ph; photoMsg = " e foto"; }
       else photoMsg = " (foto non salvabile qui)";
     } catch (e) { photoMsg = " (foto non caricata: " + (e.code || e.message) + ")"; }
   }
@@ -1228,16 +1290,192 @@ async function commitCapture() {
   toast(`Posto ${p}: ${parts}${photoMsg}. Ora sei al posto ${p + 1}.`, { label: "Annulla", fn: undo });
 }
 
+/* ---------- REGISTRA: tratto intero da video o foto ---------- */
+const run = { frames: [], kind: null, rows: [], startTouched: false };
+function setCapMode(m) {
+  $("#mode-spot").hidden = m !== "spot"; $("#mode-run").hidden = m !== "run";
+  $("#m-spot").setAttribute("aria-pressed", String(m === "spot")); $("#m-run").setAttribute("aria-pressed", String(m === "run"));
+  renderCapture();
+}
+async function imageMax() { try { return Math.max(1, Math.min(20, (await state.sample.limits()).images.maxCount)); } catch { return 8; } }
+async function videoFrames(file, max) {
+  const url = URL.createObjectURL(file);
+  const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+  try {
+    await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error("Non riesco a leggere questo video. Prova a registrarlo di nuovo o usa le foto.")); });
+    try { await v.play(); v.pause(); } catch {}
+    const d = v.duration; if (!isFinite(d) || d <= 0) throw new Error("Durata del video non leggibile.");
+    const n = Math.max(4, Math.min(max, Math.round(d / 3)));
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      await new Promise(res => { v.onseeked = res; v.currentTime = Math.min(d - 0.05, d * (i + 0.5) / n); });
+      const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+      const cv = document.createElement("canvas"); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
+      cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+      const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.8));
+      if (blob) out.push({ blob, url: URL.createObjectURL(blob) });
+      $("#run-status").textContent = `Estraggo i fotogrammi: ${i + 1} di ${n}`;
+    }
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+function clearRun() { run.frames.forEach(f => URL.revokeObjectURL(f.url)); run.frames = []; run.rows = []; run.kind = null; $("#run-video").value = ""; $("#run-photos").value = ""; }
+async function onRunFiles(files, kind) {
+  if (!files || !files.length) return;
+  clearRun(); run.kind = kind; const st = $("#run-status");
+  st.replaceChildren(el("span", { class: "spin" }), kind === "video" ? " Leggo il video…" : " Preparo le foto…");
+  const max = await imageMax();
+  try {
+    if (kind === "video") run.frames = await videoFrames(files[0], max);
+    else {
+      for (const f of [...files].slice(0, max)) { const b = await compress(f); run.frames.push({ blob: b, url: URL.createObjectURL(b) }); }
+      if (files.length > max) toast(`Uso le prime ${max} foto: è il massimo per un'analisi`);
+    }
+    st.textContent = `${run.frames.length} immagini pronte. Tocca Analizza tratto.`;
+  } catch (e) { st.textContent = e.message; clearRun(); }
+  renderRun();
+}
+function classifyAt(r, c, p) {
+  const ex = findExisting(r.scientifico);
+  if (!ex) return { ...r, posto: p, stato: "nuova", ex: null, on: r.certezza !== "bassa" };
+  if (ex.corsia === c && ex.posto === p) return { ...r, posto: p, stato: "qui", ex, on: true };
+  return { ...r, posto: p, stato: "sposta", ex, on: true };
+}
+async function askClaudeRun(blobs, dictated, c) {
+  const catalog = allItems().map(i => i.scientifico).sort().join(", ") || "(ancora vuoto)";
+  const said = dictated.length ? `L'utente ha dettato queste specie per il tratto, in ordine di percorso: ${dictated.map(d => d.scientifico).join(", ")}. Usale come riferimento principale e abbina ogni nome al suo piatto. Se un piatto non corrisponde a nessun nome, riconoscilo tu.` : "";
+  const prompt = `Sei un micologo esperto della flora fungina italiana e siciliana. Le ${blobs.length} immagini, nell'ordine dato, sono ${run.kind === "video" ? "fotogrammi di un video girato camminando" : "foto scattate in sequenza"} lungo "${laneName(c)}" di una mostra micologica, nel senso di visita. Funghi su piatti o sul terriccio, spesso con un cartellino; di solito una specie per piatto.
+Elenca i piatti nell'ordine in cui si incontrano lungo il percorso. Le immagini si sovrappongono: non ripetere lo stesso piatto visto in più immagini.
+${said}
+- Cartellino leggibile: usa quel nome, certezza "alta".
+- Altrimenti preferisci le specie già in mostra: ${catalog}.
+- Per ogni piatto indica l'immagine in cui si vede meglio ("immagine", indice da 0) e il centro del piatto in quell'immagine ("x" e "y" da 0 a 1, 0,0 in alto a sinistra).
+- Non inventare: se non sei sicuro usa certezza "bassa" e descrivi in "nota" cosa vedi.
+
+${NAME_RULES}
+
+Rispondi SOLO con JSON:
+{"piatti":[{"testo":"cartellino letto o cosa vedi","scientifico":"Genere specie","italiano":"","famiglia":"Famiglia","certezza":"alta|media|bassa","nota":"breve","immagine":0,"x":0.5,"y":0.5}]}`;
+  const res = await state.sample.json(prompt, { images: blobs, modelTier: "complex" });
+  const arr = Array.isArray(res?.piatti) ? res.piatti : [];
+  return arr.map(x => {
+    const r = cleanRows({ specie: [x] })[0]; if (!r) return null;
+    const i = Number.isInteger(x.immagine) && x.immagine >= 0 && x.immagine < blobs.length ? x.immagine : null;
+    return { ...r, via: "immagini", immagine: i, x: +x.x, y: +x.y };
+  }).filter(Boolean);
+}
+async function onRunAnalyze() {
+  const st = $("#run-status");
+  if (!run.frames.length) { toast("Aggiungi prima un video o delle foto del tratto"); return; }
+  if (!state.sample || !state.canImages) { st.textContent = "L'analisi delle immagini con Claude non è disponibile in questa vista."; return; }
+  const b = $("#run-analyze"); b.disabled = true;
+  try {
+    const text = $("#run-text").value.trim();
+    let dictated = [];
+    if (text) { st.replaceChildren(el("span", { class: "spin" }), " Riconosco i nomi dettati…"); dictated = await resolveText(text); }
+    st.replaceChildren(el("span", { class: "spin" }), ` Claude analizza ${run.frames.length} immagini, può volerci un minuto…`);
+    const plates = await askClaudeRun(run.frames.map(f => f.blob), dictated, cap.corsia);
+    const start = Math.max(1, +$("#run-start").value || 1), seen = new Set();
+    run.rows = plates.filter(r => { const id = slug(r.scientifico); if (seen.has(id)) return false; seen.add(id); return true; })
+                     .map((r, i) => classifyAt(r, cap.corsia, start + i));
+    st.textContent = run.rows.length ? `${run.rows.length} piatti trovati. Controlla e conferma.` : "Claude non ha trovato piatti riconoscibili. Prova con più luce o dettando i nomi.";
+  } catch (e) { st.textContent = claudeError(e); }
+  finally { b.disabled = false; renderRun(); }
+}
+function renderRun() {
+  $("#run-frames").replaceChildren(...run.frames.map((f, i) => el("img", { src: f.url, alt: `Immagine ${i + 1}` })));
+  $("#run-actions").hidden = !run.rows.length;
+  $("#run-review").replaceChildren(...run.rows.map((r, i) => {
+    const label = r.stato === "qui" ? el("span", { class: "pill ok" }, "Già qui") : r.stato === "sposta" ? el("span", { class: "pill warn" }, "Sposta qui")
+                : el("span", { class: "pill" + (r.certezza === "alta" ? "" : " soft") }, r.certezza === "alta" ? "Nuova" : `Nuova · ${r.certezza}`);
+    const detail = [`Posto ${r.posto}`, r.testo ? `"${r.testo}"` : null, r.stato === "sposta" ? `ora in ${where(r.ex)}` : null, r.nota || null].filter(Boolean).join(" · ");
+    return el("label", { class: "card" + (r.stato === "sposta" ? " move" : r.stato === "qui" ? " present" : ""), for: "rr" + i },
+      el("input", { type: "checkbox", id: "rr" + i, checked: r.on, disabled: r.stato === "qui", onchange: e => { r.on = e.target.checked; } }),
+      names({ ...r, settore: sectorOf(r.famiglia) }), label, el("span", { class: "src" }, detail));
+  }));
+}
+async function onRunCommit() {
+  const c = cap.corsia, now = new Date().toISOString(), tratto = "t" + Date.now(), st = $("#run-status");
+  const action = { created: [], moved: [], photos: [], slot: { corsia: c, posto: cap.posto } };
+  const byFrame = new Map();
+  for (const r of run.rows) {
+    if (!r.on) continue;
+    let id;
+    if (r.stato === "qui") id = r.ex.id;
+    else if (r.stato === "sposta") { action.moved.push({ ...r.ex }); await putItem({ ...r.ex, corsia: c, posto: r.posto, aggiornato: now }); id = r.ex.id; }
+    else { if (findExisting(r.scientifico)) continue; const it = makeItem({ ...r, corsia: c, posto: r.posto }); await putItem(it); action.created.push(it.id); id = it.id; }
+    if (r.immagine != null) { if (!byFrame.has(r.immagine)) byFrame.set(r.immagine, []); byFrame.get(r.immagine).push({ id, x: r.x, y: r.y, posto: r.posto }); }
+  }
+  /* ogni immagine copre i posti dei piatti che mostra; quelle senza piatti prendono il posto del vicino */
+  const spots = run.frames.map((_, i) => (byFrame.get(i) || []).map(p => p.posto));
+  for (let i = 0; i < spots.length; i++) if (!spots[i].length) {
+    const prev = spots.slice(0, i).reverse().find(s => s.length), next = spots.slice(i + 1).find(s => s.length);
+    spots[i] = prev ? [Math.max(...prev)] : next ? [Math.min(...next)] : [Math.max(1, +$("#run-start").value || 1)];
+  }
+  if (state.assets) {
+    for (let i = 0; i < run.frames.length; i++) {
+      st.replaceChildren(el("span", { class: "spin" }), ` Carico le immagini: ${i + 1} di ${run.frames.length}`);
+      try {
+        const asset = await uploadPhoto(run.frames[i].blob);
+        const ph = { id: asset, asset, corsia: c, posti: [...new Set(spots[i])].sort((a, b) => a - b), pins: (byFrame.get(i) || []).map(({ id, x, y }) => ({ id, x, y })), tratto, ordine: i, creato: now };
+        await putPhoto(ph); action.photos.push(ph);
+      } catch (e) { toast("Un'immagine non è stata caricata: " + (e.code || e.message)); }
+    }
+  }
+  lastAction = action;
+  const n = action.created.length, m = action.moved.length;
+  clearRun(); $("#run-text").value = ""; st.textContent = "";
+  cap.posto = maxPosto(c) + 1; persistCap(); run.startTouched = false; renderCapture();
+  toast(`${laneName(c)}: ${n} nuove, ${m} spostate, ${action.photos.length} immagini.`, { label: "Annulla", fn: undo });
+}
+
+/* ---------- Dettatura con pulsante (Web Speech, se il browser e la pagina lo consentono) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let micBlocked = false, activeRec = null;
+function micUnavailable() {
+  if (micBlocked) return; micBlocked = true;
+  document.querySelectorAll(".btn.mic").forEach(x => x.remove());
+  toast("Il microfono non è consentito in questa pagina. Per ora usa il microfono della tastiera.");
+}
+function micButton(target) {
+  if (!SR || micBlocked) return null;
+  const label = el("span", {}, "Detta");
+  const b = el("button", { class: "btn mic", type: "button" },
+    el("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2" }), label);
+  b.querySelector("svg").innerHTML = '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>';
+  b.addEventListener("click", () => {
+    if (activeRec) { activeRec.stop(); return; }
+    let rec; try { rec = new SR(); } catch { micUnavailable(); return; }
+    rec.lang = "it-IT"; rec.continuous = true; rec.interimResults = true;
+    const base = target.value.trim() ? target.value.trim().replace(/[,;]?$/, ", ") : "";
+    let finals = "";
+    rec.onresult = e => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript.trim(); if (!t) continue;
+        if (e.results[i].isFinal) finals += (finals ? ", " : "") + t; else interim += (interim ? " " : "") + t;
+      }
+      target.value = base + finals + (interim ? (finals ? ", " : "") + interim : "");
+      target.dispatchEvent(new Event("input"));
+    };
+    rec.onerror = e => { if (["not-allowed", "service-not-allowed", "audio-capture"].includes(e.error)) micUnavailable(); };
+    rec.onend = () => { activeRec = null; b.classList.remove("on"); label.textContent = "Detta"; };
+    try { rec.start(); activeRec = rec; b.classList.add("on"); label.textContent = "Stop"; } catch { micUnavailable(); }
+  });
+  return b;
+}
+document.querySelectorAll("[data-mic]").forEach(s => { const b = micButton(document.getElementById(s.dataset.mic)); if (b) s.replaceWith(b); });
+
 /* ---------- CERCA ---------- */
 const NUMW = { uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, ventuno: 21, ventidue: 22, ventitre: 23, ventiquattro: 24, venticinque: 25, trenta: 30 };
 const toNum = t => /^\d+$/.test(t) ? +t : NUMW[norm(t).replace(/ /g, "")] ?? null;
 function parseMove(text) {
-  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:in|nella|alla|al|a)\s+(mezza(?:\s+corsia)?|(?:corsia\s+)?\S+)(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
+  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:in|nella|alla|al|a)\s+(mezza(?:\s+corsia)?|(?:corsia\s+(?:dei\s+)?)?\S+)(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
   if (!m) return null;
   const lt = m[2].toLowerCase().replace(/^corsia\s+/, "");
   let lane = null;
-  if (lt.startsWith("mezza")) lane = lanes().find(c => /mezza/i.test(c.nome))?.id || lanes()[3]?.id;
-  else { const n = toNum(lt); if (n && lanes()[n - 1]) lane = lanes()[n - 1].id; }
+  if (/^(mezza|polipor|finestr)/.test(lt)) lane = lanes().find(c => /mezza|polipor|finestr/i.test(c.nome + " " + c.dove))?.id;
+  else { const n = toNum(lt); if (n) lane = (lanes().find(c => c.nome.trim().toLowerCase().replace(/\s+/g, " ") === "corsia " + n) || lanes()[n - 1])?.id; }
   if (!lane) return null;
   return { specie: m[1], corsia: lane, posto: m[3] ? toNum(m[3]) : null };
 }
@@ -1362,7 +1600,8 @@ function openEdit(it) {
 function openSlot(c, p) {
   const phs = slotPhotos(c, p), items = slotItems(c, p);
   let shown = phs[0], confirmDel = false;
-  const img = shown ? el("img", { class: "full", src: imgUrl(shown), alt: `Foto ${laneName(c)} posto ${p}` }) : null;
+  const holder = el("div", {}, shown ? pinned(shown) : "");
+  const img = shown ? holder : null;
   const delBtn = shown ? el("button", { class: "btn danger", onclick: async () => {
     if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare la foto"; return; }
     await removePhoto(shown); close(); toast("Foto eliminata");
@@ -1370,7 +1609,7 @@ function openSlot(c, p) {
   const close = sheet(
     el("h2", {}, `${laneName(c)} · posto ${p}`),
     img || el("div", { class: "empty" }, "Nessuna foto per questo posto."),
-    phs.length > 1 ? el("div", { class: "row" }, ...phs.map(f => el("button", { class: "ph", style: "background:none;border:0;padding:0", onclick: () => { shown = f; img.src = imgUrl(f); confirmDel = false; delBtn.textContent = "Elimina questa foto"; } },
+    phs.length > 1 ? el("div", { class: "row" }, ...phs.map(f => el("button", { class: "ph", style: "background:none;border:0;padding:0", onclick: () => { shown = f; holder.replaceChildren(pinned(f)); confirmDel = false; delBtn.textContent = "Elimina questa foto"; } },
       photoThumb(f), el("div", { class: "hint" }, (f.creato || "").slice(11, 16))))) : null,
     el("div", { class: "list" }, ...items.map(i => el("button", { class: "card tap", onclick: () => { close(); openEdit(i); } }, names(i)))),
     el("div", { class: "row" }, el("button", { class: "btn primary", onclick: () => { close(); goTab("v-cap"); setSlot(c, p); } }, "Registra questo posto"),
@@ -1381,10 +1620,21 @@ function openSlot(c, p) {
 let selLane = "c1", hlSlot = null;
 function renderMap() {
   if (!laneById(selLane)) selLane = lanes()[0].id;
-  $("#room").replaceChildren(...lanes().slice(0, 4).map((c, i) => el("button", { class: "bed p" + (i + 1), "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
-    el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length), el("small", {}, c.dove))));
+  const spot = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4" };
+  $("#room").replaceChildren(el("div", { class: "curve" }, "curva della U"),
+    ...lanes().filter(c => spot[c.id]).map(c => el("button", { class: "bed " + spot[c.id], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
+      el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length))));
+  $("#walk").textContent = "Percorso: " + lanes().map(c => c.nome).join(" → ") + " → uscita";
   const c = laneById(selLane), items = laneItems(selLane), max = maxPosto(selLane);
-  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = lato ingresso. Tocca una foto per ingrandirla.")];
+  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = inizio della corsia nel senso di visita. Tocca una foto per ingrandirla.")];
+  const runs = new Map();
+  for (const f of state.photos.values()) if (f.corsia === selLane && f.tratto) { if (!runs.has(f.tratto)) runs.set(f.tratto, []); runs.get(f.tratto).push(f); }
+  for (const frames of [...runs.values()].sort((a, b) => Math.min(...a.flatMap(photoSpots)) - Math.min(...b.flatMap(photoSpots)))) {
+    frames.sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0));
+    const sp = frames.flatMap(photoSpots);
+    kids.push(el("h3", {}, `Percorso fotografico · posti ${Math.min(...sp)}–${Math.max(...sp)}`));
+    kids.push(el("div", { class: "film" }, ...frames.map(f => el("div", { class: "fr" }, pinned(f), el("span", { class: "hint" }, "posti " + photoSpots(f).join(", "))))));
+  }
   if (max) {
     const strip = el("div", { class: "strip" });
     for (let p = 1; p <= max; p++) {
@@ -1475,6 +1725,14 @@ function plainList() {
 
 /* ---------- Eventi ---------- */
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => goTab(b.dataset.v)));
+$("#m-spot").addEventListener("click", () => setCapMode("spot"));
+$("#m-run").addEventListener("click", () => setCapMode("run"));
+$("#run-video").addEventListener("change", e => onRunFiles(e.target.files, "video"));
+$("#run-photos").addEventListener("change", e => onRunFiles(e.target.files, "foto"));
+$("#run-start").addEventListener("input", () => { run.startTouched = true; });
+$("#run-analyze").addEventListener("click", onRunAnalyze);
+$("#run-commit").addEventListener("click", async e => { e.target.disabled = true; try { await onRunCommit(); } finally { e.target.disabled = false; } });
+$("#run-cancel").addEventListener("click", () => { run.rows = []; $("#run-status").textContent = ""; renderRun(); });
 $("#p-minus").addEventListener("click", () => setSlot(cap.corsia, cap.posto - 1));
 $("#p-plus").addEventListener("click", () => setSlot(cap.corsia, cap.posto + 1));
 $("#p-num").addEventListener("change", e => setSlot(cap.corsia, +e.target.value));
