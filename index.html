@@ -433,7 +433,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 23;
+const APP_VERSION = 24;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1227,67 +1227,100 @@ async function uploadPhoto(blob) {
 /* Room video for Claude: frames only, stored in config/sala so Claude can redraw the plan */
 // Every upload is also kept in its own invii/ doc, so a new video never replaces one Claude has not read yet
 const uploadId = f => (f.name + "-" + f.size + "-" + f.lastModified).replace(/[^A-Za-z0-9_-]/g, "_").slice(-120);
-async function sendRoomVideo(file) {
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const errMsg = e => (String(e && e.message || e || "errore sconosciuto").replace(/\.+$/, "") + (e && e.code && e.code !== "quota" ? ` [${e.code}]` : "")).slice(0, 300);
+const QUOTA_MSG = "l'archivio dell'app è pieno e non accetta altri file. Scrivi a Claude in chat \"archivio pieno\": deve liberare spazio prima di inviare altri video";
+const quotaErr = () => Object.assign(new Error(QUOTA_MSG), { code: "quota" });
+// Asset upload with only the retries the platform allows: store_unavailable once, rate_limited after a back-off (twice at most)
+async function upAsset(blob, type) {
+  for (let a = 0; ; a++) {
+    try { return await state.assets.upload(blob, { type }); }
+    catch (e) {
+      const c = e && e.code;
+      if (c === "quota_or_state") throw quotaErr();
+      if (c === "store_unavailable" && a < 1) { await sleep(1500 + Math.random() * 1500); continue; }
+      if (c === "rate_limited" && a < 2) { await sleep(10000 * (a + 1)); continue; }
+      throw e;
+    }
+  }
+}
+// db write: quota_exceeded becomes the Italian message, unavailable is retried once
+async function dbSet(path, rec) {
+  try { await state.db.doc(path).set(rec); }
+  catch (e) {
+    if (e && e.code === "quota_exceeded") throw quotaErr();
+    if (e && e.code === "unavailable") { await sleep(1000 + Math.random() * 1000); return state.db.doc(path).set(rec); }
+    throw e;
+  }
+}
+async function sendRoomVideo(file, step = () => {}) {
   const st = $("#sala-status");
   if (!file) return { ok: false, msg: "nessun file scelto" };
   if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
+  let frames = null;
   try {
-    st.textContent = "Leggo il video per le immagini dei cartellini…";
-    const frames = await videoFrames(file, 40, st, 2), out = [];
+    st.textContent = "Leggo il video per le immagini dei cartellini…"; step("fotogrammi");
+    frames = await videoFrames(file, 40, st, 2, false);
+    const out = []; step(`invio ${frames.length} immagini`);
     for (let i = 0; i < frames.length; i++) {
       st.textContent = `Invio le immagini dei cartellini: ${i + 1} di ${frames.length}.`;
-      const r = await state.assets.upload(frames[i].blob, { type: "image/jpeg" });
+      const r = await upAsset(frames[i].blob, "image/jpeg");
+      frames[i] = null;
       out.push({ asset: r.id, url: r.url, ordine: i + 1 });
-      URL.revokeObjectURL(frames[i].url);
     }
     const rec = { frames: out, file: file.name, creato: new Date().toISOString() };
-    await state.db.doc("config/sala").set(rec);
-    await state.db.doc("invii/" + uploadId(file) + "-img").set(rec);
+    // invii/ first: it is the proof of receipt the skip check reads
+    await dbSet("invii/" + uploadId(file) + "-img", rec);
+    await dbSet("config/sala", rec);
     const msg = `${out.length} immagini dei cartellini inviate.`;
-    st.textContent = msg; return { ok: true, msg };
+    st.textContent = msg; return { ok: true, msg, n: out.length };
   } catch (e) {
-    const msg = String(e && e.message || e || "errore sconosciuto").replace(/\.+$/, "");
+    const msg = errMsg(e);
     st.textContent = "Immagini dei cartellini non inviate: " + msg + ".";
-    return { ok: false, msg };
-  }
+    return { ok: false, msg, quota: !!(e && e.code === "quota") };
+  } finally { frames = null; }
 }
 
 // Audio track as 16 kHz mono WAV, base64 in text/plain assets (the asset store takes no audio types), listed in config/sala-audio
-async function sendRoomAudio(file) {
+// Decoded in a 16 kHz OfflineAudioContext: it resamples while decoding (a third of the memory) and opens no realtime audio device
+async function sendRoomAudio(file, step = () => {}) {
   const st = $("#sala-status");
   if (!file) return { ok: false, msg: "nessun file scelto" };
   if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
   try {
-    st.textContent = "Leggo l'audio del video…";
-    const ac = new (window.AudioContext || window.webkitAudioContext)(); let buf;
-    try { buf = await withTimeout(ac.decodeAudioData(await file.arrayBuffer()), 120000, "l'audio del video non si legge (tempo scaduto)"); }
-    catch (e) { throw new Error(/tempo scaduto/.test(e && e.message) ? e.message : "il telefono non riesce a leggere l'audio di questo video"); }
-    finally { try { ac.close(); } catch {} }
-    const rate = 16000, len = Math.ceil(buf.duration * rate);
-    const off = new OfflineAudioContext(1, len, rate), src = off.createBufferSource();
-    src.buffer = buf; src.connect(off.destination); src.start();
-    const pcm = (await off.startRendering()).getChannelData(0);
+    st.textContent = "Leggo l'audio del video…"; step("lettura audio");
+    const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext; let buf;
+    try {
+      let data = await file.arrayBuffer();
+      const p = new Off(1, 1, 16000).decodeAudioData(data); data = null;
+      buf = await withTimeout(p, 180000, "l'audio del video non si legge (tempo scaduto)");
+    } catch (e) { throw new Error(/tempo scaduto/.test(e && e.message) ? e.message : "il telefono non riesce a leggere l'audio di questo video"); }
+    const rate = buf.sampleRate, len = buf.length, nch = buf.numberOfChannels, sec = Math.round(buf.duration), ch = [];
+    for (let c = 0; c < nch; c++) ch.push(buf.getChannelData(c));
+    buf = null;
     const wav = new DataView(new ArrayBuffer(44 + len * 2));
     const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
     str(0, "RIFF"); wav.setUint32(4, 36 + len * 2, true); str(8, "WAVEfmt "); wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
     wav.setUint32(24, rate, true); wav.setUint32(28, rate * 2, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true); str(36, "data"); wav.setUint32(40, len * 2, true);
-    for (let i = 0; i < len; i++) wav.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
-    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(new Blob([wav.buffer])); });
+    for (let i = 0; i < len; i++) { let s = 0; for (let c = 0; c < nch; c++) s += ch[c][i]; wav.setInt16(44 + i * 2, Math.max(-1, Math.min(1, s / nch)) * 0x7fff, true); }
+    ch.length = 0;
+    let b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(new Blob([wav.buffer])); });
     const PART = 12 * 1024 * 1024, n = Math.ceil(b64.length / PART), parts = [];
+    step("invio voce");
     for (let i = 0; i < n; i++) {
       st.textContent = `Invio la voce: parte ${i + 1} di ${n}.`;
-      parts.push((await state.assets.upload(new Blob([b64.slice(i * PART, (i + 1) * PART)], { type: "text/plain" }), { type: "text/plain" })).id);
+      parts.push((await upAsset(new Blob([b64.slice(i * PART, (i + 1) * PART)], { type: "text/plain" }), "text/plain")).id);
     }
-    const sec = Math.round(buf.duration);
-    const rec = { parti: parts, formato: "wav 16 kHz mono, base64", secondi: sec, file: file.name, creato: new Date().toISOString() };
-    await state.db.doc("config/sala-audio").set(rec);
-    await state.db.doc("invii/" + uploadId(file) + "-audio").set(rec);
+    b64 = null;
+    const rec = { parti: parts, formato: `wav ${rate === 16000 ? "16 kHz" : rate + " Hz"} mono, base64`, secondi: sec, file: file.name, creato: new Date().toISOString() };
+    await dbSet("invii/" + uploadId(file) + "-audio", rec);
+    await dbSet("config/sala-audio", rec);
     const msg = `Voce di ${sec} secondi inviata.`;
-    st.textContent = msg; return { ok: true, msg };
+    st.textContent = msg; return { ok: true, msg, sec };
   } catch (e) {
-    const msg = String(e && e.message || e || "errore sconosciuto").replace(/\.+$/, "");
+    const msg = errMsg(e);
     st.textContent = "Voce non inviata: " + msg + ".";
-    return { ok: false, msg };
+    return { ok: false, msg, quota: !!(e && e.code === "quota") };
   }
 }
 
@@ -1460,8 +1493,8 @@ async function imageMax() { try { return Math.max(1, Math.min(20, (await state.s
 function withTimeout(p, ms, msg) {
   let t; return Promise.race([p, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(msg)), ms); })]).finally(() => clearTimeout(t));
 }
-async function videoFrames(file, max, status = $("#run-status"), every = 3) {
-  const url = URL.createObjectURL(file);
+async function videoFrames(file, max, status = $("#run-status"), every = 3, urls = true) {
+  const url = URL.createObjectURL(file); let cv = null;
   const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto";
   const seekTo = t => withTimeout(new Promise(res => { v.onseeked = () => res(); v.currentTime = t; }), 10000, "seek");
   try {
@@ -1478,20 +1511,21 @@ async function videoFrames(file, max, status = $("#run-status"), every = 3) {
     if (!isFinite(d) || d <= 0) throw new Error("durata del video non leggibile");
     const n = Math.max(4, Math.min(max, Math.round(d / every)));
     const out = []; let miss = 0;
+    const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+    cv = document.createElement("canvas"); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
+    const g = cv.getContext("2d");
     for (let i = 0; i < n; i++) {
       status.textContent = `Estraggo i fotogrammi: ${i + 1} di ${n}`;
       try { await seekTo(Math.min(d - 0.05, d * (i + 0.5) / n)); }
       catch { if (++miss >= 3) throw new Error(`il video si blocca mentre estraggo i fotogrammi (al ${i + 1} di ${n})`); continue; }
       miss = 0;
-      const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
-      const cv = document.createElement("canvas"); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
-      cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+      g.drawImage(v, 0, 0, cv.width, cv.height);
       const blob = await withTimeout(new Promise(r => cv.toBlob(r, "image/jpeg", 0.8)), 10000, "toBlob").catch(() => null);
-      if (blob) out.push({ blob, url: URL.createObjectURL(blob) });
+      if (blob) out.push({ blob, url: urls ? URL.createObjectURL(blob) : null });
     }
     if (!out.length) throw new Error("nessun fotogramma estratto dal video");
     return out;
-  } finally { v.onerror = null; try { v.removeAttribute("src"); v.load(); } catch {} URL.revokeObjectURL(url); }
+  } finally { v.onerror = v.onseeked = v.onloadeddata = null; try { v.removeAttribute("src"); v.load(); } catch {} URL.revokeObjectURL(url); if (cv) cv.width = cv.height = 0; }
 }
 function clearRun() { run.frames.forEach(f => URL.revokeObjectURL(f.url)); run.frames = []; run.rows = []; run.kind = null; $("#run-video").value = ""; $("#run-photos").value = ""; }
 async function onRunFiles(files, kind) {
@@ -2040,41 +2074,128 @@ document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("cl
 $("#m-spot").addEventListener("click", () => setCapMode("spot"));
 $("#m-run").addEventListener("click", () => setCapMode("run"));
 $("#run-video").addEventListener("change", e => onRunFiles(e.target.files, "video"));
-// One pick can hold many videos, sent one at a time in name order (phone names are timestamps, so filming order)
-// Each is checked against invii/ first, so picking the same videos again only sends what Claude has not received
-// Per video: the card frames first (so the big audio decode cannot block them), then the voice (dictation)
+// One pick can hold many videos, sent strictly one at a time in name order (phone names are timestamps, so filming order)
+// Skip check per part: this phone's own record, the invii/ listing, then doc get() (exists is a boolean property; absence is not an error).
+// A part is sent only when it is surely missing; if it cannot be checked it is NOT re-sent (retry later instead of uploading twice)
+// Trail for crashes: config/upload-corrente at every step, invii-log/<uploadId> as soon as each file ends
+const LS_SENT = "funghi-invii-ok";
+let salaBusy = false;
+async function partState(path) {
+  let soft = false;
+  for (let a = 0; a < 3; a++) {
+    try {
+      const d = await withTimeout(state.db.doc(path).get(), 20000, "tempo scaduto");
+      const ex = d && (typeof d.exists === "function" ? d.exists() : d.exists);
+      if (ex === true) return { st: "si", data: (d.data && d.data()) || {} };
+      if (ex === false) { if (!(d.metadata && d.metadata.fromCache)) return { st: "no" }; soft = true; }
+    } catch (e) { if (e && ["invalid_argument", "revoked", "not_granted", "capability_disabled", "capability_removed", "transform_error"].includes(e.code)) break; }
+    if (a < 2) await sleep(700 + Math.random() * 1300);
+  }
+  return { st: soft ? "no?" : "?" };
+}
+// Whole collection once per batch: Map id -> body, or null when it cannot be read completely
+async function listDocs(coll) {
+  try {
+    const c = state.db.collection(coll), s = await withTimeout((typeof c.limit === "function" ? c.limit(1000) : c).get(), 30000, "tempo scaduto");
+    if (!s || !Array.isArray(s.docs) || s.docs.length >= 1000) return null;
+    const m = new Map(); s.docs.forEach(d => { if (d.exists !== false) m.set(d.id, (d.data && d.data()) || {}); }); return m;
+  } catch { return null; }
+}
 $("#sala-video").addEventListener("change", async e => {
-  const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })), st = $("#sala-status");
+  const inp = e.target, files = [...inp.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })), st = $("#sala-status");
   if (!files.length) return;
-  const keep = " Tieni aperta questa pagina finché non leggi \"Fatto\".";
+  if (salaBusy) { toast("Sto ancora inviando i video scelti prima: aspetta \"Fatto\"."); return; }
+  if (!state.assets || !state.db) { inp.value = ""; st.textContent = "Archivio non ancora collegato: aspetta qualche secondo o ricarica la pagina, poi scegli di nuovo i video."; return; }
+  salaBusy = true; inp.disabled = true;
+  const lab = $('label[for="sala-video"]'); lab.style.opacity = ".5"; lab.style.pointerEvents = "none";
+  const keep = " Tieni aperta questa pagina finché non leggi \"Fatto\".", batch = new Date().toISOString();
   let pre = "";
   // sendRoomVideo/sendRoomAudio write their own steps: prefix each with the position in the batch and keep the warning on
   const mo = new MutationObserver(() => {
     const s = st.textContent; if (s.startsWith(pre) && s.endsWith(keep)) return;
     const core = s.replace(keep, ""); st.textContent = (core.startsWith(pre) ? core : pre + core) + keep;
   });
-  const has = async (f, part) => { try { return !!(state.db && (await state.db.doc("invii/" + uploadId(f) + part).get()).exists); } catch { return false; } };
-  const guard = async (fn, f) => { try { return await fn(f); } catch (err) { return { ok: false, msg: String(err && err.message || err) }; } };
-  const out = [];
+  // Running status doc, one write at a time; it never blocks or breaks the batch
+  const cur = { totale: files.length, fatto: 0, file: "", fase: "inizio", quando: batch, inizio: batch, versione: APP_VERSION };
+  let chain = Promise.resolve();
+  const progress = f => { Object.assign(cur, f, { quando: new Date().toISOString() }); const rec = { ...cur }; chain = chain.then(() => withTimeout(state.db.doc("config/upload-corrente").set(rec), 20000, "tempo scaduto")).catch(() => {}); return chain; };
+  const onErr = ev => { progress({ ultimoErrore: errMsg(ev && (ev.reason || ev.error || ev.message)) }); };
+  window.addEventListener("error", onErr); window.addEventListener("unhandledrejection", onErr);
+  let wl = null; try { navigator.wakeLock.request("screen").then(w => { wl = w; }, () => {}); } catch {}
+  const sent = lsGet(LS_SENT) || {}, mark = k => { sent[k] = batch; lsSet(LS_SENT, sent); };
+  const out = []; let stop = "";
   mo.observe(st, { childList: true, characterData: true, subtree: true });
   try {
+    st.textContent = "Controllo cosa è già arrivato…";
+    await progress({ fase: "controllo iniziale" });
+    const inv = await listDocs("invii"), logs = await listDocs("invii-log");
+    try {
+      const u = (await withTimeout(state.assets.list(), 20000, "tempo scaduto")).usage;
+      const spazio = { usatiMB: Math.round(u.bytes / 1048576), maxMB: Math.round(u.maxBytes / 1048576), file: u.files, maxFile: u.maxFiles };
+      progress({ spazio });
+      if (spazio.maxMB - spazio.usatiMB < 15 || spazio.maxFile - spazio.file < 60) toast(`Archivio quasi pieno (${spazio.usatiMB} di ${spazio.maxMB} MB, ${spazio.file} di ${spazio.maxFile} file): alcuni video potrebbero non entrare.`);
+    } catch {}
+    const look = async k => {
+      if (sent[k]) return { st: "si", data: {} };
+      if (inv && inv.has(k)) return { st: "si", data: inv.get(k) };
+      const r = await partState("invii/" + k);
+      return r.st === "si" || r.st === "no" ? r : { st: inv ? "no" : "?" };
+    };
     for (let i = 0; i < files.length; i++) {
-      const f = files[i], isVid = !/^audio\//.test(f.type);
+      const f = files[i], id = uploadId(f), isVid = !/^audio\//.test(f.type);
+      const log = { file: f.name, size: f.size, stato: "incompleto", motivo: "", immagini: null, voce: null, quando: "", batch };
       pre = `Video ${i + 1} di ${files.length} (${f.name}): `;
-      st.textContent = "controllo se è già arrivato…";
-      const [hasImg, hasAud] = await Promise.all([isVid ? has(f, "-img") : true, has(f, "-audio")]);
-      if (hasImg && hasAud) { out.push({ name: f.name, esito: "già ricevuto, saltato" }); continue; }
-      const bad = [];
-      if (!hasImg) { const r = await guard(sendRoomVideo, f); if (!r.ok) bad.push(`immagini non inviate (${r.msg})`); }
-      if (!hasAud) { const r = await guard(sendRoomAudio, f); if (!r.ok) bad.push(`voce non inviata (${r.msg})`); }
-      out.push({ name: f.name, ko: bad.length > 0, esito: bad.length ? "incompleto: " + bad.join(", ") : "inviato" });
+      let worked = false;
+      try {
+        if (stop) throw new Error("non provato: " + stop);
+        st.textContent = "controllo se è già arrivato…";
+        await progress({ indice: i + 1, file: f.name, fase: "controllo" });
+        const prev = logs && logs.get(id), done = prev && prev.stato === "inviato" ? { st: "si", data: {} } : null;
+        const img = isVid ? done || await look(id + "-img") : { st: "si", data: {} };
+        const aud = done || await look(id + "-audio");
+        if (isVid && img.st === "si") log.immagini = Array.isArray(img.data.frames) ? img.data.frames.length : prev ? prev.immagini ?? null : null;
+        if (aud.st === "si") log.voce = aud.data.secondi ?? (prev ? prev.voce ?? null : null);
+        if (img.st === "si" && aud.st === "si") { log.stato = "saltato"; log.motivo = "già ricevuto"; }
+        else {
+          const bad = [], ok = [];
+          if (img.st === "?") bad.push("immagini: non riesco a controllare se sono già arrivate, quindi non le reinvio");
+          else if (img.st === "no") {
+            worked = true;
+            const r = await sendRoomVideo(f, fase => progress({ fase: "immagini: " + fase }));
+            if (r.ok) { mark(id + "-img"); log.immagini = r.n; ok.push(`${r.n} immagini inviate`); } else { bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+          } else if (isVid) ok.push("immagini già ricevute");
+          if (stop) bad.push("voce non provata");
+          else if (aud.st === "?") bad.push("voce: non riesco a controllare se è già arrivata, quindi non la reinvio");
+          else if (aud.st === "no") {
+            worked = true;
+            const r = await sendRoomAudio(f, fase => progress({ fase: "voce: " + fase }));
+            if (r.ok) { mark(id + "-audio"); log.voce = r.sec; ok.push(`voce di ${r.sec} s inviata`); } else { bad.push(`voce non inviata (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+          } else ok.push("voce già ricevuta");
+          log.stato = bad.length ? "incompleto" : "inviato"; log.motivo = [...bad, ...ok].join("; ");
+        }
+      } catch (err) { log.stato = "incompleto"; log.motivo = errMsg(err); if (err && err.code === "quota") stop = QUOTA_MSG; }
+      log.quando = new Date().toISOString();
+      out.push(log);
+      try { await withTimeout(state.db.doc("invii-log/" + id).set(log), 20000, "tempo scaduto"); } catch (err) { if (err && err.code === "quota_exceeded") stop = QUOTA_MSG; }
+      await progress({ fatto: i + 1, fase: "finito: " + log.stato });
+      // Let the phone free the previous video (decoders, buffers, canvases) before opening the next one
+      if (worked && i < files.length - 1) { st.textContent = "libero la memoria prima del prossimo video…"; await sleep(1500); }
     }
-  } finally { mo.disconnect(); $("#sala-video").value = ""; }
-  const ko = out.filter(r => r.ko).length;
-  st.textContent = ["Risultato:", ...out.map(r => `- ${r.name}: ${r.esito}`),
-    ko ? "Riprova scegliendo di nuovo gli stessi video: quelli già ricevuti vengono saltati." : "",
+    await progress({ fase: "fatto" });
+  } catch (err) { progress({ fase: "interrotto", ultimoErrore: errMsg(err) }); }
+  finally {
+    mo.disconnect(); inp.value = ""; inp.disabled = false; lab.style.opacity = ""; lab.style.pointerEvents = "";
+    window.removeEventListener("error", onErr); window.removeEventListener("unhandledrejection", onErr);
+    try { wl && wl.release(); } catch {}
+    salaBusy = false;
+  }
+  const ko = out.filter(r => r.stato === "incompleto").length;
+  const esito = r => r.stato === "saltato" ? "già ricevuto, saltato" : r.stato === "inviato" ? "inviato" + (/già ricevut/.test(r.motivo) ? ` (${r.motivo})` : "") : "incompleto: " + r.motivo;
+  st.textContent = ["Risultato:", ...out.map(r => `- ${r.file}: ${esito(r)}`),
+    stop ? stop.charAt(0).toUpperCase() + stop.slice(1) + "." : "",
+    ko && !stop ? "Riprova scegliendo di nuovo gli stessi video: quelli già ricevuti vengono saltati." : "",
     "Fatto. Scrivi a Claude in chat \"video inviati\"."].filter(Boolean).join("\n");
-  if (ko) toast(`Invio incompleto per ${ko} video: leggi l'elenco sotto "Scegli video".`, null, 10000);
+  if (ko) toast(`Invio incompleto per ${ko} video: leggi l'elenco sotto "Scegli video".`);
 });
 $("#run-photos").addEventListener("change", e => onRunFiles(e.target.files, "foto"));
 $("#run-start").addEventListener("input", () => { run.startTouched = true; });
