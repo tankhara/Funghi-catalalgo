@@ -1221,6 +1221,17 @@ async function sendRoomAudio(file) {
   finally { $("#sala-audio").value = ""; }
 }
 
+// One-off check of what the viewer frame allows, so in-page speech recognition can be chosen correctly (config/diag).
+async function probeSpeechEnv(db) {
+  const r = { quando: new Date().toISOString(), ua: navigator.userAgent, microfono: (() => { try { return document.featurePolicy ? document.featurePolicy.allowsFeature("microphone") : null; } catch { return null; } })() };
+  try { await WebAssembly.instantiate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])); r.wasm = true; } catch (e) { r.wasm = String(e && e.message || e).slice(0, 200); }
+  r.worker = (() => { try { const w = new Worker(URL.createObjectURL(new Blob(["1"], { type: "text/javascript" }))); w.terminate(); return true; } catch (e) { return String(e && e.message || e).slice(0, 200); } })();
+  for (const [k, u] of [["jsdelivr", "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.5/package.json"], ["huggingface", "https://huggingface.co/onnx-community/whisper-base/resolve/main/config.json"]]) {
+    try { const res = await fetch(u); r[k] = res.status; } catch (e) { r[k] = String(e && e.message || e).slice(0, 200); }
+  }
+  try { await db.doc("config/diag").set(r); } catch {}
+}
+
 /* ---------- UI helpers ---------- */
 const $ = s => document.querySelector(s);
 function el(tag, attrs = {}, ...kids) {
@@ -1945,6 +1956,7 @@ loadLocal(); renderAll(); openFromHash();
   let db = null; try { db = await c.use("db"); } catch {}
   if (!db) { state.mode = "locale"; renderHeader(); return; }
   state.db = db; state.mode = "cloud"; state.items = new Map(); renderAll();
+  probeSpeechEnv(db);
   db.collection("specie").onSnapshot(snap => {
     const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.scientifico) m.set(d.id, { ...v, id: d.id }); });
     state.items = m; renderAll();
