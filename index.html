@@ -63,6 +63,10 @@ header.top h1 { font-family: var(--serif); font-weight: 700; font-size: 1.35rem;
 header.top .count { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
 header.top .mode { margin-left: auto; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 header.top .mode.local { color: var(--warn); }
+header.top .status { margin-left: auto; display: grid; justify-items: end; line-height: 1.2; }
+header.top .ver { font-size: .7rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.banner.upd { background: var(--accent-soft); border: 1px solid var(--accent); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.banner.upd span { flex: 1 1 200px; }
 /* Voce di Claude: one slim row under the title, spoken replies for hands-busy work */
 .voce { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: -2px; font-size: .85rem; }
 .voce .v-main { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; background: none; border: 0; padding: 4px 0; text-align: left; color: var(--muted); }
@@ -145,6 +149,13 @@ textarea { min-height: 96px; resize: vertical; }
 .card.move { border-color: var(--warn); background: var(--warn-soft); }
 .card.tap { cursor: pointer; text-align: left; width: 100%; font: inherit; }
 .card.withimg { grid-template-columns: auto 1fr auto; }
+/* Catalogue card: text and zone on the left, photo thumbnail on the right */
+.card.cat { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 10px 10px 14px; align-items: stretch; }
+.card .cmain { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; display: grid; gap: 6px; justify-items: start; align-content: center; min-width: 0; }
+.card .cmain .pos { grid-column: auto; }
+.cthumb { width: 60px; height: 60px; flex: none; align-self: center; border: 0; padding: 0; border-radius: 8px; overflow: hidden; background: var(--line); display: block; cursor: pointer; }
+.cthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cthumb.none { cursor: default; background: none; border: 1.5px dashed var(--muted); color: var(--muted); font-size: .68rem; line-height: 1.15; display: grid; place-items: center; text-align: center; padding: 4px; }
 .pill { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
 .pill.ok { background: var(--ok); color: var(--surface); }
 .pill.warn { background: var(--warn); color: var(--surface); }
@@ -242,6 +253,19 @@ textarea { min-height: 96px; resize: vertical; }
   display: grid; gap: 14px; max-width: 760px; width: 100%; margin: 0 auto;
 }
 .sheet img.full { width: 100%; border-radius: var(--r); }
+/* Sheet top bar: always visible way back (the app runs without browser buttons) */
+.sheet-bar {
+  position: sticky; top: -18px; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line);
+  margin-top: -18px; margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding-block: 10px 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 10px; border-radius: 16px 16px 0 0;
+}
+.btn.back { padding: 8px 14px 8px 10px; gap: 4px; }
+.btn.back svg { width: 20px; height: 20px; }
+.lanehead { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.lanehead h2 { flex: 1 1 auto; min-width: 0; }
+.btn.small { padding: 7px 12px; font-size: .88rem; flex: none; }
+#lane-view { scroll-margin-top: 64px; }
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 30;
   background: var(--fg); color: var(--bg); padding: 12px 14px; border-radius: var(--r); width: min(92vw, 520px); font-size: .95rem;
@@ -257,7 +281,7 @@ textarea { min-height: 96px; resize: vertical; }
 <header class="top">
   <h1>Funghi in mostra</h1>
   <span class="count" id="count">0 specie</span>
-  <span class="mode" id="mode">Connessione…</span>
+  <span class="status"><span class="mode" id="mode">Connessione…</span><span class="ver" id="ver">v23</span></span>
   <div class="voce wait" id="voce" hidden>
     <button class="v-main" id="voce-main" aria-expanded="false"><b id="voce-stato">Voce di Claude: tocca per attivare</b><span class="v-txt" id="voce-txt"></span></button>
     <button class="v-mute" id="voce-mute" hidden aria-pressed="false">Silenzia</button>
@@ -265,6 +289,7 @@ textarea { min-height: 96px; resize: vertical; }
 </header>
 
 <main>
+  <div class="banner upd" id="upd" role="status" hidden><span id="upd-txt"></span><button class="btn primary" id="upd-reload">Ricarica</button></div>
   <!-- REGISTRA: posto per posto -->
   <section class="view" id="v-cap">
     <div class="seg" role="group" aria-label="Modo di registrazione">
@@ -408,6 +433,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
+const APP_VERSION = 23;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1701,10 +1727,10 @@ function renderResults() {
   box.replaceChildren(...hits.map(h => h.item ? presentCard(h.item) : refCard(h.ref)));
 }
 function presentCard(it) {
-  const ph = it.posto ? slotPhotos(it.corsia, it.posto)[0] : null;
-  return el("button", { class: "card present tap" + (ph ? " withimg" : ""), onclick: () => openEdit(it) },
-    ph ? photoThumb(ph) : null, names(it), el("span", { class: "pill ok" }, "In mostra"),
-    el("span", { class: "pos" }, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))));
+  return el("div", { class: "card present cat" },
+    el("button", { class: "cmain", type: "button", onclick: () => openEdit(it) }, names(it), el("span", { class: "pill ok" }, "In mostra"),
+      el("span", { class: "pos" }, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it)))),
+    cardThumb(it, photoFor(it)));
 }
 function refCard(r) {
   const probe = { ...r, settore: sectorOf(r.famiglia, r.scientifico) };
@@ -1747,9 +1773,38 @@ async function onAskAI() {
 /* ---------- Schede ---------- */
 function sheet(...kids) {
   const root = $("#sheet-root");
-  const close = () => root.replaceChildren();
-  root.replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) close(); } }, el("div", { class: "sheet", role: "dialog" }, ...kids)));
+  // One sheet at a time: a new sheet replaces the open one and reuses its history entry.
+  if (!nav.sheet) { nav.sheet = true; nav.sheetEntry = histPush({ sheet: 1, v: curTab }); }
+  const close = () => { if (!root.contains(bg)) return; closeSheetDom(); if (nav.sheetEntry) { nav.sheetEntry = false; histBack(); } };
+  const back = el("button", { class: "btn ghost back", type: "button", onclick: () => close() });
+  back.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Indietro';
+  const bg = el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) close(); } },
+    el("div", { class: "sheet", role: "dialog", "aria-modal": "true" }, el("div", { class: "sheet-bar" }, back), ...kids));
+  root.replaceChildren(bg); nav.close = close;
   return close;
+}
+function closeSheetDom() { $("#sheet-root").replaceChildren(); nav.sheet = false; nav.close = null; }
+/* Foto della specie: prima quelle che la nominano, poi quelle del suo posto; vince la più recente */
+function photoIndex() {
+  const m = new Map();
+  for (const f of state.photos.values()) for (const id of Array.isArray(f.specie) ? f.specie : []) {
+    const o = m.get(id); if (!o || (f.creato || "") > (o.creato || "")) m.set(id, f);
+  }
+  return m;
+}
+function photoFor(it, idx = photoIndex()) { return idx.get(it.id) || (it.posto ? slotPhotos(it.corsia, it.posto)[0] : null) || null; }
+function cardThumb(it, ph) {
+  if (!ph) return el("span", { class: "cthumb none" }, "senza foto");
+  return el("button", { class: "cthumb", type: "button", "aria-label": "Foto di " + it.scientifico, onclick: () => openPhoto(ph, it) },
+    el("img", { src: imgUrl(ph), alt: "", loading: "lazy", decoding: "async" }));
+}
+function openPhoto(f, it) {
+  const sp = photoSpots(f);
+  const close = sheet(el("h2", { class: it ? "sci" : "" }, it ? it.scientifico : "Foto"),
+    pinned(f),
+    el("p", { class: "hint" }, [laneName(f.corsia), sp.length ? (sp.length > 1 ? "posti " : "posto ") + sp.join(", ") : null, (f.creato || "").slice(0, 16).replace("T", " ")].filter(Boolean).join(" · ")),
+    el("div", { class: "row" }, sp.length ? el("button", { class: "btn", onclick: () => openSlot(f.corsia, sp[0]) }, "Apri il posto") : null,
+      el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi")));
 }
 function laneSelect(id, value, auto) {
   return el("select", { id }, auto ? el("option", { value: "" }, "Automatica, secondo lo schema") : null,
@@ -1783,7 +1838,7 @@ function openEdit(it) {
   const sci = el("input", { type: "text", id: "e-sci", value: cur.scientifico, autocapitalize: "off", spellcheck: "false" });
   const ita = el("input", { type: "text", id: "e-ita", value: cur.italiano });
   const note = el("textarea", { id: "e-note", style: "min-height:70px" }, cur.note || "");
-  const ph = it?.posto ? slotPhotos(it.corsia, it.posto)[0] : null;
+  const ph = it ? photoFor(it) : null;
   const delBtn = isNew ? null : el("button", { class: "btn danger", onclick: async () => {
     if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare"; return; }
     await removeItem(it.id); close(); toast(`Eliminata ${it.scientifico}`);
@@ -1799,7 +1854,7 @@ function openEdit(it) {
   const close = sheet(
     el("h2", { class: isNew ? "" : "sci" }, isNew ? "Nuova specie" : it.scientifico),
     isNew ? null : el("p", {}, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))),
-    ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0;justify-self:start", onclick: () => openSlot(it.corsia, it.posto) }, photoThumb(ph, "thumb lg")) : null,
+    ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0;justify-self:start", onclick: () => openPhoto(ph, it) }, photoThumb(ph, "thumb lg")) : null,
     el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
     el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
     el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
@@ -1842,10 +1897,10 @@ function planEls(sel, pick) {
 let selLane = "c1", hlSlot = null;
 function renderMap() {
   if (!laneById(selLane)) selLane = lanes()[0].id;
-  $("#map-plan").replaceChildren(...planEls(selLane, id => { selLane = id; hlSlot = null; renderMap(); }));
+  $("#map-plan").replaceChildren(...planEls(selLane, id => { selLane = id; hlSlot = null; mapLaneStep(id); renderMap(); showLane(); }));
   $("#walk").textContent = "Percorso: " + lanes().map(c => c.nome).join(" → ") + " → uscita";
   const c = laneById(selLane), items = laneItems(selLane), max = maxPosto(selLane);
-  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = inizio della zona nel senso di visita. Tocca una foto per ingrandirla.")];
+  const kids = [el("div", { class: "lanehead" }, el("h2", {}, `${c.nome} · ${c.dove}`), el("button", { class: "btn ghost small", type: "button", onclick: backToPlan }, "↑ Pianta")), el("p", { class: "hint" }, "Posto 1 = inizio della zona nel senso di visita. Tocca una foto per ingrandirla.")];
   const runs = new Map();
   for (const f of state.photos.values()) if (f.corsia === selLane && f.tratto) { if (!runs.has(f.tratto)) runs.set(f.tratto, []); runs.get(f.tratto).push(f); }
   for (const frames of [...runs.values()].sort((a, b) => Math.min(...a.flatMap(photoSpots)) - Math.min(...b.flatMap(photoSpots)))) {
@@ -1882,13 +1937,15 @@ function renderCatalog() {
   if (f) list = list.filter(i => [i.scientifico, i.italiano, i.famiglia, i.genere].some(x => norm(x).includes(f)));
   if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Inizia da Registra: una zona alla volta, posto per posto.")); return; }
   if (!list.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna specie corrisponde al filtro.")); return; }
-  const groups = [];
+  const groups = [], idx = photoIndex();
   for (const s of SECTORS) {
     const items = list.filter(i => i.settore === s.id); if (!items.length) continue;
     const kids = []; let lastFam = null;
     for (const it of items) {
       if (it.famiglia !== lastFam) { kids.push(el("div", { class: "fam" }, it.famiglia || "Famiglia da verificare")); lastFam = it.famiglia; }
-      kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) }, names(it), el("span", { class: it.posto ? "pill" : "pill soft" }, it.posto ? `${laneName(it.corsia)} · ${it.posto}` : laneName(it.corsia))));
+      kids.push(el("div", { class: "card cat" },
+        el("button", { class: "cmain", type: "button", onclick: () => openEdit(it) }, names(it), el("span", { class: it.posto ? "pill" : "pill soft" }, it.posto ? `${laneName(it.corsia)} · ${it.posto}` : laneName(it.corsia))),
+        cardThumb(it, photoFor(it, idx))));
     }
     groups.push(el("div", { class: "group" }, el("header", {}, el("h2", {}, s.nome), el("span", { class: "num" }, items.length)), ...kids));
   }
@@ -1924,7 +1981,43 @@ function renderAll() {
   if (visible("v-map")) renderMap();
   if (visible("v-cat")) renderCatalog();
 }
-function goTab(v) {
+/* ---------- Navigazione: il gesto Indietro del telefono chiude la scheda aperta o torna alla schermata precedente ---------- */
+const LS_TAB = "funghi.tab.v1";
+const nav = { sheet: false, sheetEntry: false, close: null, backing: false, queued: [], timer: 0 };
+let curTab = "v-cap";
+function histPush(st) {
+  if (nav.backing) { nav.queued.push(st); return true; }
+  try { history.pushState({ funghi: 1, ...st }, ""); return true; } catch { return false; }
+}
+function histReplace(st) { try { history.replaceState({ funghi: 1, ...st }, ""); } catch {} }
+function histBack() {
+  try { history.back(); } catch { return; }
+  nav.backing = true; clearTimeout(nav.timer); nav.timer = setTimeout(flushBack, 700);
+}
+function flushBack() { clearTimeout(nav.timer); nav.backing = false; nav.queued.splice(0).forEach(histPush); }
+function mapLaneStep(id) {
+  let st = null; try { st = history.state; } catch {}
+  if (st && st.funghi && st.lane) histReplace({ v: "v-map", lane: id }); else histPush({ v: "v-map", lane: id });
+}
+function showLane() { try { $("#lane-view").scrollIntoView({ behavior: "smooth", block: "start" }); } catch {} }
+function backToPlan() {
+  let st = null; try { st = history.state; } catch {}
+  if (st && st.funghi && st.lane) histBack();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+window.addEventListener("popstate", e => {
+  if (nav.backing) { flushBack(); return; }
+  if (nav.sheet) { nav.sheetEntry = false; closeSheetDom(); return; }
+  const st = e.state; if (!st || !st.funghi) return;
+  if (st.v && st.v !== curTab) goTab(st.v, false);
+  if (st.v === "v-map" && st.lane && laneById(st.lane)) { selLane = st.lane; hlSlot = null; renderMap(); showLane(); }
+  else window.scrollTo(0, 0);
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && nav.close) nav.close(); });
+function goTab(v, hist = true) {
+  if (!document.getElementById(v) || !/^v-/.test(v)) v = "v-cap";
+  if (hist && v !== curTab) histPush({ v });
+  curTab = v; lsSet(LS_TAB, v);
   document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.v === v)));
   document.querySelectorAll("section.view[id^=v-]").forEach(s => s.hidden = s.id !== v);
   if (v === "v-schema") renderSchema();
@@ -2108,8 +2201,26 @@ function voceListen(db) {
 }
 voceInit();
 
+/* ---------- Versione: avvisa quando ne è uscita una nuova (config/versione {v, quando}) ---------- */
+function versionInit() {
+  $("#ver").textContent = "v" + APP_VERSION;
+  $("#upd-reload").addEventListener("click", () => { try { location.reload(); } catch { toast("Chiudi l'app e riaprila per aggiornarla."); } });
+}
+function versionListen(db) {
+  try {
+    db.doc("config/versione").onSnapshot(d => {
+      const v = d && d.exists ? d.data() : null, n = v ? Number(v.v) : NaN;
+      const box = $("#upd");
+      if (!(n > APP_VERSION)) { box.hidden = true; return; }
+      $("#upd-txt").textContent = `C'è una versione nuova dell'app (v${n}). Chiudi l'app e riaprila per aggiornarla.`;
+      box.hidden = false;
+    }, () => {});
+  } catch {}
+}
+versionInit();
+
 /* ---------- Avvio ---------- */
-loadLocal(); renderAll(); openFromHash();
+loadLocal(); goTab(lsGet(LS_TAB) || "v-cap", false); histReplace({ v: curTab }); openFromHash();
 (async function boot() {
   const c = window.claude;
   if (!c || typeof c.use !== "function") { state.mode = "locale"; renderHeader(); return; }
@@ -2120,6 +2231,7 @@ loadLocal(); renderAll(); openFromHash();
   if (!db) { state.mode = "locale"; renderHeader(); return; }
   state.db = db; state.mode = "cloud"; state.items = new Map(); renderAll();
   voceListen(db);
+  versionListen(db);
   probeSpeechEnv(db);
   db.collection("specie").onSnapshot(snap => {
     const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.scientifico) m.set(d.id, { ...v, id: d.id }); });
