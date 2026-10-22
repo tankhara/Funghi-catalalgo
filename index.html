@@ -23,6 +23,7 @@
   --warn: #9a5b00;
   --warn-soft: #f6e6c8;
   --danger: #a3302a;
+  --scrim: rgba(0,0,0,.45);
   --serif: "Alegreya", Georgia, "Times New Roman", serif;
   --sans: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r: 10px;
@@ -31,14 +32,14 @@
   :root:not([data-theme="light"]) {
     --bg: #151916; --surface: #1d221e; --sunk: #252b26; --fg: #e8ebe3; --muted: #a3ab9d; --line: #343c35;
     --accent: #5fb8b0; --accent-ink: #0c1a19; --accent-soft: #1d3a38; --soil: #c9b39a; --bed: #3d3026; --bed-fg: #f3ece3; --brick: #d98a62;
-    --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83;
+    --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83; --scrim: rgba(0,0,0,.6);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #151916; --surface: #1d221e; --sunk: #252b26; --fg: #e8ebe3; --muted: #a3ab9d; --line: #343c35;
   --accent: #5fb8b0; --accent-ink: #0c1a19; --accent-soft: #1d3a38; --soil: #c9b39a; --bed: #3d3026; --bed-fg: #f3ece3; --brick: #d98a62;
-  --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83;
+  --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83; --scrim: rgba(0,0,0,.6);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -46,7 +47,7 @@ html, body { background: var(--bg); color: var(--fg); }
 body { font-family: var(--sans); font-size: 16px; line-height: 1.45; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
 button, input, select, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; }
+button, label.btn { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .sci { font-family: var(--serif); font-style: italic; font-weight: 600; }
 
@@ -56,7 +57,7 @@ header.top {
   padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
 }
-header.top h1 { font-family: var(--serif); font-weight: 700; font-size: 1.35rem; margin: 0; text-wrap: balance; }
+header.top h1 { font-family: var(--serif); font-weight: 700; font-size: 1.35rem; margin: 0; }
 header.top .count { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
 header.top .mode { margin-left: auto; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 header.top .mode.local { color: var(--warn); }
@@ -66,7 +67,7 @@ main {
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   max-width: 760px; margin: 0 auto;
 }
-section.view { display: grid; gap: 16px; }
+section.view, .stack { display: grid; gap: 14px; }
 h2 { font-family: var(--serif); font-size: 1.25rem; margin: 0; text-wrap: balance; }
 h3 { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 700; }
 p { margin: 0; }
@@ -75,36 +76,48 @@ p { margin: 0; }
 nav.tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
   background: var(--surface); border-top: 1px solid var(--line);
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
 }
 nav.tabs button {
-  background: none; border: 0; padding: 12px 4px 10px; font-size: .85rem; color: var(--muted);
+  background: none; border: 0; padding: 10px 2px 8px; font-size: .78rem; color: var(--muted);
   display: grid; justify-items: center; gap: 2px; border-top: 3px solid transparent;
 }
 nav.tabs button[aria-selected="true"] { color: var(--accent); border-top-color: var(--accent); font-weight: 700; }
 nav.tabs svg { width: 22px; height: 22px; }
 
-.seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; }
-.seg button { border: 0; background: none; padding: 7px 14px; border-radius: 999px; font-size: .9rem; color: var(--muted); }
-.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
-
 .field { display: grid; gap: 6px; }
 .field label { font-size: .85rem; font-weight: 700; }
-input[type=text], input[type=search], textarea, select {
+input[type=text], input[type=search], input[type=number], textarea, select {
   width: 100%; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r);
   padding: 12px 14px; font-size: 1.05rem;
 }
-textarea { min-height: 120px; resize: vertical; }
-input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent); }
+textarea { min-height: 96px; resize: vertical; }
+.big { font-size: 1.2rem !important; border-color: var(--accent) !important; }
 
-.btn { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 16px; font-weight: 700; }
+.btn { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 11px 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn.ghost { background: none; }
 .btn.danger { color: var(--danger); border-color: var(--danger); background: none; }
+.btn.wide { flex: 1 1 160px; justify-content: center; }
 .btn:disabled { opacity: .5; cursor: default; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* Capture: lane chips + spot stepper */
+.chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.chips button { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 4px; font-weight: 700; font-size: .9rem; }
+.chips button[aria-pressed="true"] { background: var(--bed); color: var(--bed-fg); border-color: var(--brick); }
+.stepper { display: grid; grid-template-columns: 64px 1fr 64px; gap: 8px; align-items: stretch; }
+.stepper button { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); font-size: 1.8rem; font-weight: 700; }
+.stepper .val { background: var(--sunk); border-radius: var(--r); display: grid; justify-items: center; padding: 6px; }
+.stepper .val small { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stepper .val input { width: 5ch; text-align: center; font-family: var(--serif); font-size: 2rem; font-weight: 700; border: 0; background: none; padding: 0; font-variant-numeric: tabular-nums; }
+.slotnow { background: var(--sunk); border-radius: var(--r); padding: 10px 12px; display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; font-size: .92rem; }
+.slotnow.nophoto { grid-template-columns: 1fr; }
+.thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: var(--line); display: block; }
+.thumb.lg { width: 96px; height: 96px; }
+.preview { max-height: 180px; border-radius: var(--r); object-fit: cover; }
 
 .list { display: grid; gap: 8px; }
 .card {
@@ -112,44 +125,62 @@ input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent);
   padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
 }
 .card .names { min-width: 0; display: grid; gap: 1px; }
-.card .names .sci { font-size: 1.15rem; overflow-wrap: anywhere; }
-.card .names .ita { color: var(--fg); font-size: .95rem; }
+.card .names .sci { font-size: 1.12rem; overflow-wrap: anywhere; }
+.card .names .ita { font-size: .95rem; }
 .card .names .meta { color: var(--muted); font-size: .8rem; }
 .card.present { border-color: var(--ok); background: var(--ok-soft); }
+.card.move { border-color: var(--warn); background: var(--warn-soft); }
 .card.tap { cursor: pointer; text-align: left; width: 100%; font: inherit; }
+.card.withimg { grid-template-columns: auto 1fr auto; }
 .pill { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
 .pill.ok { background: var(--ok); color: var(--surface); }
-.pill.warn { background: var(--warn-soft); color: var(--warn); }
-.pos { font-size: .85rem; color: var(--fg); grid-column: 1 / -1; }
+.pill.warn { background: var(--warn); color: var(--surface); }
+.pill.soft { background: var(--sunk); color: var(--muted); }
+.pos { font-size: .88rem; grid-column: 1 / -1; }
+.src { font-size: .78rem; color: var(--muted); grid-column: 2 / -1; }
+.review { display: grid; gap: 8px; }
+.review label.card { grid-template-columns: auto 1fr auto; cursor: pointer; }
+.review input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--accent); }
 
 .banner { border-radius: var(--r); padding: 12px 14px; font-size: .92rem; }
-.banner.ok { background: var(--ok-soft); color: var(--fg); border: 1px solid var(--ok); }
-.banner.warn { background: var(--warn-soft); color: var(--fg); border: 1px solid var(--warn); }
+.banner.warn { background: var(--warn-soft); border: 1px solid var(--warn); }
 .empty { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px; color: var(--muted); text-align: center; }
 
 .group { display: grid; gap: 8px; }
 .group > header { display: flex; align-items: baseline; gap: 8px; justify-content: space-between; border-bottom: 2px solid var(--soil); padding-bottom: 4px; }
 .group > header h2 { font-size: 1.1rem; }
-.group .fam { font-size: .8rem; font-weight: 700; color: var(--soil); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
-.num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; min-width: 2.2em; display: inline-block; }
+.fam { font-size: .8rem; font-weight: 700; color: var(--soil); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
+.num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
 
 /* Room plan */
-.plan { background: var(--sunk); border-radius: var(--r); padding: 14px; display: grid; gap: 10px; }
-.plan .room { display: grid; grid-template-columns: 1fr 1.15fr .75fr; grid-template-rows: auto 1fr; gap: 10px; min-height: 300px; }
+.plan { background: var(--sunk); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
+.plan .room { display: grid; grid-template-columns: 1fr 1.15fr .75fr; grid-template-rows: auto 1fr; gap: 8px; min-height: 240px; }
 .plan .bed {
-  border-radius: 6px; padding: 10px 8px; color: var(--bed-fg); text-align: left;
-  background: var(--bed); border: 5px solid var(--brick);
-  display: grid; align-content: space-between; gap: 6px; min-width: 0;
+  border-radius: 6px; padding: 8px; color: var(--bed-fg); text-align: left;
+  background: var(--bed); border: 5px solid var(--brick); display: grid; align-content: space-between; gap: 4px; min-width: 0;
 }
 .plan .bed[aria-pressed="true"] { outline: 4px solid var(--accent); outline-offset: 2px; }
-.plan .bed b { font-size: .95rem; }
-.plan .bed small { font-size: .75rem; opacity: .85; overflow-wrap: anywhere; }
-.plan .bed .n { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.plan .c4 { grid-column: 1 / 3; grid-row: 1; min-height: 70px; }
-.plan .c1 { grid-column: 1; grid-row: 2; }
-.plan .c2 { grid-column: 2; grid-row: 2; }
-.plan .c3 { grid-column: 3; grid-row: 1 / 3; }
-.plan .door { font-size: .75rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
+.plan .bed b { font-size: .9rem; }
+.plan .bed small { font-size: .72rem; opacity: .85; overflow-wrap: anywhere; }
+.plan .bed .n { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.plan .p4 { grid-column: 1 / 3; grid-row: 1; min-height: 64px; }
+.plan .p1 { grid-column: 1; grid-row: 2; }
+.plan .p2 { grid-column: 2; grid-row: 2; }
+.plan .p3 { grid-column: 3; grid-row: 1 / 3; }
+.plan .door { font-size: .72rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
+
+/* Lane strip: one row per spot */
+.strip { display: grid; gap: 0; border-left: 6px solid var(--brick); background: var(--surface); border-radius: 0 var(--r) var(--r) 0; }
+.spot { display: grid; grid-template-columns: 3.2em auto 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.spot:last-child { border-bottom: 0; }
+.spot.hl { background: var(--accent-soft); }
+.spot .no { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--brick); font-variant-numeric: tabular-nums; }
+.spot .who { display: grid; gap: 4px; min-width: 0; }
+.spot .who button { background: none; border: 0; padding: 0; text-align: left; }
+.spot .who .ita { color: var(--muted); font-size: .85rem; }
+.spot .ph { background: none; border: 0; padding: 0; }
+.spot .ph .thumb { width: 72px; height: 72px; }
+.spot .noimg { width: 72px; height: 72px; border-radius: 8px; border: 1.5px dashed var(--line); display: grid; place-items: center; font-size: .7rem; color: var(--muted); text-align: center; }
 
 .sector { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; }
 .sector .head { display: flex; gap: 10px; align-items: baseline; }
@@ -159,23 +190,21 @@ input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent);
 .prose { display: grid; gap: 10px; font-size: .95rem; }
 .prose ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
 
-.review { display: grid; gap: 8px; }
-.review label.card { grid-template-columns: auto 1fr auto; cursor: pointer; }
-.review input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); }
-.src { font-size: .75rem; color: var(--muted); grid-column: 2 / -1; }
-
-.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 20; display: grid; align-items: end; }
+.sheet-bg { position: fixed; inset: 0; background: var(--scrim); z-index: 20; display: grid; align-items: end; }
 .sheet {
   background: var(--bg); border-radius: 16px 16px 0 0; max-height: 92vh; overflow: auto;
   padding-block: 18px calc(18px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: grid; gap: 14px; max-width: 760px; width: 100%; margin: 0 auto;
 }
+.sheet img.full { width: 100%; border-radius: var(--r); }
 .toast {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); z-index: 30;
-  background: var(--fg); color: var(--bg); padding: 12px 16px; border-radius: var(--r); max-width: min(92vw, 520px); font-size: .95rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--fg); color: var(--bg); padding: 12px 14px; border-radius: var(--r); width: min(92vw, 520px); font-size: .95rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25); display: flex; gap: 12px; align-items: center;
 }
+.toast span { flex: 1; }
+.toast button { background: none; border: 1.5px solid var(--bg); color: var(--bg); border-radius: 8px; padding: 6px 10px; font-weight: 700; }
 .spin { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: s 0.8s linear infinite; vertical-align: -2px; }
 @keyframes s { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
@@ -188,90 +217,91 @@ input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent);
 </header>
 
 <main>
-  <!-- AGGIUNGI -->
-  <section class="view" id="v-add">
-    <div class="row">
-      <div class="seg" role="group" aria-label="Modalità">
-        <button id="m-one" aria-pressed="true">Una specie</button>
-        <button id="m-many" aria-pressed="false">Elenco dettato</button>
-      </div>
+  <!-- REGISTRA: posto per posto -->
+  <section class="view" id="v-cap">
+    <div class="chips" id="cap-lanes" role="group" aria-label="Corsia"></div>
+    <div class="stepper">
+      <button id="p-minus" aria-label="Posto precedente">−</button>
+      <div class="val"><small>Posto</small><input id="p-num" type="number" inputmode="numeric" min="1" value="1" aria-label="Numero del posto"></div>
+      <button id="p-plus" aria-label="Posto successivo">+</button>
     </div>
-
-    <div id="one" class="view">
-      <div class="field">
-        <label for="q">Nome scientifico o italiano</label>
-        <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Boletus aereus, porcino nero">
-        <p class="hint">Per dettare, tocca il microfono della tastiera del telefono. Basta un nome approssimativo.</p>
-      </div>
-      <div id="results" class="list"></div>
-      <div id="ai-out" class="list"></div>
-      <div class="row" id="one-actions" hidden>
-        <button class="btn" id="ask-ai">Chiedi a Claude di riconoscerlo</button>
-        <button class="btn ghost" id="manual">Inserisci a mano</button>
-      </div>
-    </div>
-
-    <div id="many" class="view" hidden>
-      <div class="field">
-        <label for="batch">Detta o scrivi più specie</label>
-        <textarea id="batch" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Amanita caesarea, Russula virescens, porcino estivo, Clathrus ruber"></textarea>
-        <p class="hint">Separa le specie con una virgola, un punto o andando a capo. Va bene anche dirle una dopo l'altra con "poi".</p>
-      </div>
-      <div class="field">
-        <label for="batch-lane">Dove le stai mettendo?</label>
-        <select id="batch-lane"></select>
-      </div>
-      <div class="row">
-        <button class="btn primary" id="parse">Analizza elenco</button>
-        <span id="parse-status" class="hint"></span>
-      </div>
-      <div id="review" class="review"></div>
-      <div class="row" id="review-actions" hidden>
-        <button class="btn primary" id="commit">Aggiungi selezionate</button>
-        <button class="btn ghost" id="clear-review">Annulla</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- CATALOGO -->
-  <section class="view" id="v-cat" hidden>
+    <div id="slot-now"></div>
     <div class="field">
-      <label for="filter">Cerca nel catalogo</label>
-      <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filtra per nome, genere, famiglia">
+      <label for="cap-text">Specie in questo posto</label>
+      <textarea id="cap-text" class="big" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Detta i nomi, es. Russula cyanoxantha, Lactarius deterrimus"></textarea>
+      <p class="hint">Tocca il microfono della tastiera e detta. Più specie vanno separate con "virgola" o "poi".</p>
     </div>
     <div class="row">
-      <button class="btn" id="export">Scarica CSV</button>
-      <button class="btn ghost" id="copy">Copia elenco</button>
+      <label class="btn wide" for="cap-photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="cap-photo-label">Scatta foto</span></label>
+      <input id="cap-photo" type="file" accept="image/*" capture="environment" hidden>
+      <button class="btn primary wide" id="cap-save">Salva posto</button>
     </div>
-    <div id="catalog" class="view"></div>
+    <img id="cap-prev" class="preview" alt="Foto da salvare" hidden>
+    <div class="row" id="cap-photo-actions" hidden>
+      <button class="btn" id="cap-from-photo">Riconosci le specie dalla foto</button>
+      <button class="btn ghost" id="cap-photo-clear">Togli foto</button>
+    </div>
+    <div id="cap-status" class="hint"></div>
+    <div id="cap-review" class="review"></div>
+    <div class="row" id="cap-review-actions" hidden>
+      <button class="btn primary wide" id="cap-confirm">Conferma e vai avanti</button>
+      <button class="btn ghost" id="cap-cancel">Annulla</button>
+    </div>
   </section>
 
-  <!-- CORSIE -->
-  <section class="view" id="v-lanes" hidden>
+  <!-- CERCA -->
+  <section class="view" id="v-find" hidden>
+    <div class="field">
+      <label for="q">Dov'è? C'è già?</label>
+      <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Lactarius blennius">
+      <p class="hint">Per spostare una specie detta: "sposta Russula virescens in corsia 2 posto 4".</p>
+    </div>
+    <div id="results" class="list"></div>
+    <div id="ai-out" class="list"></div>
+    <div class="row" id="find-actions" hidden>
+      <button class="btn" id="ask-ai">Chiedi a Claude</button>
+      <button class="btn ghost" id="manual">Inserisci a mano</button>
+    </div>
+  </section>
+
+  <!-- MAPPA -->
+  <section class="view" id="v-map" hidden>
     <div class="plan">
       <div class="door">Fondo sala · porta</div>
       <div class="room" id="room"></div>
       <div class="door">Ingresso · punto della foto</div>
     </div>
-    <p class="hint">Pianta indicativa ricavata dalla foto. Nomi e descrizioni delle corsie si cambiano in Schema.</p>
-    <div id="lane-list" class="view"></div>
+    <div id="lane-view" class="stack"></div>
+  </section>
+
+  <!-- CATALOGO -->
+  <section class="view" id="v-cat" hidden>
+    <div class="field">
+      <label for="filter">Filtra il catalogo</label>
+      <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="Nome, genere, famiglia">
+    </div>
+    <div class="row">
+      <button class="btn" id="export">Scarica CSV</button>
+      <button class="btn ghost" id="copy">Copia elenco</button>
+    </div>
+    <div id="catalog" class="stack"></div>
   </section>
 
   <!-- SCHEMA -->
   <section class="view" id="v-schema" hidden>
     <div class="prose">
       <h2>Ordine espositivo</h2>
-      <p>Le mostre micologiche italiane, quelle dei gruppi AMB comprese, dispongono i funghi in ordine sistematico. Le specie dello stesso genere stanno vicine, i generi della stessa famiglia uno accanto all'altro e le famiglie seguono l'ordine tassonomico. Così il visitatore vede affinità e differenze.</p>
-      <p>In pratica si usano due impostazioni, spesso mescolate:</p>
+      <p>Le mostre micologiche italiane, quelle dei gruppi AMB comprese, dispongono i funghi in ordine sistematico. Le specie dello stesso genere stanno vicine, i generi della stessa famiglia uno accanto all'altro e le famiglie seguono l'ordine tassonomico.</p>
       <ol>
-        <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani. Esempi di ordini sono Boletales, Russulales, Agaricales, Cantharellales e Polyporales, poi gli Ascomycota.</li>
-        <li><b>Tradizionale morfologica</b>, per tipo di imenoforo e colore delle spore: lamelle con spore bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e infine ascomiceti.</li>
+        <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani.</li>
+        <li><b>Tradizionale morfologica</b>, per imenoforo e colore delle spore: lamelle bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e ascomiceti.</li>
       </ol>
-      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore, che il pubblico riconosce facilmente. Quando arriverà lo schema del volontario lo adattiamo.</p>
+      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono corsia e posto registrati.</p>
     </div>
-    <div id="sectors" class="view"></div>
+    <div id="sectors" class="stack"></div>
     <h2>Corsie</h2>
-    <div id="lanes-edit" class="view"></div>
+    <p class="hint">Il posto 1 di ogni corsia è il lato verso l'ingresso.</p>
+    <div id="lanes-edit" class="stack"></div>
     <div class="row">
       <button class="btn primary" id="save-layout">Salva schema e corsie</button>
       <button class="btn ghost" id="reset-layout">Ripristina predefinito</button>
@@ -280,9 +310,10 @@ input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent);
 </main>
 
 <nav class="tabs" role="tablist">
-  <button role="tab" data-v="v-add" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Aggiungi</button>
+  <button role="tab" data-v="v-cap" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Registra</button>
+  <button role="tab" data-v="v-find" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Cerca</button>
+  <button role="tab" data-v="v-map" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>Mappa</button>
   <button role="tab" data-v="v-cat" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Catalogo</button>
-  <button role="tab" data-v="v-lanes" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>Corsie</button>
   <button role="tab" data-v="v-schema" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v4M12 7l-6 5M12 7l6 5M6 12v4M18 12v4M4 20h4M16 20h4"/></svg>Schema</button>
 </nav>
 
@@ -297,7 +328,7 @@ const SECTORS = [
     fam: ["Boletaceae","Suillaceae","Gyroporaceae","Paxillaceae","Gomphidiaceae","Hygrophoropsidaceae","Tapinellaceae","Sclerodermataceae","Diplocystidiaceae","Rhizopogonaceae"] },
   { id: "rus", nome: "Russulales", desc: "Russule, lattari, Lactifluus e affini (Auriscalpium, Stereum, Hericium)",
     fam: ["Russulaceae","Auriscalpiaceae","Bondarzewiaceae","Stereaceae","Hericiaceae"] },
-  { id: "ama", nome: "Agaricales: Amanite e Plutei", desc: "Amanita, Pluteus, Volvopluteus, Volvariella",
+  { id: "ama", nome: "Agaricales: Amanite e Plutei", desc: "Amanita, Limacella, Pluteus, Volvopluteus, Volvariella",
     fam: ["Amanitaceae","Pluteaceae"] },
   { id: "agr", nome: "Agaricales: Agaricacee", desc: "Prataioli, lepiote, mazze di tamburo, coprino chiomato, vesce",
     fam: ["Agaricaceae"] },
@@ -313,12 +344,12 @@ const SECTORS = [
     fam: ["Cantharellaceae","Hydnaceae","Clavulinaceae"] },
   { id: "gom", nome: "Gomphales, Phallales, Geastrales", desc: "Ramarie, Gomphus, Clavariadelphus, satirione, clatro, geastri",
     fam: ["Gomphaceae","Clavariadelphaceae","Phallaceae","Clathraceae","Geastraceae"] },
-  { id: "pol", nome: "Polipori e lignicoli", desc: "Polyporales, Hymenochaetales, Thelephorales, Fistulina, Schizophyllum",
-    fam: ["Fistulinaceae","Polyporaceae","Ganodermataceae","Fomitopsidaceae","Laetiporaceae","Meripilaceae","Grifolaceae","Sparassidaceae","Meruliaceae","Phanerochaetaceae","Irpicaceae","Schizophyllaceae","Hymenochaetaceae","Thelephoraceae","Bankeraceae"] },
+  { id: "pol", nome: "Polipori e lignicoli", desc: "Polyporales, Hymenochaetales, Gloeophyllales, Thelephorales, Fistulina, Schizophyllum",
+    fam: ["Fistulinaceae","Polyporaceae","Ganodermataceae","Fomitopsidaceae","Laetiporaceae","Meripilaceae","Grifolaceae","Sparassidaceae","Meruliaceae","Podoscyphaceae","Phanerochaetaceae","Irpicaceae","Gloeophyllaceae","Schizophyllaceae","Hymenochaetaceae","Thelephoraceae","Bankeraceae"] },
   { id: "gel", nome: "Clavarie e gelatinosi", desc: "Clavaria, Clavulinopsis, Auricularia, Exidia, Tremella, Calocera",
-    fam: ["Clavariaceae","Auriculariaceae","Exidiaceae","Tremellaceae","Dacrymycetaceae"] },
+    fam: ["Clavariaceae","Auriculariaceae","Exidiaceae","Tremellaceae","Phaeotremellaceae","Dacrymycetaceae"] },
   { id: "asc", nome: "Ascomycota", desc: "Spugnole, elvelle, pezize, tartufi, Xylaria, Daldinia",
-    fam: ["Morchellaceae","Helvellaceae","Discinaceae","Pezizaceae","Pyronemataceae","Sarcoscyphaceae","Sarcosomataceae","Tuberaceae","Rhizinaceae","Xylariaceae","Hypoxylaceae","Hypocreaceae","Cordycipitaceae","Leotiaceae","Chlorociboriaceae","Geoglossaceae"] },
+    fam: ["Morchellaceae","Helvellaceae","Discinaceae","Pezizaceae","Pyronemataceae","Sarcoscyphaceae","Sarcosomataceae","Tuberaceae","Elaphomycetaceae","Rhizinaceae","Xylariaceae","Hypoxylaceae","Hypocreaceae","Nectriaceae","Cordycipitaceae","Ophiocordycipitaceae","Leotiaceae","Chlorociboriaceae","Geoglossaceae"] },
   { id: "alt", nome: "Da collocare", desc: "Famiglia non riconosciuta o da verificare", fam: [] },
 ];
 const SEC_IDX = Object.fromEntries(SECTORS.map((s, i) => [s.id, i]));
@@ -336,7 +367,9 @@ const DEFAULT_LAYOUT = {
   assegna: { bol: "c1", rus: "c1", ama: "c1", agr: "c1", tri: "c2", ent: "c2", ocr: "c2", ner: "c2", can: "c3", gom: "c3", pol: "c3", gel: "c3", asc: "c4", alt: "c4" },
 };
 
-/* ---------- Riferimento: Genere specie | nome italiano | famiglia | sinonimi e altri nomi (;) ---------- */
+/* ---------- Riferimento ----------
+   Righe "Genere specie | nome italiano | famiglia | sinonimi e altri nomi (;)"
+   Righe "@Genere | famiglia | epiteto,epiteto,..." per elenchi senza nome italiano */
 const REF_RAW = `
 Boletus edulis|porcino|Boletaceae|porcino d'autunno;boleto edule
 Boletus aereus|porcino nero|Boletaceae|bronzino;boleto bronzino
@@ -400,7 +433,7 @@ Russula emetica|rossola emetica|Russulaceae|
 Russula foetens||Russulaceae|
 Russula aurea|colombina dorata|Russulaceae|Russula aurata
 Russula olivacea||Russulaceae|
-Russula lepida||Russulaceae|Russula rosea
+Russula rosea||Russulaceae|Russula lepida
 Russula fellea||Russulaceae|
 Lactarius deliciosus|lapacendro buono|Russulaceae|sanguinello
 Lactarius sanguifluus|sanguinello|Russulaceae|
@@ -610,14 +643,193 @@ Hypomyces chrysospermus||Hypocreaceae|
 Cordyceps militaris||Cordycipitaceae|
 Leotia lubrica||Leotiaceae|
 Chlorociboria aeruginascens||Chlorociboriaceae|
+Lactarius turpis||Russulaceae|Lactarius necator;Lactarius plumbeus
+Trametes cinnabarina||Polyporaceae|Pycnoporus cinnabarinus
+Trametes betulina||Polyporaceae|Lenzites betulinus
+Fomitopsis betulina||Fomitopsidaceae|Piptoporus betulinus
+Lycoperdon excipuliforme||Agaricaceae|Calvatia excipuliformis
+Vascellum pratense||Agaricaceae|Lycoperdon pratense
+Paralepista flaccida||Tricholomataceae|Lepista flaccida;Lepista inversa
+Pseudosperma rimosum||Inocybaceae|Inocybe rimosa;Inocybe fastigiata
+Mallocybe dulcamara||Inocybaceae|Inocybe dulcamara
+Inosperma cookei||Inocybaceae|Inocybe cookei
+Inosperma bongardii||Inocybaceae|Inocybe bongardii
+Protostropharia semiglobata||Strophariaceae|Stropharia semiglobata
+Stropharia caerulea||Strophariaceae|Stropharia cyanea
+Gliophorus psittacinus||Hygrophoraceae|Hygrocybe psittacina
+Cuphophyllus virgineus||Hygrophoraceae|Hygrocybe virginea
+Ampulloclitocybe clavipes||Hygrophoraceae|Clitocybe clavipes
+Mycetinis alliaceus||Omphalotaceae|Marasmius alliaceus
+Rhodocollybia butyracea||Omphalotaceae|Collybia butyracea
+Gymnopus fusipes||Omphalotaceae|Collybia fusipes
+Pseudoinonotus dryadeus||Hymenochaetaceae|Inonotus dryadeus
+Phaeotremella foliacea||Phaeotremellaceae|Tremella foliacea
+Pseudoboletus parasiticus||Boletaceae|Boletus parasiticus;Xerocomus parasiticus
+Rheubarbariboletus armeniacus||Boletaceae|Xerocomus armeniacus
+Xerocomus ferrugineus||Boletaceae|Boletus ferrugineus
+Echinoderma asperum||Agaricaceae|Lepiota aspera;Lepiota acutesquamosa
+Lentinus arcularius||Polyporaceae|Polyporus arcularius
+Picipes badius||Polyporaceae|Polyporus badius
+Coriolopsis trogii||Polyporaceae|Trametes trogii
+@Butyriboletus|Boletaceae|pseudoregius
+@Rubroboletus|Boletaceae|pulchrotinctus,rubrosanguineus,dupainii
+@Suillellus|Boletaceae|mendax,comptus
+@Imperator|Boletaceae|luteocupreus
+@Leccinum|Boletaceae|versipelle,vulpinum,variicolor,holopus,albostipitatum
+@Leccinellum|Boletaceae|pseudoscabrum,crocipodium
+@Xerocomus|Boletaceae|ferrugineus
+@Xerocomellus|Boletaceae|porosporus,pruinatus,ripariellus,redeuilhii,cisalpinus
+@Hortiboletus|Boletaceae|engelii
+@Rheubarbariboletus|Boletaceae|armeniacus,persicolor
+@Pseudoboletus|Boletaceae|parasiticus
+@Porphyrellus|Boletaceae|porphyrosporus
+@Strobilomyces|Boletaceae|strobilaceus
+@Buchwaldoboletus|Boletaceae|lignicola
+@Suillus|Suillaceae|grevillei,viscidus,bovinus,variegatus,placidus
+@Gyroporus|Gyroporaceae|ammophilus
+@Paxillus|Paxillaceae|rubicundulus,ammoniavirescens
+@Gomphidius|Gomphidiaceae|roseus,maculatus
+@Chroogomphus|Gomphidiaceae|fulmineus,helveticus
+@Scleroderma|Sclerodermataceae|meridionale,areolatum,bovista,cepa
+@Rhizopogon|Rhizopogonaceae|luteolus,obtextus
+@Russula|Russulaceae|albonigra,maculata,nigricans,adusta,acrifolia,densifolia,persicina,xerampelina,integra,nobilis,ochroleuca,queletii,decolorans,puellaris,risigallina,romellii,grisea,ionochlora,parazurea,heterophylla,mustelina,amoenolens,pectinata,pectinatoides,cutefracta,atropurpurea,badia,sardonia,turci,amethystina,galochroa,insignis,odorata,curtipes,vinosa,illota,laurocerasi,subfoetens,fragilis,betularum,nana,mairei,faginea,monspeliensis,aurora,raoultii,cessans,firmula,melliolens,rubroalba,cuprea,lutea,graveolens,amarissima,pseudointegra,alutacea,viscida,anthracina,solaris,violeipes,praetervisa,pelargonia,cavipes,exalbicans,globispora,minutula,gracillima,roseipes,lilacea,carpini,medullata,werneri,seperina,decipiens,recondita,farinipes
+@Lactarius|Russulaceae|scrobiculatus,blennius,deterrimus,salmonicolor,quietus,controversus,pyrogalus,circellatus,fluens,pallidus,subdulcis,camphoratus,serifluus,decipiens,aurantiacus,uvidus,flavidus,turpis,pubescens,mairei,acerrimus,zonarioides,porninsis,picinus,lignyotus,fuliginosus,azonites,pterosporus,ruginosus,subumbonatus,cremor,hepaticus,rufus,helvus,mitissimus,tabidus,vietus,trivialis,aurantiofulvus,ilicis,atlanticus,cistophilus,lacunarum,quieticolor,rubrocinctus,citriolens,intermedius,resimus,repraesentaneus,glyciosmus,musteus,romagnesii,acris,lilacinus,spinosulus,evosmus
+@Lactifluus|Russulaceae|bertillonii,luteolus,glaucescens,rugatus
+@Amanita|Amanitaceae|franchetii,excelsa,solitaria,eliae,porphyria,battarrae,mairei,lividopallescens,simulans,submembranacea,virosa,pseudovaginata,beckeri,codinae,ponderosa,singeri,regalis,gemmata,lepiotoides,asteropus
+@Limacella|Amanitaceae|guttata,illinita
+@Pluteus|Pluteaceae|salicinus,leoninus,romellii,umbrosus,aurantiorugosus
+@Volvariella|Pluteaceae|volvacea
+@Agaricus|Agaricaceae|essettei,impudicus,langei,moelleri,litoralis,urinascens,porphyrizon,subperonatus,phaeolepidotus,devoniensis,bernardii,pseudopratensis,menieri,bisporus,lanipes,benesii,cupressicola,dulcidulus,semotus,romagnesii,pilatianus,freirei,fissuratus
+@Lepiota|Agaricaceae|clypeolaria,castanea,ignivolvata,felina,ventriosospora,subincarnata,josserandii,helveola,pseudolilacea,magnispora,erminea,oreadiformis
+@Echinoderma|Agaricaceae|asperum
+@Leucoagaricus|Agaricaceae|badhamii
+@Leucocoprinus|Agaricaceae|birnbaumii
+@Macrolepiota|Agaricaceae|konradii,phaeodisca,fuliginosa
+@Chlorophyllum|Agaricaceae|brunneum,olivieri
+@Cystoderma|Agaricaceae|amianthinum
+@Melanophyllum|Agaricaceae|haematospermum
+@Coprinus|Agaricaceae|sterquilinus
+@Lycoperdon|Agaricaceae|echinatum,umbrinum,molle,lividum,excipuliforme,utriforme
+@Vascellum|Agaricaceae|pratense
+@Bovista|Agaricaceae|nigrescens
+@Battarrea|Agaricaceae|phalloides
+@Tulostoma|Agaricaceae|brumale
+@Tricholoma|Tricholomataceae|acerbum,album,lascivum,sejunctum,sciodes,virgatum,imbricatum,vaccinum,focale,populinum,basirubens,josserandii,myomyces,argyraceum,cingulatum,orirubens,squarrulosum,inamoenum,aurantium,colossus,stiparophyllum,fracticum,roseoacerbum,caligatum,batschii,albobrunneum,stans,psammopus,gausapatum,bufonium,sudum,pessundatum,frondosae,joachimii
+@Tricholomopsis|Tricholomataceae|rutilans,decora
+@Leucopaxillus|Tricholomataceae|gentianeus,candidus
+@Melanoleuca|Tricholomataceae|melaleuca,cognata,grammopodia
+@Lepista|Tricholomataceae|glaucocana,panaeolus,irina,luscina
+@Paralepista|Tricholomataceae|flaccida,gilva
+@Clitocybe|Tricholomataceae|phyllophila,fragrans,metachroa,phaeophthalma
+@Infundibulicybe|Tricholomataceae|costata
+@Pseudoclitocybe|Tricholomataceae|cyathiformis
+@Lyophyllum|Lyophyllaceae|fumosum
+@Ossicaulis|Lyophyllaceae|lignatilis
+@Armillaria|Physalacriaceae|ostoyae,gallica
+@Strobilurus|Physalacriaceae|esculentus,tenacellus
+@Marasmius|Marasmiaceae|rotula,wynneae
+@Gymnopus|Omphalotaceae|fusipes,peronatus,confluens,androsaceus
+@Rhodocollybia|Omphalotaceae|butyracea,maculata
+@Connopus|Omphalotaceae|acervatus
+@Mycetinis|Omphalotaceae|alliaceus,scorodonius
+@Mycena|Mycenaceae|galericulata,inclinata,haematopus,crocata,epipterygia,polygramma,galopus,renati,seynii,zephirus,rosella,pelianthina,diosma
+@Panellus|Mycenaceae|stipticus
+@Pleurotus|Pleurotaceae|pulmonarius,dryinus
+@Hygrophorus|Hygrophoraceae|agathosmus,pustulatus,hypothejus,gliocyclus,arbustivus,discoxanthus,persoonii,leucophaeus,poetarum,roseodiscoideus,nemoreus,lindtneri,unicolor,olivaceoalbus,mesotephrus,lucorum,erubescens,pudorinus,capreolarius
+@Hygrocybe|Hygrophoraceae|coccinea,chlorophana,miniata,acutoconica
+@Gliophorus|Hygrophoraceae|psittacinus
+@Cuphophyllus|Hygrophoraceae|virgineus
+@Ampulloclitocybe|Hygrophoraceae|clavipes
+@Cantharellula|Hygrophoraceae|umbonata
+@Laccaria|Hydnangiaceae|bicolor,proxima,affinis
+@Entoloma|Entolomataceae|rhodopolium,nidorosum,lividoalbum,saundersii,aprile,sericeum,incanum,euchroum,bloxamii,nitidum
+@Cortinarius|Cortinariaceae|rubellus,sanguineus,semisanguineus,cinnamomeus,croceus,purpurascens,glaucopus,varius,triumphans,collinitus,mucosus,delibutus,bolaris,alboviolaceus,camphoratus,traganus,torvus,anomalus,largus,multiformis,odorifer,elegantissimus,splendens,cotoneus,venetus,armillatus,hinnuleus,decipiens,calochrous,sodagnitus
+@Inocybe|Inocybaceae|asterospora,corydalina,lacera,fuscidula,flocculosa,sindonia,piriodora,tenebrosa,splendens,mixtilis,cincinnata
+@Inosperma|Inocybaceae|cookei,bongardii
+@Pseudosperma|Inocybaceae|rimosum
+@Mallocybe|Inocybaceae|dulcamara
+@Crepidotus|Crepidotaceae|mollis,variabilis
+@Hebeloma|Hymenogastraceae|mesophaeum,radicosum,sacchariolens,cylindrosporum,edurum,laterinum
+@Gymnopilus|Hymenogastraceae|penetrans,sapineus
+@Psilocybe|Hymenogastraceae|semilanceata,cyanescens
+@Pholiota|Strophariaceae|adiposa,aurivella,gummosa,highlandensis,lenta
+@Hypholoma|Strophariaceae|capnoides
+@Stropharia|Strophariaceae|coronilla,rugosoannulata,caerulea
+@Protostropharia|Strophariaceae|semiglobata
+@Leratiomyces|Strophariaceae|ceres
+@Agrocybe|Strophariaceae|dura,pediades
+@Tubaria|Tubariaceae|furfuracea
+@Cyclocybe|Tubariaceae|erebia
+@Conocybe|Bolbitiaceae|tenera,apala
+@Psathyrella|Psathyrellaceae|piluliformis,spadiceogrisea,corrugis
+@Coprinellus|Psathyrellaceae|domesticus,disseminatus
+@Coprinopsis|Psathyrellaceae|lagopus,nivea
+@Parasola|Psathyrellaceae|plicatilis
+@Panaeolus|Galeropsidaceae|papilionaceus,semiovatus,fimicola
+@Cantharellus|Cantharellaceae|pallens,friesii,ferruginascens,alborufescens
+@Pseudocraterellus|Cantharellaceae|undulatus
+@Hydnum|Hydnaceae|albidum
+@Ramaria|Gomphaceae|aurea,largentii,fennica,pallida,sanguinea
+@Phallus|Phallaceae|hadriani
+@Clathrus|Phallaceae|archeri
+@Geastrum|Geastraceae|rufescens,pectinatum,coronatum
+@Myriostoma|Geastraceae|coliforme
+@Fomitiporia|Hymenochaetaceae|mediterranea
+@Inocutis|Hymenochaetaceae|tamaricis
+@Pseudoinonotus|Hymenochaetaceae|dryadeus
+@Hymenochaete|Hymenochaetaceae|rubiginosa
+@Trametes|Polyporaceae|gibbosa,pubescens,cinnabarina,betulina
+@Coriolopsis|Polyporaceae|trogii
+@Daedaleopsis|Polyporaceae|confragosa
+@Polyporus|Polyporaceae|tuberaster
+@Picipes|Polyporaceae|badius
+@Lentinus|Polyporaceae|arcularius
+@Hexagonia|Polyporaceae|nitida
+@Ganoderma|Ganodermataceae|adspersum,australe,pfeifferi
+@Fomitopsis|Fomitopsidaceae|betulina
+@Phaeolus|Laetiporaceae|schweinitzii
+@Abortiporus|Podoscyphaceae|biennis
+@Irpex|Irpicaceae|lacteus
+@Hapalopilus|Phanerochaetaceae|rutilans
+@Gloeophyllum|Gloeophyllaceae|sepiarium,trabeum
+@Hydnellum|Bankeraceae|ferrugineum,concrescens
+@Phellodon|Bankeraceae|niger
+@Thelephora|Thelephoraceae|palmata,caryophyllea
+@Phaeotremella|Phaeotremellaceae|foliacea
+@Exidia|Auriculariaceae|nigricans,recisa
+@Pseudohydnum|Exidiaceae|gelatinosum
+@Calocera|Dacrymycetaceae|cornea
+@Dacrymyces|Dacrymycetaceae|stillatus
+@Clavaria|Clavariaceae|zollingeri
+@Clavulinopsis|Clavariaceae|helvola,laeticolor,fusiformis
+@Ramariopsis|Clavariaceae|kunzei
+@Morchella|Morchellaceae|deliciosa,importuna
+@Verpa|Morchellaceae|conica,bohemica
+@Disciotis|Morchellaceae|venosa
+@Helvella|Helvellaceae|acetabulum,elastica
+@Gyromitra|Discinaceae|infula
+@Peziza|Pezizaceae|ammophila
+@Sarcoscypha|Sarcoscyphaceae|austriaca,jurana
+@Tarzetta|Pyronemataceae|cupularis
+@Scutellinia|Pyronemataceae|scutellata
+@Humaria|Pyronemataceae|hemisphaerica
+@Geopora|Pyronemataceae|sumneriana
+@Tuber|Tuberaceae|excavatum,rufum,mesentericum
+@Choiromyces|Tuberaceae|meandriformis
+@Elaphomyces|Elaphomycetaceae|granulatus
+@Xylaria|Xylariaceae|longipes,carpophila
+@Kretzschmaria|Xylariaceae|deusta
+@Hypoxylon|Hypoxylaceae|fragiforme
+@Nectria|Nectriaceae|cinnabarina
+@Tolypocladium|Ophiocordycipitaceae|ophioglossoides
 `;
 
-/* ---------- Normalizzazione e confronto approssimato (pensato per la dettatura) ---------- */
+/* ---------- Normalizzazione e confronto approssimato (pensato per la dettatura in italiano) ---------- */
 function norm(s) {
   s = String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  s = s.replace(/var\.|sp\.|spp\./g, " ").replace(/[^a-z\s]/g, " ");
-  s = s.replace(/ae/g, "e").replace(/oe/g, "e").replace(/ph/g, "f").replace(/th/g, "t").replace(/ch/g, "c")
-       .replace(/k/g, "c").replace(/y/g, "i").replace(/j/g, "i").replace(/w/g, "v").replace(/x/g, "s")
+  s = s.replace(/\b(var|subsp|ssp|sp|spp|f|fo)\./g, " ").replace(/[^a-z\s]/g, " ");
+  s = s.replace(/\bps/g, "s").replace(/ae/g, "e").replace(/oe/g, "e").replace(/ph/g, "f").replace(/th/g, "t").replace(/ch/g, "c")
+       .replace(/ct/g, "t").replace(/cs|ks/g, "s").replace(/k/g, "c").replace(/y/g, "i").replace(/j/g, "i").replace(/w/g, "v").replace(/x/g, "s")
        .replace(/qu/g, "cu").replace(/h/g, "").replace(/([a-z])\1+/g, "$1");
   return s.replace(/\s+/g, " ").trim();
 }
@@ -648,32 +860,44 @@ function score(q, t) {
 }
 function slug(sci) { return norm(sci).replace(/\s+/g, "-") || ("x-" + Date.now()); }
 
-const REF = REF_RAW.trim().split("\n").map(line => {
-  const [sci, ita, fam, al] = line.split("|");
-  const aliases = (al || "").split(";").map(x => x.trim()).filter(Boolean);
-  const keys = [sci, ...(ita ? [ita] : []), ...aliases].map(norm);
-  return { scientifico: sci.trim(), italiano: (ita || "").trim(), famiglia: fam.trim(), aliases, keys };
+const REF = []; const REF_BY_ID = new Map();
+REF_RAW.trim().split("\n").forEach(line => {
+  line = line.trim(); if (!line) return;
+  const add = (sci, ita, fam, aliases) => {
+    const id = slug(sci); if (REF_BY_ID.has(id)) return;
+    const r = { scientifico: sci, italiano: ita, famiglia: fam, aliases, keys: [sci, ...(ita ? [ita] : []), ...aliases].map(norm) };
+    REF.push(r); REF_BY_ID.set(id, r);
+  };
+  if (line.startsWith("@")) {
+    const [gen, fam, eps] = line.slice(1).split("|");
+    eps.split(",").forEach(e => add(gen.trim() + " " + e.trim(), "", fam.trim(), []));
+  } else {
+    const [sci, ita, fam, al] = line.split("|");
+    add(sci.trim(), (ita || "").trim(), fam.trim(), (al || "").split(";").map(x => x.trim()).filter(Boolean));
+  }
 });
-const REF_BY_ID = new Map(REF.map(r => [slug(r.scientifico), r]));
-/* alias → nome accettato, per riconoscere un sinonimo già in mostra */
 const ALIAS2ID = new Map();
 REF.forEach(r => r.aliases.forEach(a => ALIAS2ID.set(norm(a), slug(r.scientifico))));
+const GENUS_FAM = {}; REF.forEach(r => { GENUS_FAM[r.scientifico.split(" ")[0]] ??= r.famiglia; });
 
 /* ---------- Stato e archiviazione ---------- */
 const state = {
   items: new Map(),      // id → specie
+  photos: new Map(),     // id → foto di un posto
   layout: structuredClone(DEFAULT_LAYOUT),
-  db: null, sample: null, downloads: null,
+  db: null, sample: null, downloads: null, assets: null, canImages: false,
   mode: "attesa",
 };
-const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v1";
+const cap = { corsia: "c1", posto: 1, file: null, blob: null, previewUrl: null, rows: [] };
+const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v1", LS_CAP = "funghi.cap.v1";
 function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 function loadLocal() {
   const it = lsGet(LS_ITEMS); if (it) state.items = new Map(Object.entries(it));
   const lay = lsGet(LS_LAYOUT); if (lay && lay.corsie) state.layout = lay;
+  const c = lsGet(LS_CAP); if (c) { cap.corsia = c.corsia || "c1"; cap.posto = c.posto || 1; }
 }
-function saveLocal() { lsSet(LS_ITEMS, Object.fromEntries(state.items)); lsSet(LS_LAYOUT, state.layout); }
+function saveLocal() { if (!state.db) { lsSet(LS_ITEMS, Object.fromEntries(state.items)); lsSet(LS_LAYOUT, state.layout); } }
 
 async function putItem(item) {
   state.items.set(item.id, item); renderAll();
@@ -685,34 +909,52 @@ async function removeItem(id) {
   if (state.db) { try { await state.db.collection("specie").doc(id).delete(); } catch (e) { toast("Eliminazione non riuscita. Riprova."); } }
   else saveLocal();
 }
+async function putPhoto(p) {
+  state.photos.set(p.id, p); renderAll();
+  if (state.db) { try { await state.db.collection("foto").doc(p.id).set(p); } catch (e) { toast("Foto non registrata. Riprova."); } }
+}
+async function removePhoto(p) {
+  state.photos.delete(p.id); renderAll();
+  if (state.db) { try { await state.db.collection("foto").doc(p.id).delete(); } catch {} }
+  if (state.assets) { try { await state.assets.delete(p.asset); } catch {} }
+}
 async function putLayout(layout) {
   state.layout = layout; renderAll();
-  if (state.db) { try { await state.db.doc("config/layout").set(layout); } catch (e) { toast("Schema non salvato. Riprova."); return; } }
+  if (state.db) { try { await state.db.doc("config/layout").set(layout); } catch (e) { toast("Schema non salvato. Riprova."); return false; } }
   else saveLocal();
-  toast("Schema e corsie salvati");
+  return true;
 }
 
 /* ---------- Helpers di dominio ---------- */
 const lanes = () => state.layout.corsie;
 const laneById = id => lanes().find(c => c.id === id);
 const laneName = id => (laneById(id) || { nome: "Da collocare" }).nome;
-function sectorOf(fam) { return FAM2SEC[fam] || "alt"; }
+const sectorOf = fam => FAM2SEC[fam] || "alt";
 function laneFor(sec) { return (state.layout.assegna || {})[sec] || lanes()[lanes().length - 1].id; }
-function sortKey(it) {
-  const si = SEC_IDX[it.settore] ?? 99, fi = FAM_IDX[it.famiglia] ?? 99;
-  return [si, fi, it.scientifico.toLowerCase()];
-}
+function sortKey(it) { return [SEC_IDX[it.settore] ?? 99, FAM_IDX[it.famiglia] ?? 99, it.scientifico.toLowerCase()]; }
 function cmp(a, b) { const A = sortKey(a), B = sortKey(b); for (let i = 0; i < A.length; i++) { if (A[i] < B[i]) return -1; if (A[i] > B[i]) return 1; } return 0; }
-function laneItems(laneId) { return [...state.items.values()].filter(i => i.corsia === laneId).sort(cmp); }
-function positionText(it) {
-  const list = laneItems(it.corsia); const i = list.findIndex(x => x.id === it.id);
-  if (i < 0) return "";
-  const prev = list[i - 1], next = list[i + 1];
-  let t = `${laneName(it.corsia)} · posizione ${i + 1} di ${list.length}`;
-  if (prev && next) t += ` · tra ${prev.scientifico} e ${next.scientifico}`;
-  else if (prev) t += ` · dopo ${prev.scientifico}`;
-  else if (next) t += ` · prima di ${next.scientifico}`;
-  return t;
+const allItems = () => [...state.items.values()];
+function laneItems(c) { return allItems().filter(i => i.corsia === c).sort((a, b) => (a.posto ?? 1e9) - (b.posto ?? 1e9) || cmp(a, b)); }
+function slotItems(c, p) { return allItems().filter(i => i.corsia === c && i.posto === p).sort(cmp); }
+function slotPhotos(c, p) { return [...state.photos.values()].filter(f => f.corsia === c && f.posto === p).sort((a, b) => (b.creato || "").localeCompare(a.creato || "")); }
+function maxPosto(c) {
+  let m = 0;
+  for (const i of state.items.values()) if (i.corsia === c && i.posto > m) m = i.posto;
+  for (const f of state.photos.values()) if (f.corsia === c && f.posto > m) m = f.posto;
+  return m;
+}
+const imgUrl = p => "/_blob/" + p.asset;
+function where(it) { return it.posto ? `${laneName(it.corsia)} · posto ${it.posto}` : `${laneName(it.corsia)} · senza posto`; }
+/* Dove andrebbe secondo l'ordine sistematico, rispetto alle specie già collocate nella corsia */
+function suggestion(it) {
+  const lane = it.corsia || laneFor(it.settore || sectorOf(it.famiglia));
+  const placed = allItems().filter(x => x.corsia === lane && x.posto && x.id !== it.id).sort(cmp);
+  if (!placed.length) return `Proposta: ${laneName(lane)}, è la prima specie della corsia`;
+  const probe = { ...it, settore: it.settore || sectorOf(it.famiglia) };
+  let prev = null, next = null;
+  for (const x of placed) { if (cmp(x, probe) <= 0) prev = x; else { next = x; break; } }
+  const ref = prev || next;
+  return `Proposta: ${laneName(lane)}, vicino al posto ${ref.posto} (${prev ? "dopo" : "prima di"} ${ref.scientifico})`;
 }
 function findExisting(sci) {
   const id = slug(sci);
@@ -720,17 +962,23 @@ function findExisting(sci) {
   const viaAlias = ALIAS2ID.get(norm(sci)); if (viaAlias && state.items.has(viaAlias)) return state.items.get(viaAlias);
   return null;
 }
-function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, note = "", fonte = "" }) {
-  scientifico = scientifico.trim().replace(/\s+/g, " ");
-  const accepted = ALIAS2ID.get(norm(scientifico)); /* sinonimo → nome accettato */
-  if (accepted && REF_BY_ID.has(accepted)) scientifico = REF_BY_ID.get(accepted).scientifico;
-  scientifico = scientifico.charAt(0).toUpperCase() + scientifico.slice(1);
+function tidySci(s) {
+  s = s.trim().replace(/\s+/g, " ");
+  const accepted = ALIAS2ID.get(norm(s)); /* sinonimo → nome accettato */
+  if (accepted && REF_BY_ID.has(accepted)) return REF_BY_ID.get(accepted).scientifico;
+  const ref = REF_BY_ID.get(slug(s)); if (ref) return ref.scientifico;
+  const parts = s.split(" ");
+  return parts.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : (/^(var|subsp|f|fo|sp|spp)\.?$/i.test(w) ? w.toLowerCase() : w.toLowerCase())).join(" ");
+}
+function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, posto = null, note = "" }) {
+  scientifico = tidySci(scientifico);
   const ref = REF_BY_ID.get(slug(scientifico));
   if (ref) { italiano = italiano || ref.italiano; famiglia = famiglia || ref.famiglia; }
+  if (!famiglia) famiglia = GENUS_FAM[scientifico.split(" ")[0]] || "";
   const settore = sectorOf(famiglia);
   const now = new Date().toISOString();
   return { id: slug(scientifico), scientifico, italiano, genere: scientifico.split(" ")[0], famiglia, settore,
-           corsia: corsia || laneFor(settore), note, fonte, creato: now, aggiornato: now };
+           corsia: corsia || laneFor(settore), posto: posto || null, note, creato: now, aggiornato: now };
 }
 
 /* Cerca: prima il catalogo, poi il riferimento. */
@@ -739,39 +987,111 @@ function search(qRaw, limit = 8) {
   const out = [];
   for (const it of state.items.values()) {
     const keys = [it.scientifico, it.italiano, ...(REF_BY_ID.get(it.id)?.aliases || [])].filter(Boolean).map(norm);
-    const s = Math.max(...keys.map(k => score(q, k)));
-    if (s >= 0.5) out.push({ s: s + 0.05, item: it });
+    const s = Math.max(0, ...keys.map(k => score(q, k)));
+    if (s >= 0.5) out.push({ s: s + 0.03, item: it });
   }
   for (const r of REF) {
-    const id = slug(r.scientifico); if (state.items.has(id)) continue;
+    if (state.items.has(slug(r.scientifico))) continue;
     const s = Math.max(...r.keys.map(k => score(q, k)));
     if (s >= 0.5) out.push({ s, ref: r });
   }
   return out.sort((a, b) => b.s - a.s).slice(0, limit);
 }
-
-/* ---------- Claude: riconoscimento di nomi dettati ---------- */
-async function askClaude(text) {
-  if (!state.sample) throw new Error("Il riconoscimento con Claude non è disponibile in questa vista.");
-  const prompt = `Sei un micologo esperto della flora fungina italiana e siciliana. Ricevi un testo dettato a voce con il riconoscimento vocale italiano oppure scritto in fretta: i nomi latini possono essere storpiati (es. "boleto sedulis", "amanita cesarea", "cantarellus cibarius"). Il testo contiene uno o più funghi, con nome scientifico, nome volgare italiano o nome dialettale siciliano.
-
-Per ogni fungo menzionato restituisci il nome scientifico oggi accettato (Species Fungorum), il nome volgare italiano più comune se esiste e la famiglia.
-Usa preferibilmente una di queste famiglie: ${ALL_FAMILIES.join(", ")}. Se nessuna è adatta, indica la famiglia corretta comunque.
-Se è indicato solo il genere scrivi "Genere sp.". Se un frammento non è un fungo, ignoralo.
-
-Rispondi SOLO con JSON in questa forma:
-{"specie":[{"testo":"frammento originale","scientifico":"Genere specie","italiano":"nome o stringa vuota","famiglia":"Famiglia","certezza":"alta|media|bassa","nota":"breve, es. sinonimo usato o dubbio"}]}
-
-Testo:
-"""${text}"""`;
-  const res = await state.sample.json(prompt, { modelTier: "default" });
-  const arr = Array.isArray(res?.specie) ? res.specie : [];
-  return arr.filter(x => x && typeof x.scientifico === "string" && x.scientifico.trim())
-            .map(x => ({ testo: String(x.testo || ""), scientifico: x.scientifico.trim(), italiano: String(x.italiano || "").trim(),
-                         famiglia: String(x.famiglia || "").trim(), certezza: String(x.certezza || ""), nota: String(x.nota || "") }));
+function splitNames(text) {
+  const protectedText = text.replace(/\b(var|subsp|ssp|sp|spp|f|fo)\./gi, "$1§");
+  return protectedText.split(/[\n,;.]+|\s+(?:e poi|poi|quindi|ed|e)\s+|\s+virgola\s+/i)
+    .map(s => s.replace(/§/g, ".").trim()).filter(s => norm(s).length >= 3);
 }
 
-/* ---------- UI ---------- */
+/* ---------- Claude ---------- */
+function claudeError(e) {
+  return e?.code === "not_granted" ? "Non hai concesso a questa pagina di usare Claude. Puoi farlo dal menu Autorizzazioni dell'artifact."
+       : e?.code === "rate_limited" ? "Troppe richieste ravvicinate. Attendi qualche secondo e riprova."
+       : "Claude non ha risposto: " + (e?.message || e);
+}
+const NAME_RULES = `Regole:
+- Scrivi il nome scientifico oggi accettato (Species Fungorum) con l'ortografia esatta: genere con maiuscola, epiteto minuscolo. Se è dettato un sinonimo, restituisci il nome accettato e metti il sinonimo in "nota".
+- Il testo viene dal riconoscimento vocale italiano: i nomi latini arrivano storpiati foneticamente. Esempi: "russula chanoxanta" o "cianossanta" = Russula cyanoxantha; "lactarius blemius" = Lactarius blennius; "russula fetens" = Russula foetens; "lattarius" = Lactarius; "licoperdon perlatum" = Lycoperdon perlatum; "igroforus" = Hygrophorus; "serocomus" = Xerocomus.
+- Mantieni varietà e forme se dette (es. "Amanita muscaria var. aureola").
+- Se è detto solo il genere scrivi "Genere sp.". Ignora parole che non sono funghi.
+- Famiglia: usa preferibilmente una di queste: ${ALL_FAMILIES.join(", ")}.`;
+function cleanRows(res) {
+  const arr = Array.isArray(res?.specie) ? res.specie : [];
+  return arr.filter(x => x && typeof x.scientifico === "string" && x.scientifico.trim())
+    .map(x => ({ testo: String(x.testo || ""), scientifico: tidySci(x.scientifico), italiano: String(x.italiano || "").trim(),
+                 famiglia: String(x.famiglia || "").trim(), certezza: ["alta", "media", "bassa"].includes(x.certezza) ? x.certezza : "media",
+                 nota: String(x.nota || ""), via: "Claude" }));
+}
+async function askClaudeNames(frags) {
+  if (!state.sample) throw new Error("Claude non è disponibile in questa vista.");
+  const lines = frags.map((f, i) => `${i + 1}. "${f.testo}"` + (f.candidati?.length ? ` (candidati simili nel nostro elenco: ${f.candidati.join(", ")})` : "")).join("\n");
+  const prompt = `Sei un micologo esperto della flora fungina italiana e siciliana e prepari i cartellini di una mostra micologica.
+Ogni riga qui sotto è un frammento dettato che dovrebbe contenere il nome di un fungo (scientifico, volgare italiano o dialettale siciliano). I candidati sono solo un aiuto: scegli il fungo giusto anche se non è tra i candidati.
+
+${NAME_RULES}
+
+Rispondi SOLO con JSON:
+{"specie":[{"testo":"frammento originale","scientifico":"Genere specie","italiano":"nome volgare o stringa vuota","famiglia":"Famiglia","certezza":"alta|media|bassa","nota":"breve"}]}
+
+Frammenti:
+${lines}`;
+  return cleanRows(await state.sample.json(prompt, { modelTier: "default" }));
+}
+async function askClaudePhoto(blob, c, p) {
+  if (!state.sample || !state.canImages) throw new Error("Il riconoscimento da foto non è disponibile in questa vista.");
+  const catalog = allItems().map(i => i.scientifico).sort().join(", ") || "(ancora vuoto)";
+  const here = slotItems(c, p).map(i => i.scientifico).join(", ") || "(nessuna)";
+  const prompt = `Sei un micologo esperto della flora fungina italiana e siciliana. La foto mostra un tratto di aiuola di una mostra micologica (${laneName(c)}, posto ${p}), con funghi su piatti o sul terriccio ed eventuali cartellini con il nome.
+Elenca le specie presenti nella foto, da sinistra a destra.
+- Se un cartellino è leggibile, usa il nome scritto e metti certezza "alta".
+- Altrimenti riconosci a vista, preferendo le specie già in mostra: ${catalog}.
+- Specie registrate finora in questo posto: ${here}.
+- Non inventare: se non sei sicuro usa certezza "bassa" e spiega in "nota" cosa vedi.
+
+${NAME_RULES}
+
+Rispondi SOLO con JSON:
+{"specie":[{"testo":"cosa hai visto o letto","scientifico":"Genere specie","italiano":"","famiglia":"Famiglia","certezza":"alta|media|bassa","nota":"breve"}]}`;
+  return cleanRows(await state.sample.json(prompt, { images: [blob], modelTier: "complex" })).map(r => ({ ...r, via: "foto" }));
+}
+/* Testo dettato → righe risolte: elenco locale quando è sicuro, Claude per il resto */
+async function resolveText(text) {
+  const rows = [], unresolved = [];
+  for (const p of splitNames(text)) {
+    const hits = search(p, 3), top = hits[0], gap = hits[1] ? top.s - hits[1].s : 1;
+    if (top && ((top.s >= 0.9 && gap >= 0.04) || (top.s >= 0.85 && gap >= 0.1))) {
+      const d = top.item || top.ref;
+      rows.push({ testo: p, scientifico: d.scientifico, italiano: d.italiano, famiglia: d.famiglia, certezza: "alta", via: "elenco" });
+    } else unresolved.push({ testo: p, candidati: hits.map(h => (h.item || h.ref).scientifico) });
+  }
+  if (unresolved.length) {
+    if (state.sample) {
+      try { rows.push(...await askClaudeNames(unresolved)); }
+      catch (e) { toast(claudeError(e)); unresolved.forEach(u => rows.push({ testo: u.testo, scientifico: u.candidati[0] || u.testo, italiano: "", famiglia: "", certezza: "bassa", via: "da verificare" })); }
+    } else unresolved.forEach(u => rows.push({ testo: u.testo, scientifico: u.candidati[0] || u.testo, italiano: "", famiglia: "", certezza: "bassa", via: "da verificare" }));
+  }
+  const seen = new Set();
+  return rows.filter(r => { const id = slug(r.scientifico); if (seen.has(id)) return false; seen.add(id); return true; });
+}
+
+/* ---------- Foto ---------- */
+async function compress(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+    cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+    const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.82));
+    return blob || file;
+  } catch { return file; }
+}
+async function uploadPhoto(blob) {
+  if (!state.assets) return null;
+  const res = await state.assets.upload(blob, { type: blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg" });
+  return res.id;
+}
+
+/* ---------- UI helpers ---------- */
 const $ = s => document.querySelector(s);
 function el(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
@@ -783,179 +1103,315 @@ function el(tag, attrs = {}, ...kids) {
   return e;
 }
 let toastTimer;
-function toast(msg) {
-  const root = $("#toast-root"); root.replaceChildren(el("div", { class: "toast", role: "status" }, msg));
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => root.replaceChildren(), 4200);
+function toast(msg, action) {
+  const root = $("#toast-root");
+  const t = el("div", { class: "toast", role: "status" }, el("span", {}, msg),
+    action ? el("button", { onclick: () => { root.replaceChildren(); action.fn(); } }, action.label) : null);
+  root.replaceChildren(t);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => root.replaceChildren(), action ? 8000 : 4500);
 }
-
 function names(it) {
   return el("div", { class: "names" },
     el("span", { class: "sci" }, it.scientifico),
     it.italiano ? el("span", { class: "ita" }, it.italiano) : null,
     el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia)]] || {}).nome].filter(Boolean).join(" · ")));
 }
+function photoThumb(p, cls = "thumb") { return el("img", { class: cls, src: imgUrl(p), alt: `Foto ${laneName(p.corsia)} posto ${p.posto}`, loading: "lazy" }); }
 
-async function addFrom(data, laneOverride) {
-  const existing = findExisting(data.scientifico);
-  if (existing) { toast(`${existing.scientifico} è già in mostra. ${positionText(existing)}`); return existing; }
-  const it = makeItem({ ...data, corsia: laneOverride || null });
-  await putItem(it);
-  toast(`Aggiunto ${it.scientifico}. ${positionText(it)}`);
-  return it;
+/* ---------- Annulla ultima operazione ---------- */
+let lastAction = null;
+async function undo() {
+  const a = lastAction; lastAction = null; if (!a) return;
+  for (const id of a.created) await removeItem(id);
+  for (const prev of a.moved) await putItem(prev);
+  if (a.photo) await removePhoto(a.photo);
+  if (a.slot) { cap.corsia = a.slot.corsia; cap.posto = a.slot.posto; }
+  toast("Annullato"); renderCapture();
 }
 
-/* Una specie */
-function renderResults() {
-  const qv = $("#q").value; const box = $("#results");
-  const hits = search(qv);
-  $("#one-actions").hidden = norm(qv).length < 3;
-  if (!qv.trim()) { box.replaceChildren(); return; }
-  if (!hits.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna corrispondenza nell'elenco. Chiedi a Claude o inseriscilo a mano.")); return; }
-  box.replaceChildren(...hits.map(h => {
-    if (h.item) {
-      return el("button", { class: "card present tap", onclick: () => openEdit(h.item) },
-        names(h.item), el("span", { class: "pill ok" }, "Già in mostra"),
-        el("span", { class: "pos" }, positionText(h.item)));
-    }
-    const r = h.ref, sec = sectorOf(r.famiglia);
-    return el("div", { class: "card" },
-      names({ ...r, settore: sec }),
-      el("button", { class: "btn primary", onclick: async () => { await addFrom(r); $("#q").value = ""; renderResults(); $("#q").focus(); } }, "Aggiungi"),
-      el("span", { class: "pos hint" }, `Andrà in ${laneName(laneFor(sec))}`));
+/* ---------- REGISTRA ---------- */
+function persistCap() { lsSet(LS_CAP, { corsia: cap.corsia, posto: cap.posto }); }
+function setSlot(corsia, posto) { cap.corsia = corsia; cap.posto = Math.max(1, posto | 0 || 1); persistCap(); clearCapReview(); renderCapture(); }
+function renderCapture() {
+  $("#cap-lanes").replaceChildren(...lanes().map(c => el("button", { "aria-pressed": String(c.id === cap.corsia), onclick: () => setSlot(c.id, maxPosto(c.id) || 1) }, c.nome)));
+  const pn = $("#p-num"); if (document.activeElement !== pn) pn.value = cap.posto;
+  const here = slotItems(cap.corsia, cap.posto), ph = slotPhotos(cap.corsia, cap.posto)[0];
+  const txt = here.length ? [el("b", {}, "Qui ora: "), here.map(i => i.scientifico).join(", ")] : [`${laneName(cap.corsia)}, posto ${cap.posto}: ancora vuoto.`];
+  const last = maxPosto(cap.corsia);
+  $("#slot-now").replaceChildren(el("div", { class: "slotnow" + (ph ? "" : " nophoto") },
+    ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0", onclick: () => openSlot(cap.corsia, cap.posto) }, photoThumb(ph)) : null,
+    el("div", {}, ...txt, last ? el("div", { class: "hint" }, `Ultimo posto registrato in questa corsia: ${last}`) : null)));
+  $("#cap-photo-label").textContent = cap.blob ? "Rifai foto" : "Scatta foto";
+  const prev = $("#cap-prev");
+  prev.hidden = !cap.previewUrl; if (cap.previewUrl) prev.src = cap.previewUrl;
+  $("#cap-photo-actions").hidden = !cap.blob;
+  $("#cap-from-photo").hidden = !(state.sample && state.canImages);
+  renderCapReview();
+}
+function classify(r) {
+  const ex = findExisting(r.scientifico);
+  if (!ex) return { ...r, stato: "nuova", ex: null, on: r.certezza !== "bassa" };
+  if (ex.corsia === cap.corsia && ex.posto === cap.posto) return { ...r, stato: "qui", ex, on: true };
+  return { ...r, stato: "sposta", ex, on: true };
+}
+function renderCapReview() {
+  const box = $("#cap-review"); const rows = cap.rows;
+  $("#cap-review-actions").hidden = !rows.length && !cap.pendingPhotoOnly;
+  if (!rows.length) { box.replaceChildren(); return; }
+  box.replaceChildren(el("h3", {}, `Controlla · ${laneName(cap.corsia)}, posto ${cap.posto}`), ...rows.map((r, i) => {
+    const label = r.stato === "qui" ? el("span", { class: "pill ok" }, "Già qui")
+                : r.stato === "sposta" ? el("span", { class: "pill warn" }, "Sposta qui")
+                : el("span", { class: "pill" + (r.certezza === "alta" ? "" : " soft") }, r.certezza === "alta" ? "Nuova" : `Nuova · ${r.certezza}`);
+    const detail = [`Detto: "${r.testo}"`, r.stato === "sposta" ? `ora in ${where(r.ex)}` : null, r.via !== "elenco" ? `da ${r.via}` : null, r.nota || null].filter(Boolean).join(" · ");
+    return el("label", { class: "card" + (r.stato === "sposta" ? " move" : r.stato === "qui" ? " present" : ""), for: "cr" + i },
+      el("input", { type: "checkbox", id: "cr" + i, checked: r.on, disabled: r.stato === "qui", onchange: e => { r.on = e.target.checked; } }),
+      names({ ...r, settore: sectorOf(r.famiglia) }), label, el("span", { class: "src" }, detail));
   }));
 }
+function clearCapReview() { cap.rows = []; cap.pendingPhotoOnly = false; $("#cap-status").textContent = ""; }
+function clearCapPhoto() { if (cap.previewUrl) URL.revokeObjectURL(cap.previewUrl); cap.file = cap.blob = cap.previewUrl = null; $("#cap-photo").value = ""; }
 
-async function onAskAI() {
-  const text = $("#q").value.trim(); if (!text) return;
-  const out = $("#ai-out"); const btn = $("#ask-ai");
-  btn.disabled = true; out.replaceChildren(el("div", { class: "hint" }, el("span", { class: "spin" }), " Claude sta riconoscendo il nome…"));
+async function onCapSave() {
+  const text = $("#cap-text").value.trim();
+  if (!text && !cap.blob) { $("#cap-text").focus(); toast("Detta almeno una specie o scatta una foto"); return; }
+  const btn = $("#cap-save"); btn.disabled = true;
+  const st = $("#cap-status");
   try {
-    const list = await askClaude(text);
-    if (!list.length) { out.replaceChildren(el("div", { class: "empty" }, "Claude non ha riconosciuto nessun fungo. Prova a ripetere il nome o inseriscilo a mano.")); return; }
-    out.replaceChildren(el("h3", {}, "Proposta di Claude"), ...list.map(x => {
-      const ex = findExisting(x.scientifico);
-      const item = ex || { ...x, settore: sectorOf(x.famiglia) };
-      return el("div", { class: "card" + (ex ? " present" : "") },
-        names(item),
-        ex ? el("span", { class: "pill ok" }, "Già in mostra")
-           : el("button", { class: "btn primary", onclick: async () => { await addFrom(x); out.replaceChildren(); $("#q").value = ""; renderResults(); } }, "Aggiungi"),
-        el("span", { class: "pos hint" }, ex ? positionText(ex) : [x.certezza && `Certezza ${x.certezza}`, x.nota].filter(Boolean).join(" · ")));
-    }));
-  } catch (e) {
-    const msg = e?.code === "not_granted" ? "Non hai concesso a questa pagina di usare Claude. Puoi farlo dal menu Autorizzazioni dell'artifact."
-              : e?.code === "rate_limited" ? "Troppe richieste ravvicinate. Attendi qualche secondo e riprova."
-              : "Riconoscimento non riuscito: " + (e?.message || e);
-    out.replaceChildren(el("div", { class: "banner warn" }, msg));
+    let rows = [];
+    if (text) { st.replaceChildren(el("span", { class: "spin" }), " Riconosco i nomi…"); rows = await resolveText(text); }
+    cap.rows = rows.map(classify);
+    const sure = cap.rows.length && cap.rows.every(r => r.stato !== "sposta" && r.certezza === "alta");
+    if (sure || (!text && cap.blob)) { await commitCapture(); return; }
+    st.textContent = "Controlla e conferma. Le voci incerte sono deselezionate.";
+    renderCapReview();
   } finally { btn.disabled = false; }
 }
-
-/* Elenco dettato */
-let reviewRows = [];
-function splitBatch(text) {
-  return text.split(/[\n,;.]+|\s+(?:e|ed|poi|quindi|e poi)\s+/i).map(s => s.trim()).filter(s => norm(s).length >= 3);
+async function onCapFromPhoto() {
+  if (!cap.blob) return;
+  const st = $("#cap-status"); const b = $("#cap-from-photo"); b.disabled = true;
+  st.replaceChildren(el("span", { class: "spin" }), " Claude guarda la foto…");
+  try {
+    const rows = await askClaudePhoto(cap.blob, cap.corsia, cap.posto);
+    const known = new Set(cap.rows.map(r => slug(r.scientifico)));
+    cap.rows.push(...rows.filter(r => !known.has(slug(r.scientifico))).map(classify));
+    st.textContent = rows.length ? "Proposte dalla foto: controlla prima di confermare." : "Claude non ha riconosciuto specie nella foto.";
+    if (!cap.rows.length) cap.pendingPhotoOnly = true;
+    renderCapReview();
+  } catch (e) { st.textContent = claudeError(e); }
+  finally { b.disabled = false; }
 }
-async function onParse() {
-  const text = $("#batch").value.trim(); if (!text) return;
-  const status = $("#parse-status"); const parts = splitBatch(text);
-  reviewRows = []; const unresolved = [];
-  for (const p of parts) {
-    const hits = search(p, 2); const top = hits[0];
-    const gap = hits[1] ? top.s - hits[1].s : 1;
-    if (top && top.s >= 0.82 && gap >= 0.04) {
-      const d = top.item || top.ref;
-      reviewRows.push({ testo: p, scientifico: d.scientifico, italiano: d.italiano, famiglia: d.famiglia, via: "elenco", on: true });
-    } else unresolved.push(p);
-  }
-  if (unresolved.length && state.sample) {
-    status.replaceChildren(el("span", { class: "spin" }), ` Claude riconosce ${unresolved.length} nomi…`);
-    $("#parse").disabled = true;
-    try {
-      const got = await askClaude(unresolved.join("\n"));
-      got.forEach(x => reviewRows.push({ ...x, via: "Claude", on: x.certezza !== "bassa" }));
-    } catch (e) {
-      unresolved.forEach(p => reviewRows.push({ testo: p, scientifico: p, italiano: "", famiglia: "", via: "non riconosciuto", on: false }));
-      toast("Claude non ha risposto. I nomi non riconosciuti sono in fondo, deselezionati.");
-    } finally { $("#parse").disabled = false; }
-  } else {
-    unresolved.forEach(p => reviewRows.push({ testo: p, scientifico: p, italiano: "", famiglia: "", via: "non riconosciuto", on: false }));
-  }
-  status.textContent = `${reviewRows.length} voci da controllare`;
-  renderReview();
-}
-function renderReview() {
-  const box = $("#review");
-  $("#review-actions").hidden = !reviewRows.length;
-  box.replaceChildren(...reviewRows.map((r, i) => {
-    const ex = findExisting(r.scientifico);
-    const cb = el("input", { type: "checkbox", id: "rv" + i, checked: r.on && !ex, disabled: !!ex, onchange: e => { r.on = e.target.checked; } });
-    return el("label", { class: "card" + (ex ? " present" : ""), for: "rv" + i },
-      cb, names({ ...r, settore: sectorOf(r.famiglia) }),
-      ex ? el("span", { class: "pill ok" }, "Già in mostra") : el("span", { class: "pill" + (r.via === "elenco" ? "" : " warn") }, r.via),
-      el("span", { class: "src" }, `Hai detto: "${r.testo}"` + (ex ? ` · ${positionText(ex)}` : "") + (r.nota ? ` · ${r.nota}` : "")));
-  }));
-}
-async function onCommit() {
-  const lane = $("#batch-lane").value || null; let n = 0, dup = 0;
-  for (const r of reviewRows) {
+async function commitCapture() {
+  const c = cap.corsia, p = cap.posto, now = new Date().toISOString();
+  const action = { created: [], moved: [], photo: null, slot: { corsia: c, posto: p } };
+  const ids = [];
+  for (const r of cap.rows) {
     if (!r.on) continue;
-    if (findExisting(r.scientifico)) { dup++; continue; }
-    const it = makeItem({ ...r, corsia: lane }); await putItem(it); n++;
+    if (r.stato === "qui") { ids.push(r.ex.id); continue; }
+    if (r.stato === "sposta") { action.moved.push({ ...r.ex }); await putItem({ ...r.ex, corsia: c, posto: p, aggiornato: now }); ids.push(r.ex.id); continue; }
+    if (findExisting(r.scientifico)) continue;
+    const it = makeItem({ ...r, corsia: c, posto: p }); await putItem(it); action.created.push(it.id); ids.push(it.id);
   }
-  reviewRows = []; renderReview(); $("#batch").value = ""; $("#parse-status").textContent = "";
-  toast(`Aggiunte ${n} specie` + (dup ? `, ${dup} erano già in mostra` : ""));
+  let photoMsg = "";
+  if (cap.blob) {
+    $("#cap-status").replaceChildren(el("span", { class: "spin" }), " Carico la foto…");
+    try {
+      const asset = await uploadPhoto(cap.blob);
+      if (asset) { const ph = { id: asset, asset, corsia: c, posto: p, specie: ids, creato: now }; await putPhoto(ph); action.photo = ph; photoMsg = " e foto"; }
+      else photoMsg = " (foto non salvabile qui)";
+    } catch (e) { photoMsg = " (foto non caricata: " + (e.code || e.message) + ")"; }
+  }
+  const n = action.created.length, m = action.moved.length;
+  lastAction = action;
+  $("#cap-text").value = ""; clearCapPhoto(); clearCapReview();
+  cap.posto = p + 1; persistCap(); renderCapture();
+  const parts = [n ? `${n} nuove` : null, m ? `${m} spostate` : null].filter(Boolean).join(", ") || "nessuna specie nuova";
+  toast(`Posto ${p}: ${parts}${photoMsg}. Ora sei al posto ${p + 1}.`, { label: "Annulla", fn: undo });
 }
 
-/* Scheda modifica / inserimento manuale */
+/* ---------- CERCA ---------- */
+const NUMW = { uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, ventuno: 21, ventidue: 22, ventitre: 23, ventiquattro: 24, venticinque: 25, trenta: 30 };
+const toNum = t => /^\d+$/.test(t) ? +t : NUMW[norm(t).replace(/ /g, "")] ?? null;
+function parseMove(text) {
+  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:in|nella|alla|al|a)\s+(mezza(?:\s+corsia)?|(?:corsia\s+)?\S+)(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
+  if (!m) return null;
+  const lt = m[2].toLowerCase().replace(/^corsia\s+/, "");
+  let lane = null;
+  if (lt.startsWith("mezza")) lane = lanes().find(c => /mezza/i.test(c.nome))?.id || lanes()[3]?.id;
+  else { const n = toNum(lt); if (n && lanes()[n - 1]) lane = lanes()[n - 1].id; }
+  if (!lane) return null;
+  return { specie: m[1], corsia: lane, posto: m[3] ? toNum(m[3]) : null };
+}
+function renderResults() {
+  const qv = $("#q").value, box = $("#results");
+  $("#find-actions").hidden = norm(qv).length < 3;
+  if (!qv.trim()) { box.replaceChildren(); return; }
+  const mv = parseMove(qv);
+  if (mv) { renderMove(mv); return; }
+  const hits = search(qv);
+  if (!hits.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna corrispondenza nell'elenco. Chiedi a Claude o inseriscilo a mano.")); return; }
+  box.replaceChildren(...hits.map(h => h.item ? presentCard(h.item) : refCard(h.ref)));
+}
+function presentCard(it) {
+  const ph = it.posto ? slotPhotos(it.corsia, it.posto)[0] : null;
+  return el("button", { class: "card present tap" + (ph ? " withimg" : ""), onclick: () => openEdit(it) },
+    ph ? photoThumb(ph) : null, names(it), el("span", { class: "pill ok" }, "In mostra"),
+    el("span", { class: "pos" }, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))));
+}
+function refCard(r) {
+  const probe = { ...r, settore: sectorOf(r.famiglia) };
+  return el("div", { class: "card" }, names(probe),
+    el("button", { class: "btn primary", onclick: () => openPlace(r) }, "Aggiungi"),
+    el("span", { class: "pos hint" }, "Non ancora in mostra · " + suggestion(probe)));
+}
+async function renderMove(mv) {
+  const box = $("#results");
+  let target = search(mv.specie, 2).find(h => h.item)?.item || null;
+  if (!target) { const ex = findExisting(mv.specie); if (ex) target = ex; }
+  const dest = `${laneName(mv.corsia)}${mv.posto ? ", posto " + mv.posto : ""}`;
+  if (!target) { box.replaceChildren(el("div", { class: "empty" }, `"${mv.specie}" non risulta in mostra. Controlla il nome.`)); return; }
+  box.replaceChildren(el("div", { class: "card move" }, names(target),
+    el("button", { class: "btn primary", onclick: async () => {
+      const prev = { ...target };
+      await putItem({ ...target, corsia: mv.corsia, posto: mv.posto, aggiornato: new Date().toISOString() });
+      lastAction = { created: [], moved: [prev], photo: null };
+      $("#q").value = ""; renderResults(); toast(`${target.scientifico} spostata in ${dest}`, { label: "Annulla", fn: undo });
+    } }, "Sposta"),
+    el("span", { class: "pos" }, `Da ${where(target)} a ${dest}`)));
+}
+async function onAskAI() {
+  const text = $("#q").value.trim(); if (!text) return;
+  const out = $("#ai-out"), btn = $("#ask-ai");
+  btn.disabled = true; out.replaceChildren(el("div", { class: "hint" }, el("span", { class: "spin" }), " Claude sta riconoscendo il nome…"));
+  try {
+    const hits = search(text, 3);
+    const list = await askClaudeNames([{ testo: text, candidati: hits.map(h => (h.item || h.ref).scientifico) }]);
+    if (!list.length) { out.replaceChildren(el("div", { class: "empty" }, "Claude non ha riconosciuto nessun fungo. Ripeti il nome o inseriscilo a mano.")); return; }
+    out.replaceChildren(el("h3", {}, "Proposta di Claude"), ...list.map(x => {
+      const ex = findExisting(x.scientifico);
+      if (ex) return presentCard(ex);
+      const c = refCard(x); c.append(el("span", { class: "pos hint" }, [`Certezza ${x.certezza}`, x.nota].filter(Boolean).join(" · "))); return c;
+    }));
+  } catch (e) { out.replaceChildren(el("div", { class: "banner warn" }, claudeError(e))); }
+  finally { btn.disabled = false; }
+}
+
+/* ---------- Schede ---------- */
+function sheet(...kids) {
+  const root = $("#sheet-root");
+  const close = () => root.replaceChildren();
+  root.replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) close(); } }, el("div", { class: "sheet", role: "dialog" }, ...kids)));
+  return close;
+}
+function laneSelect(id, value, auto) {
+  return el("select", { id }, auto ? el("option", { value: "" }, "Automatica, secondo lo schema") : null,
+    ...lanes().map(c => el("option", { value: c.id, selected: c.id === value }, `${c.nome} · ${c.dove}`)));
+}
+/* Aggiungi dalla ricerca: scegli corsia e posto (proposti) */
+function openPlace(r) {
+  const it = makeItem(r);
+  const ls = laneSelect("pl-lane", it.corsia, false);
+  const ps = el("input", { type: "number", id: "pl-posto", inputmode: "numeric", min: "1", placeholder: "vuoto = senza posto" });
+  const close = sheet(el("h2", { class: "sci" }, it.scientifico), el("p", { class: "hint" }, suggestion(it)),
+    el("div", { class: "field" }, el("label", { for: "pl-lane" }, "Corsia"), ls),
+    el("div", { class: "field" }, el("label", { for: "pl-posto" }, "Posto"), ps),
+    el("div", { class: "row" }, el("button", { class: "btn primary", onclick: async () => {
+      if (findExisting(it.scientifico)) { close(); toast(`${it.scientifico} è già in mostra`); return; }
+      const fin = { ...it, corsia: ls.value, posto: ps.value ? +ps.value : null };
+      await putItem(fin); lastAction = { created: [fin.id], moved: [], photo: null };
+      close(); $("#q").value = ""; $("#ai-out").replaceChildren(); renderResults();
+      toast(`Aggiunta ${fin.scientifico} · ${where(fin)}`, { label: "Annulla", fn: undo });
+    } }, "Aggiungi"), el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi")));
+}
 function openEdit(it) {
   const isNew = !it;
-  const cur = it || { scientifico: $("#q").value.trim(), italiano: "", famiglia: "", corsia: "", note: "" };
-  const root = $("#sheet-root"); let confirmDel = false;
+  const cur = it || { scientifico: $("#q").value.trim(), italiano: "", famiglia: "", corsia: "", posto: null, note: "" };
+  let confirmDel = false;
   const famSel = el("select", { id: "e-fam" }, el("option", { value: "" }, "Da verificare"),
     ...SECTORS.filter(s => s.fam.length).map(s => el("optgroup", { label: s.nome }, ...s.fam.map(f => el("option", { value: f, selected: f === cur.famiglia }, f)))));
   if (cur.famiglia && !ALL_FAMILIES.includes(cur.famiglia)) famSel.prepend(el("option", { value: cur.famiglia, selected: true }, cur.famiglia));
-  const laneSel = el("select", { id: "e-lane" }, el("option", { value: "" }, "Automatica, secondo lo schema"),
-    ...lanes().map(c => el("option", { value: c.id, selected: c.id === cur.corsia }, `${c.nome} · ${c.dove}`)));
+  const ls = laneSelect("e-lane", cur.corsia, true);
+  const ps = el("input", { type: "number", id: "e-posto", inputmode: "numeric", min: "1", value: cur.posto ?? "", placeholder: "vuoto = senza posto" });
   const sci = el("input", { type: "text", id: "e-sci", value: cur.scientifico, autocapitalize: "off", spellcheck: "false" });
   const ita = el("input", { type: "text", id: "e-ita", value: cur.italiano });
   const note = el("textarea", { id: "e-note", style: "min-height:70px" }, cur.note || "");
+  const ph = it?.posto ? slotPhotos(it.corsia, it.posto)[0] : null;
   const delBtn = isNew ? null : el("button", { class: "btn danger", onclick: async () => {
     if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare"; return; }
-    await removeItem(it.id); close(); toast(`Eliminato ${it.scientifico}`);
+    await removeItem(it.id); close(); toast(`Eliminata ${it.scientifico}`);
   } }, "Elimina");
-  function close() { root.replaceChildren(); }
   async function save() {
     const s = sci.value.trim(); if (!s) { sci.focus(); return; }
-    const fam = famSel.value, sec = sectorOf(fam);
-    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: laneSel.value || laneFor(sec), note: note.value.trim() });
-    if (isNew) {
-      if (findExisting(s)) { toast(`${s} è già in mostra`); return; }
-      await putItem(base);
-    } else {
-      base.creato = it.creato || base.creato;
-      if (base.id !== it.id) await removeItem(it.id);
-      await putItem(base);
-    }
-    close(); toast(`Salvato. ${positionText(state.items.get(base.id))}`);
+    const fam = famSel.value;
+    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: ls.value || laneFor(sectorOf(fam)), posto: ps.value ? +ps.value : null, note: note.value.trim() });
+    if (isNew) { if (findExisting(s)) { toast(`${s} è già in mostra`); return; } await putItem(base); }
+    else { base.creato = it.creato || base.creato; if (base.id !== it.id) await removeItem(it.id); await putItem(base); }
+    close(); toast(`Salvata · ${where(base)}`);
   }
-  root.replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) close(); } },
-    el("div", { class: "sheet", role: "dialog", "aria-label": isNew ? "Nuova specie" : "Modifica specie" },
-      el("h2", {}, isNew ? "Nuova specie" : it.scientifico),
-      isNew ? null : el("p", { class: "hint" }, positionText(it)),
-      el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
-      el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
-      el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
-      el("div", { class: "field" }, el("label", { for: "e-lane" }, "Corsia"), laneSel),
-      el("div", { class: "field" }, el("label", { for: "e-note" }, "Note"), note),
-      el("div", { class: "row" }, el("button", { class: "btn primary", onclick: save }, "Salva"), el("button", { class: "btn ghost", onclick: close }, "Chiudi"), delBtn))));
-  (isNew ? sci : ita).focus();
+  const close = sheet(
+    el("h2", { class: isNew ? "" : "sci" }, isNew ? "Nuova specie" : it.scientifico),
+    isNew ? null : el("p", {}, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))),
+    ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0;justify-self:start", onclick: () => openSlot(it.corsia, it.posto) }, photoThumb(ph, "thumb lg")) : null,
+    el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
+    el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
+    el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
+    el("div", { class: "row" }, el("div", { class: "field", style: "flex:2 1 200px" }, el("label", { for: "e-lane" }, "Corsia"), ls),
+      el("div", { class: "field", style: "flex:1 1 100px" }, el("label", { for: "e-posto" }, "Posto"), ps)),
+    el("div", { class: "field" }, el("label", { for: "e-note" }, "Note"), note),
+    el("div", { class: "row" }, el("button", { class: "btn primary", onclick: save }, "Salva"), el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi"), delBtn));
+}
+function openSlot(c, p) {
+  const phs = slotPhotos(c, p), items = slotItems(c, p);
+  let shown = phs[0], confirmDel = false;
+  const img = shown ? el("img", { class: "full", src: imgUrl(shown), alt: `Foto ${laneName(c)} posto ${p}` }) : null;
+  const delBtn = shown ? el("button", { class: "btn danger", onclick: async () => {
+    if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare la foto"; return; }
+    await removePhoto(shown); close(); toast("Foto eliminata");
+  } }, "Elimina questa foto") : null;
+  const close = sheet(
+    el("h2", {}, `${laneName(c)} · posto ${p}`),
+    img || el("div", { class: "empty" }, "Nessuna foto per questo posto."),
+    phs.length > 1 ? el("div", { class: "row" }, ...phs.map(f => el("button", { class: "ph", style: "background:none;border:0;padding:0", onclick: () => { shown = f; img.src = imgUrl(f); confirmDel = false; delBtn.textContent = "Elimina questa foto"; } },
+      photoThumb(f), el("div", { class: "hint" }, (f.creato || "").slice(11, 16))))) : null,
+    el("div", { class: "list" }, ...items.map(i => el("button", { class: "card tap", onclick: () => { close(); openEdit(i); } }, names(i)))),
+    el("div", { class: "row" }, el("button", { class: "btn primary", onclick: () => { close(); goTab("v-cap"); setSlot(c, p); } }, "Registra questo posto"),
+      el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi"), delBtn));
 }
 
-/* Catalogo */
+/* ---------- MAPPA ---------- */
+let selLane = "c1", hlSlot = null;
+function renderMap() {
+  if (!laneById(selLane)) selLane = lanes()[0].id;
+  $("#room").replaceChildren(...lanes().slice(0, 4).map((c, i) => el("button", { class: "bed p" + (i + 1), "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; hlSlot = null; renderMap(); } },
+    el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length), el("small", {}, c.dove))));
+  const c = laneById(selLane), items = laneItems(selLane), max = maxPosto(selLane);
+  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, "Posto 1 = lato ingresso. Tocca una foto per ingrandirla.")];
+  if (max) {
+    const strip = el("div", { class: "strip" });
+    for (let p = 1; p <= max; p++) {
+      const here = slotItems(selLane, p), ph = slotPhotos(selLane, p)[0];
+      strip.append(el("div", { class: "spot" + (hlSlot === p ? " hl" : ""), id: `spot-${selLane}-${p}` },
+        el("span", { class: "no" }, p),
+        ph ? el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, photoThumb(ph)) : el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, el("span", { class: "noimg" }, "senza foto")),
+        el("div", { class: "who" }, here.length ? here.map(i => el("button", { onclick: () => openEdit(i) }, el("span", { class: "sci" }, i.scientifico), i.italiano ? el("span", { class: "ita" }, " · " + i.italiano) : null))
+                                               : el("span", { class: "hint" }, "vuoto"))));
+    }
+    kids.push(strip);
+  } else kids.push(el("div", { class: "empty" }, "Nessun posto registrato in questa corsia. Usa Registra: scegli la corsia, detta le specie del posto 1, scatta la foto e salva."));
+  const loose = items.filter(i => !i.posto);
+  if (loose.length) {
+    kids.push(el("h3", {}, `Senza posto (${loose.length})`));
+    kids.push(el("div", { class: "list" }, ...loose.sort(cmp).map(i => el("button", { class: "card tap", onclick: () => openEdit(i) }, names(i), el("span", { class: "pos hint" }, suggestion(i))))));
+  }
+  $("#lane-view").replaceChildren(...kids);
+  if (hlSlot) document.getElementById(`spot-${selLane}-${hlSlot}`)?.scrollIntoView({ block: "center" });
+}
+
+/* ---------- CATALOGO ---------- */
 function renderCatalog() {
-  const f = norm($("#filter").value); const box = $("#catalog");
-  let list = [...state.items.values()].sort(cmp);
+  const f = norm($("#filter").value), box = $("#catalog");
+  let list = allItems().sort(cmp);
   if (f) list = list.filter(i => [i.scientifico, i.italiano, i.famiglia, i.genere].some(x => norm(x).includes(f)));
-  if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Aggiungi la prima specie dalla scheda Aggiungi, una alla volta oppure dettando un elenco di una corsia.")); return; }
+  if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Inizia da Registra: una corsia alla volta, posto per posto.")); return; }
   if (!list.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna specie corrisponde al filtro.")); return; }
   const groups = [];
   for (const s of SECTORS) {
@@ -963,35 +1419,14 @@ function renderCatalog() {
     const kids = []; let lastFam = null;
     for (const it of items) {
       if (it.famiglia !== lastFam) { kids.push(el("div", { class: "fam" }, it.famiglia || "Famiglia da verificare")); lastFam = it.famiglia; }
-      kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) }, names(it), el("span", { class: "pill" }, laneName(it.corsia))));
+      kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) }, names(it), el("span", { class: it.posto ? "pill" : "pill soft" }, it.posto ? `${laneName(it.corsia)} · ${it.posto}` : laneName(it.corsia))));
     }
     groups.push(el("div", { class: "group" }, el("header", {}, el("h2", {}, s.nome), el("span", { class: "num" }, items.length)), ...kids));
   }
   box.replaceChildren(...groups);
 }
 
-/* Corsie */
-let selLane = "c1";
-function renderLanes() {
-  const room = $("#room");
-  room.replaceChildren(...lanes().slice(0, 4).map((c, i) => el("button", { class: "bed " + ["c1","c2","c3","c4"][i], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; renderLanes(); } },
-    el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length), el("small", {}, c.dove))));
-  if (!laneById(selLane)) selLane = lanes()[0].id;
-  const c = laneById(selLane); const items = laneItems(selLane);
-  const secs = SECTORS.filter(s => laneFor(s.id) === selLane).map(s => s.nome);
-  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, secs.length ? "Settori previsti: " + secs.join(", ") : "Nessun settore assegnato in Schema.")];
-  if (!items.length) kids.push(el("div", { class: "empty" }, "Nessuna specie in questa corsia."));
-  let lastSec = null;
-  items.forEach((it, i) => {
-    if (it.settore !== lastSec) { kids.push(el("h3", {}, SECTORS[SEC_IDX[it.settore]]?.nome || "Da collocare")); lastSec = it.settore; }
-    kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) },
-      el("div", { class: "names" }, el("span", {}, el("span", { class: "num" }, i + 1), el("span", { class: "sci" }, it.scientifico)), it.italiano ? el("span", { class: "ita" }, it.italiano) : null),
-      el("span", { class: "meta hint" }, it.famiglia)));
-  });
-  $("#lane-list").replaceChildren(...kids);
-}
-
-/* Schema */
+/* ---------- SCHEMA ---------- */
 let draft = null;
 function renderSchema(from = state.layout) {
   draft = structuredClone(from);
@@ -1005,12 +1440,8 @@ function renderSchema(from = state.layout) {
     el("div", { class: "field" }, el("label", { for: "ld-" + c.id }, "Dove si trova"), el("input", { type: "text", id: "ld-" + c.id, value: c.dove, oninput: e => { draft.corsie[i].dove = e.target.value; } })))));
 }
 
-function renderBatchLanes() {
-  const sel = $("#batch-lane"); const v = sel.value;
-  sel.replaceChildren(el("option", { value: "" }, "Automatica, secondo lo schema"), ...lanes().map(c => el("option", { value: c.id }, `${c.nome} · ${c.dove}`)));
-  sel.value = v;
-}
-
+/* ---------- Render generale ---------- */
+const visible = id => !$("#" + id).hidden;
 function renderHeader() {
   const n = state.items.size; $("#count").textContent = n === 1 ? "1 specie" : `${n} specie`;
   const m = $("#mode");
@@ -1018,48 +1449,58 @@ function renderHeader() {
   m.textContent = state.mode === "cloud" ? "Salvato online" : state.mode === "locale" ? "Solo su questo dispositivo" : "Connessione…";
 }
 function renderAll() {
-  renderHeader(); renderBatchLanes();
-  if (!$("#v-add").hidden) { renderResults(); renderReview(); }
-  if (!$("#v-cat").hidden) renderCatalog();
-  if (!$("#v-lanes").hidden) renderLanes();
+  renderHeader();
+  if (visible("v-cap")) renderCapture();
+  if (visible("v-find")) renderResults();
+  if (visible("v-map")) renderMap();
+  if (visible("v-cat")) renderCatalog();
+}
+function goTab(v) {
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.v === v)));
+  document.querySelectorAll("section.view[id^=v-]").forEach(s => s.hidden = s.id !== v);
+  if (v === "v-schema") renderSchema();
+  renderAll(); window.scrollTo(0, 0);
 }
 
-/* CSV */
+/* ---------- Esportazione ---------- */
 function csv() {
   const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = [["Corsia","Posizione","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunto il"]];
-  for (const c of lanes()) laneItems(c.id).forEach((it, i) => rows.push([c.nome, i + 1, SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
+  const rows = [["Corsia","Posto","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunta il"]];
+  for (const c of lanes()) laneItems(c.id).forEach(it => rows.push([c.nome, it.posto ?? "", SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
   return "﻿" + rows.map(r => r.map(q).join(";")).join("\r\n");
 }
 function plainList() {
-  return lanes().map(c => `${c.nome} (${c.dove})\n` + laneItems(c.id).map((it, i) => `${i + 1}. ${it.scientifico}${it.italiano ? " – " + it.italiano : ""}`).join("\n")).join("\n\n");
+  return lanes().map(c => `${c.nome} (${c.dove})\n` + laneItems(c.id).map(it => `${it.posto ? "posto " + it.posto : "senza posto"}: ${it.scientifico}${it.italiano ? " (" + it.italiano + ")" : ""}`).join("\n")).join("\n\n");
 }
 
 /* ---------- Eventi ---------- */
-document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
-  document.querySelectorAll("section.view[id^=v-]").forEach(s => s.hidden = s.id !== b.dataset.v);
-  if (b.dataset.v === "v-schema") renderSchema();
-  renderAll(); window.scrollTo(0, 0);
-}));
-$("#m-one").addEventListener("click", () => { $("#one").hidden = false; $("#many").hidden = true; $("#m-one").setAttribute("aria-pressed", "true"); $("#m-many").setAttribute("aria-pressed", "false"); });
-$("#m-many").addEventListener("click", () => { $("#one").hidden = true; $("#many").hidden = false; $("#m-one").setAttribute("aria-pressed", "false"); $("#m-many").setAttribute("aria-pressed", "true"); });
-let qTimer; $("#q").addEventListener("input", () => { clearTimeout(qTimer); $("#ai-out").replaceChildren(); qTimer = setTimeout(renderResults, 120); });
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => goTab(b.dataset.v)));
+$("#p-minus").addEventListener("click", () => setSlot(cap.corsia, cap.posto - 1));
+$("#p-plus").addEventListener("click", () => setSlot(cap.corsia, cap.posto + 1));
+$("#p-num").addEventListener("change", e => setSlot(cap.corsia, +e.target.value));
+$("#cap-photo").addEventListener("change", async e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  clearCapPhoto(); cap.file = f; cap.blob = await compress(f); cap.previewUrl = URL.createObjectURL(cap.blob); renderCapture();
+});
+$("#cap-photo-clear").addEventListener("click", () => { clearCapPhoto(); renderCapture(); });
+$("#cap-save").addEventListener("click", onCapSave);
+$("#cap-from-photo").addEventListener("click", onCapFromPhoto);
+$("#cap-confirm").addEventListener("click", async e => { e.target.disabled = true; try { await commitCapture(); } finally { e.target.disabled = false; } });
+$("#cap-cancel").addEventListener("click", () => { clearCapReview(); renderCapReview(); });
+let qTimer; $("#q").addEventListener("input", () => { clearTimeout(qTimer); $("#ai-out").replaceChildren(); qTimer = setTimeout(renderResults, 150); });
 $("#q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); renderResults(); } });
 $("#ask-ai").addEventListener("click", onAskAI);
 $("#manual").addEventListener("click", () => openEdit(null));
-$("#parse").addEventListener("click", onParse);
-$("#commit").addEventListener("click", onCommit);
-$("#clear-review").addEventListener("click", () => { reviewRows = []; renderReview(); $("#parse-status").textContent = ""; });
 $("#filter").addEventListener("input", renderCatalog);
 $("#save-layout").addEventListener("click", async () => {
-  const before = state.layout; await putLayout(draft);
-  /* le specie seguono la nuova assegnazione se erano nella corsia prevista dallo schema precedente */
-  for (const it of state.items.values()) {
+  const before = state.layout, next = draft;
+  if (!await putLayout(next)) return;
+  /* le specie senza posto seguono la nuova assegnazione della loro corsia automatica */
+  for (const it of allItems()) {
     const oldAuto = (before.assegna || {})[it.settore], newAuto = laneFor(it.settore);
-    if (it.corsia === oldAuto && oldAuto !== newAuto) await putItem({ ...it, corsia: newAuto, aggiornato: new Date().toISOString() });
+    if (!it.posto && it.corsia === oldAuto && oldAuto !== newAuto) await putItem({ ...it, corsia: newAuto, aggiornato: new Date().toISOString() });
   }
-  renderSchema();
+  renderSchema(); toast("Schema e corsie salvati");
 });
 $("#reset-layout").addEventListener("click", () => { renderSchema(DEFAULT_LAYOUT); toast("Predefinito caricato. Tocca Salva per confermare."); });
 $("#export").addEventListener("click", async () => {
@@ -1074,34 +1515,40 @@ $("#export").addEventListener("click", async () => {
 $("#copy").addEventListener("click", async () => {
   const t = plainList();
   try { await navigator.clipboard.writeText(t); toast("Elenco copiato"); }
-  catch { openTextSheet(t); }
+  catch {
+    const ta = el("textarea", { id: "copy-area", readonly: true, style: "min-height:50vh" }, t);
+    sheet(el("h2", {}, "Elenco per corsia"), el("p", { class: "hint" }, "Tieni premuto per selezionare e copiare."), ta); ta.select();
+  }
 });
-function openTextSheet(t) {
-  const ta = el("textarea", { id: "copy-area", readonly: true, style: "min-height:50vh" }, t);
-  $("#sheet-root").replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) $("#sheet-root").replaceChildren(); } },
-    el("div", { class: "sheet" }, el("h2", {}, "Elenco per corsia"), el("p", { class: "hint" }, "Tieni premuto per selezionare e copiare."), ta,
-      el("button", { class: "btn", onclick: () => $("#sheet-root").replaceChildren() }, "Chiudi"))));
-  ta.select();
+/* Da un link con #c2-5 si apre la mappa su quel posto */
+function openFromHash() {
+  const m = location.hash.match(/^#(c\d)-(\d+)$/); if (!m) return;
+  selLane = m[1]; hlSlot = +m[2]; goTab("v-map");
 }
 
 /* ---------- Avvio ---------- */
-loadLocal(); renderAll();
+loadLocal(); renderAll(); openFromHash();
 (async function boot() {
   const c = window.claude;
   if (!c || typeof c.use !== "function") { state.mode = "locale"; renderHeader(); return; }
-  c.use("sample").then(s => { state.sample = s; }).catch(() => {});
+  c.use("sample").then(async s => { state.sample = s; if (s) { try { state.canImages = !!(await s.limits()).images; } catch {} } renderAll(); }).catch(() => {});
   c.use("downloads").then(d => { state.downloads = d; }).catch(() => {});
+  c.use("assets").then(a => { state.assets = a; }).catch(() => {});
   let db = null; try { db = await c.use("db"); } catch {}
   if (!db) { state.mode = "locale"; renderHeader(); return; }
   state.db = db; state.mode = "cloud"; state.items = new Map(); renderAll();
   db.collection("specie").onSnapshot(snap => {
     const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.scientifico) m.set(d.id, { ...v, id: d.id }); });
     state.items = m; renderAll();
-  }, e => { toast("Collegamento al catalogo interrotto. Ricarica la pagina."); });
+  }, () => toast("Collegamento al catalogo interrotto. Ricarica la pagina."));
+  db.collection("foto").onSnapshot(snap => {
+    const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.asset) m.set(d.id, { ...v, id: d.id }); });
+    state.photos = m; renderAll();
+  }, () => {});
   db.doc("config/layout").onSnapshot(d => {
     const v = d.exists ? d.data() : null;
     state.layout = v && Array.isArray(v.corsie) ? structuredClone(v) : structuredClone(DEFAULT_LAYOUT);
-    if (!$("#v-schema").hidden) renderSchema();
+    if (visible("v-schema")) renderSchema();
     renderAll();
   }, () => {});
 })();
