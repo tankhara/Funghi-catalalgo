@@ -1508,26 +1508,39 @@ async function onRunCommit() {
 
 /* ---------- Dettatura con pulsante (Web Speech, se il browser e la pagina lo consentono) ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-// The claude.ai viewer frame does not grant the microphone: detect it up front and point to the keyboard mic instead.
-const KEYBOARD_HINT = "Tocca il campo e usa il microfono della tastiera: pronuncia i nomi con una pausa tra una specie e l'altra.";
-const micPolicyOff = (() => { try { return document.featurePolicy ? !document.featurePolicy.allowsFeature("microphone") : false; } catch { return false; } })();
-let micBlocked = !SR || micPolicyOff || lsGet("funghi.micBlocked") === true, activeRec = null;
-if (micBlocked) $("#dict-hint").textContent = KEYBOARD_HINT;
-function micUnavailable() {
-  if (micBlocked) return; micBlocked = true; lsSet("funghi.micBlocked", true);
-  document.querySelectorAll(".btn.mic").forEach(x => x.remove());
-  $("#dict-hint").textContent = KEYBOARD_HINT;
-  toast("Il microfono non è consentito in questa pagina. Usa il microfono della tastiera.");
+// Dictation inside the claude.ai viewer: getUserMedia first, so Chrome shows its microphone prompt, then it-IT speech recognition.
+// If it still fails, say exactly why (error code and whether the frame may use the microphone).
+const micPolicy = (() => { try { return document.featurePolicy ? document.featurePolicy.allowsFeature("microphone") : null; } catch { return null; } })();
+try { localStorage.removeItem("funghi.micBlocked"); } catch {}
+let activeRec = null;
+async function askMic() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+  try { const st = await navigator.mediaDevices.getUserMedia({ audio: true }); st.getTracks().forEach(t => t.stop()); return null; }
+  catch (e) { return (e && e.name) || "errore"; }
+}
+function micHelp(code) {
+  const why = !SR ? "questo browser non ha il riconoscimento vocale"
+    : micPolicy === false ? "il visualizzatore di claude.ai non concede il microfono a questa pagina"
+    : ["NotAllowedError", "not-allowed", "SecurityError"].includes(code) ? "Chrome non ha il permesso del microfono per claude.ai. Tocca l'icona a sinistra dell'indirizzo, poi Autorizzazioni, Microfono, Consenti, e ricarica la pagina"
+    : ["NotFoundError", "NotReadableError", "audio-capture"].includes(code) ? "il microfono non è disponibile, forse lo sta usando un'altra app"
+    : code === "network" ? "manca la connessione al servizio di riconoscimento vocale"
+    : code === "service-not-allowed" ? "Chrome non permette il riconoscimento vocale in questa pagina"
+    : "errore imprevisto";
+  toast(`Detta non funziona: ${why}. Codice: ${code}, microfono nel riquadro: ${micPolicy === null ? "non noto" : micPolicy ? "sì" : "no"}.`, { label: "OK", fn: () => {} });
 }
 function micButton(target) {
-  if (!SR || micBlocked) return null;
   const label = el("span", {}, "Detta");
   const b = el("button", { class: "btn mic", type: "button" },
     el("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2" }), label);
   b.querySelector("svg").innerHTML = '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>';
-  b.addEventListener("click", () => {
+  b.addEventListener("click", async () => {
     if (activeRec) { activeRec.stop(); return; }
-    let rec; try { rec = new SR(); } catch { micUnavailable(); return; }
+    if (!SR) { micHelp("nessun SpeechRecognition"); return; }
+    b.disabled = true; label.textContent = "…";
+    const denied = await askMic();
+    b.disabled = false; label.textContent = "Detta";
+    if (denied) { micHelp(denied); return; }
+    let rec; try { rec = new SR(); } catch (e) { micHelp((e && e.name) || "SR"); return; }
     rec.lang = "it-IT"; rec.continuous = true; rec.interimResults = true;
     const base = target.value.trim() ? target.value.trim().replace(/[,;]?$/, ", ") : "";
     let finals = "";
@@ -1540,9 +1553,9 @@ function micButton(target) {
       target.value = base + finals + (interim ? (finals ? ", " : "") + interim : "");
       target.dispatchEvent(new Event("input"));
     };
-    rec.onerror = e => { if (["not-allowed", "service-not-allowed", "audio-capture"].includes(e.error)) micUnavailable(); };
+    rec.onerror = e => { if (!["no-speech", "aborted"].includes(e.error)) micHelp(e.error); };
     rec.onend = () => { activeRec = null; b.classList.remove("on"); label.textContent = "Detta"; };
-    try { rec.start(); activeRec = rec; b.classList.add("on"); label.textContent = "Stop"; } catch { micUnavailable(); }
+    try { rec.start(); activeRec = rec; b.classList.add("on"); label.textContent = "Stop"; } catch (e) { micHelp((e && e.name) || "start"); }
   });
   return b;
 }
