@@ -331,9 +331,13 @@ textarea { min-height: 96px; resize: vertical; }
     <p class="hint" id="walk"></p>
     <div class="salabox stack" id="sala-box" hidden>
       <h3>Mostra la sala a Claude</h3>
-      <p class="hint">Scegli il video della sala. Il telefono ne estrae circa 40 fotogrammi e li salva qui, così Claude li vede e corregge la pianta. Non riconosce specie e non tocca il catalogo.</p>
-      <label class="btn wide" for="sala-video">Scegli il video della sala</label>
+      <p class="hint">Scegli il video della sala. Il telefono ne estrae circa 40 fotogrammi, oppure solo l'audio se hai commentato a voce, e li salva qui, così Claude li vede o li ascolta e corregge la pianta. Non riconosce specie e non tocca il catalogo.</p>
+      <div class="row">
+        <label class="btn wide" for="sala-video">Immagini dal video</label>
+        <label class="btn wide" for="sala-audio">Solo l'audio del video</label>
+      </div>
       <input id="sala-video" type="file" accept="video/*" hidden>
+      <input id="sala-audio" type="file" accept="video/*,audio/*" hidden>
       <p class="hint" id="sala-status"></p>
     </div>
     <div id="lane-view" class="stack"></div>
@@ -1176,6 +1180,35 @@ async function sendRoomVideo(file) {
   finally { $("#sala-video").value = ""; }
 }
 
+// Audio track as 16 kHz mono WAV, base64 in text/plain assets (the asset store takes no audio types), listed in config/sala-audio
+async function sendRoomAudio(file) {
+  const st = $("#sala-status"); if (!file || !state.assets || !state.db) return;
+  try {
+    st.textContent = "Leggo l'audio del video…";
+    const ac = new (window.AudioContext || window.webkitAudioContext)(); let buf;
+    try { buf = await ac.decodeAudioData(await file.arrayBuffer()); } finally { try { ac.close(); } catch {} }
+    const rate = 16000, len = Math.ceil(buf.duration * rate);
+    const off = new OfflineAudioContext(1, len, rate), src = off.createBufferSource();
+    src.buffer = buf; src.connect(off.destination); src.start();
+    const pcm = (await off.startRendering()).getChannelData(0);
+    const wav = new DataView(new ArrayBuffer(44 + len * 2));
+    const str = (o, t) => { for (let i = 0; i < t.length; i++) wav.setUint8(o + i, t.charCodeAt(i)); };
+    str(0, "RIFF"); wav.setUint32(4, 36 + len * 2, true); str(8, "WAVEfmt "); wav.setUint32(16, 16, true); wav.setUint16(20, 1, true); wav.setUint16(22, 1, true);
+    wav.setUint32(24, rate, true); wav.setUint32(28, rate * 2, true); wav.setUint16(32, 2, true); wav.setUint16(34, 16, true); str(36, "data"); wav.setUint32(40, len * 2, true);
+    for (let i = 0; i < len; i++) wav.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
+    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(new Blob([wav.buffer])); });
+    const PART = 12 * 1024 * 1024, n = Math.ceil(b64.length / PART), parts = [];
+    for (let i = 0; i < n; i++) {
+      st.textContent = `Invio l'audio: parte ${i + 1} di ${n}`;
+      parts.push((await state.assets.upload(new Blob([b64.slice(i * PART, (i + 1) * PART)], { type: "text/plain" }), { type: "text/plain" })).id);
+    }
+    const sec = Math.round(buf.duration);
+    await state.db.doc("config/sala-audio").set({ parti: parts, formato: "wav 16 kHz mono, base64", secondi: sec, file: file.name, creato: new Date().toISOString() });
+    st.textContent = `Fatto: audio di ${sec} secondi inviato. Scrivi a Claude in chat che l'audio è pronto.`;
+  } catch (e) { st.textContent = "Audio non riuscito: " + (e && e.message || e) + ". Riprova."; }
+  finally { $("#sala-audio").value = ""; }
+}
+
 /* ---------- UI helpers ---------- */
 const $ = s => document.querySelector(s);
 function el(tag, attrs = {}, ...kids) {
@@ -1772,6 +1805,7 @@ $("#m-spot").addEventListener("click", () => setCapMode("spot"));
 $("#m-run").addEventListener("click", () => setCapMode("run"));
 $("#run-video").addEventListener("change", e => onRunFiles(e.target.files, "video"));
 $("#sala-video").addEventListener("change", e => sendRoomVideo(e.target.files[0]));
+$("#sala-audio").addEventListener("change", e => sendRoomAudio(e.target.files[0]));
 $("#run-photos").addEventListener("change", e => onRunFiles(e.target.files, "foto"));
 $("#run-start").addEventListener("input", () => { run.startTouched = true; });
 $("#run-analyze").addEventListener("click", onRunAnalyze);
