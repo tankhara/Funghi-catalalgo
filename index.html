@@ -1,0 +1,1108 @@
+<title>Catalogo Mostra Funghi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,500;1,600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: phone-first single column, sticky header, bottom tab bar; content reads like exhibition name cards on soil. */
+:root {
+  --bg: #f3f4ef;
+  --surface: #ffffff;
+  --sunk: #e7e9e1;
+  --fg: #1f231d;
+  --muted: #5d6458;
+  --line: #d3d7cb;
+  --accent: #0e5e5a;        /* the teal of the table skirts */
+  --accent-ink: #ffffff;
+  --accent-soft: #d5ebe8;
+  --soil: #4a3b2e;
+  --bed: #4a3b2e;
+  --bed-fg: #ffffff;
+  --brick: #b0603a;
+  --ok: #2f7a3a;
+  --ok-soft: #dcefd9;
+  --warn: #9a5b00;
+  --warn-soft: #f6e6c8;
+  --danger: #a3302a;
+  --serif: "Alegreya", Georgia, "Times New Roman", serif;
+  --sans: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151916; --surface: #1d221e; --sunk: #252b26; --fg: #e8ebe3; --muted: #a3ab9d; --line: #343c35;
+    --accent: #5fb8b0; --accent-ink: #0c1a19; --accent-soft: #1d3a38; --soil: #c9b39a; --bed: #3d3026; --bed-fg: #f3ece3; --brick: #d98a62;
+    --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151916; --surface: #1d221e; --sunk: #252b26; --fg: #e8ebe3; --muted: #a3ab9d; --line: #343c35;
+  --accent: #5fb8b0; --accent-ink: #0c1a19; --accent-soft: #1d3a38; --soil: #c9b39a; --bed: #3d3026; --bed-fg: #f3ece3; --brick: #d98a62;
+  --ok: #7cc487; --ok-soft: #1f3523; --warn: #e0a64a; --warn-soft: #3a2f1b; --danger: #ec8a83;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--sans); font-size: 16px; line-height: 1.45; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sci { font-family: var(--serif); font-style: italic; font-weight: 600; }
+
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+}
+header.top h1 { font-family: var(--serif); font-weight: 700; font-size: 1.35rem; margin: 0; text-wrap: balance; }
+header.top .count { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+header.top .mode { margin-left: auto; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+header.top .mode.local { color: var(--warn); }
+
+main {
+  padding-block: 16px 110px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  max-width: 760px; margin: 0 auto;
+}
+section.view { display: grid; gap: 16px; }
+h2 { font-family: var(--serif); font-size: 1.25rem; margin: 0; text-wrap: balance; }
+h3 { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 700; }
+p { margin: 0; }
+.hint { color: var(--muted); font-size: .9rem; }
+
+nav.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  background: var(--surface); border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+nav.tabs button {
+  background: none; border: 0; padding: 12px 4px 10px; font-size: .85rem; color: var(--muted);
+  display: grid; justify-items: center; gap: 2px; border-top: 3px solid transparent;
+}
+nav.tabs button[aria-selected="true"] { color: var(--accent); border-top-color: var(--accent); font-weight: 700; }
+nav.tabs svg { width: 22px; height: 22px; }
+
+.seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: none; padding: 7px 14px; border-radius: 999px; font-size: .9rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+.field { display: grid; gap: 6px; }
+.field label { font-size: .85rem; font-weight: 700; }
+input[type=text], input[type=search], textarea, select {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r);
+  padding: 12px 14px; font-size: 1.05rem;
+}
+textarea { min-height: 120px; resize: vertical; }
+input.big { font-size: 1.25rem; padding: 14px 16px; border-color: var(--accent); }
+
+.btn { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 16px; font-weight: 700; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: none; }
+.btn.danger { color: var(--danger); border-color: var(--danger); background: none; }
+.btn:disabled { opacity: .5; cursor: default; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.list { display: grid; gap: 8px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+}
+.card .names { min-width: 0; display: grid; gap: 1px; }
+.card .names .sci { font-size: 1.15rem; overflow-wrap: anywhere; }
+.card .names .ita { color: var(--fg); font-size: .95rem; }
+.card .names .meta { color: var(--muted); font-size: .8rem; }
+.card.present { border-color: var(--ok); background: var(--ok-soft); }
+.card.tap { cursor: pointer; text-align: left; width: 100%; font: inherit; }
+.pill { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.pill.ok { background: var(--ok); color: var(--surface); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pos { font-size: .85rem; color: var(--fg); grid-column: 1 / -1; }
+
+.banner { border-radius: var(--r); padding: 12px 14px; font-size: .92rem; }
+.banner.ok { background: var(--ok-soft); color: var(--fg); border: 1px solid var(--ok); }
+.banner.warn { background: var(--warn-soft); color: var(--fg); border: 1px solid var(--warn); }
+.empty { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px; color: var(--muted); text-align: center; }
+
+.group { display: grid; gap: 8px; }
+.group > header { display: flex; align-items: baseline; gap: 8px; justify-content: space-between; border-bottom: 2px solid var(--soil); padding-bottom: 4px; }
+.group > header h2 { font-size: 1.1rem; }
+.group .fam { font-size: .8rem; font-weight: 700; color: var(--soil); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
+.num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; min-width: 2.2em; display: inline-block; }
+
+/* Room plan */
+.plan { background: var(--sunk); border-radius: var(--r); padding: 14px; display: grid; gap: 10px; }
+.plan .room { display: grid; grid-template-columns: 1fr 1.15fr .75fr; grid-template-rows: auto 1fr; gap: 10px; min-height: 300px; }
+.plan .bed {
+  border-radius: 6px; padding: 10px 8px; color: var(--bed-fg); text-align: left;
+  background: var(--bed); border: 5px solid var(--brick);
+  display: grid; align-content: space-between; gap: 6px; min-width: 0;
+}
+.plan .bed[aria-pressed="true"] { outline: 4px solid var(--accent); outline-offset: 2px; }
+.plan .bed b { font-size: .95rem; }
+.plan .bed small { font-size: .75rem; opacity: .85; overflow-wrap: anywhere; }
+.plan .bed .n { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.plan .c4 { grid-column: 1 / 3; grid-row: 1; min-height: 70px; }
+.plan .c1 { grid-column: 1; grid-row: 2; }
+.plan .c2 { grid-column: 2; grid-row: 2; }
+.plan .c3 { grid-column: 3; grid-row: 1 / 3; }
+.plan .door { font-size: .75rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
+
+.sector { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; }
+.sector .head { display: flex; gap: 10px; align-items: baseline; }
+.sector .idx { font-family: var(--serif); font-weight: 700; color: var(--brick); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.sector .desc { color: var(--muted); font-size: .88rem; }
+.sector select { padding: 8px 10px; font-size: .95rem; }
+.prose { display: grid; gap: 10px; font-size: .95rem; }
+.prose ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+
+.review { display: grid; gap: 8px; }
+.review label.card { grid-template-columns: auto 1fr auto; cursor: pointer; }
+.review input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); }
+.src { font-size: .75rem; color: var(--muted); grid-column: 2 / -1; }
+
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 20; display: grid; align-items: end; }
+.sheet {
+  background: var(--bg); border-radius: 16px 16px 0 0; max-height: 92vh; overflow: auto;
+  padding-block: 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 14px; max-width: 760px; width: 100%; margin: 0 auto;
+}
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--fg); color: var(--bg); padding: 12px 16px; border-radius: var(--r); max-width: min(92vw, 520px); font-size: .95rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+.spin { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: s 0.8s linear infinite; vertical-align: -2px; }
+@keyframes s { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+</style>
+
+<header class="top">
+  <h1>Funghi in mostra</h1>
+  <span class="count" id="count">0 specie</span>
+  <span class="mode" id="mode">Connessione…</span>
+</header>
+
+<main>
+  <!-- AGGIUNGI -->
+  <section class="view" id="v-add">
+    <div class="row">
+      <div class="seg" role="group" aria-label="Modalità">
+        <button id="m-one" aria-pressed="true">Una specie</button>
+        <button id="m-many" aria-pressed="false">Elenco dettato</button>
+      </div>
+    </div>
+
+    <div id="one" class="view">
+      <div class="field">
+        <label for="q">Nome scientifico o italiano</label>
+        <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Boletus aereus, porcino nero">
+        <p class="hint">Per dettare, tocca il microfono della tastiera del telefono. Basta un nome approssimativo.</p>
+      </div>
+      <div id="results" class="list"></div>
+      <div id="ai-out" class="list"></div>
+      <div class="row" id="one-actions" hidden>
+        <button class="btn" id="ask-ai">Chiedi a Claude di riconoscerlo</button>
+        <button class="btn ghost" id="manual">Inserisci a mano</button>
+      </div>
+    </div>
+
+    <div id="many" class="view" hidden>
+      <div class="field">
+        <label for="batch">Detta o scrivi più specie</label>
+        <textarea id="batch" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Amanita caesarea, Russula virescens, porcino estivo, Clathrus ruber"></textarea>
+        <p class="hint">Separa le specie con una virgola, un punto o andando a capo. Va bene anche dirle una dopo l'altra con "poi".</p>
+      </div>
+      <div class="field">
+        <label for="batch-lane">Dove le stai mettendo?</label>
+        <select id="batch-lane"></select>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="parse">Analizza elenco</button>
+        <span id="parse-status" class="hint"></span>
+      </div>
+      <div id="review" class="review"></div>
+      <div class="row" id="review-actions" hidden>
+        <button class="btn primary" id="commit">Aggiungi selezionate</button>
+        <button class="btn ghost" id="clear-review">Annulla</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATALOGO -->
+  <section class="view" id="v-cat" hidden>
+    <div class="field">
+      <label for="filter">Cerca nel catalogo</label>
+      <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filtra per nome, genere, famiglia">
+    </div>
+    <div class="row">
+      <button class="btn" id="export">Scarica CSV</button>
+      <button class="btn ghost" id="copy">Copia elenco</button>
+    </div>
+    <div id="catalog" class="view"></div>
+  </section>
+
+  <!-- CORSIE -->
+  <section class="view" id="v-lanes" hidden>
+    <div class="plan">
+      <div class="door">Fondo sala · porta</div>
+      <div class="room" id="room"></div>
+      <div class="door">Ingresso · punto della foto</div>
+    </div>
+    <p class="hint">Pianta indicativa ricavata dalla foto. Nomi e descrizioni delle corsie si cambiano in Schema.</p>
+    <div id="lane-list" class="view"></div>
+  </section>
+
+  <!-- SCHEMA -->
+  <section class="view" id="v-schema" hidden>
+    <div class="prose">
+      <h2>Ordine espositivo</h2>
+      <p>Le mostre micologiche italiane, quelle dei gruppi AMB comprese, dispongono i funghi in ordine sistematico. Le specie dello stesso genere stanno vicine, i generi della stessa famiglia uno accanto all'altro e le famiglie seguono l'ordine tassonomico. Così il visitatore vede affinità e differenze.</p>
+      <p>In pratica si usano due impostazioni, spesso mescolate:</p>
+      <ol>
+        <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani. Esempi di ordini sono Boletales, Russulales, Agaricales, Cantharellales e Polyporales, poi gli Ascomycota.</li>
+        <li><b>Tradizionale morfologica</b>, per tipo di imenoforo e colore delle spore: lamelle con spore bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e infine ascomiceti.</li>
+      </ol>
+      <p>Lo schema qui sotto è un ibrido. I grandi gruppi seguono gli ordini moderni e gli Agaricales sono divisi per colore delle spore, che il pubblico riconosce facilmente. Quando arriverà lo schema del volontario lo adattiamo.</p>
+    </div>
+    <div id="sectors" class="view"></div>
+    <h2>Corsie</h2>
+    <div id="lanes-edit" class="view"></div>
+    <div class="row">
+      <button class="btn primary" id="save-layout">Salva schema e corsie</button>
+      <button class="btn ghost" id="reset-layout">Ripristina predefinito</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-v="v-add" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Aggiungi</button>
+  <button role="tab" data-v="v-cat" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Catalogo</button>
+  <button role="tab" data-v="v-lanes" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>Corsie</button>
+  <button role="tab" data-v="v-schema" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v4M12 7l-6 5M12 7l6 5M6 12v4M18 12v4M4 20h4M16 20h4"/></svg>Schema</button>
+</nav>
+
+<div id="sheet-root"></div>
+<div id="toast-root"></div>
+
+<script>
+"use strict";
+/* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
+const SECTORS = [
+  { id: "bol", nome: "Boletales", desc: "Porcini e boleti, pinaroli, Gyroporus, poi Paxillus, Gomphidius, falso gallinaccio, Scleroderma e Astraeus",
+    fam: ["Boletaceae","Suillaceae","Gyroporaceae","Paxillaceae","Gomphidiaceae","Hygrophoropsidaceae","Tapinellaceae","Sclerodermataceae","Diplocystidiaceae","Rhizopogonaceae"] },
+  { id: "rus", nome: "Russulales", desc: "Russule, lattari, Lactifluus e affini (Auriscalpium, Stereum, Hericium)",
+    fam: ["Russulaceae","Auriscalpiaceae","Bondarzewiaceae","Stereaceae","Hericiaceae"] },
+  { id: "ama", nome: "Agaricales: Amanite e Plutei", desc: "Amanita, Pluteus, Volvopluteus, Volvariella",
+    fam: ["Amanitaceae","Pluteaceae"] },
+  { id: "agr", nome: "Agaricales: Agaricacee", desc: "Prataioli, lepiote, mazze di tamburo, coprino chiomato, vesce",
+    fam: ["Agaricaceae"] },
+  { id: "tri", nome: "Agaricales: spore bianche", desc: "Tricholoma, Clitocybe, Lepista, Calocybe, Armillaria, Pleurotus, Hygrophorus, Mycena, Laccaria",
+    fam: ["Tricholomataceae","Clitocybaceae","Lyophyllaceae","Physalacriaceae","Marasmiaceae","Omphalotaceae","Mycenaceae","Pleurotaceae","Hygrophoraceae","Hydnangiaceae","Porotheleaceae","Biannulariaceae","Callistosporiaceae"] },
+  { id: "ent", nome: "Agaricales: spore rosa", desc: "Entoloma, Clitopilus",
+    fam: ["Entolomataceae"] },
+  { id: "ocr", nome: "Agaricales: spore ocra e brune", desc: "Cortinarius, Inocybe, Hebeloma, Gymnopilus, Pholiota, Hypholoma, Agrocybe, pioppino",
+    fam: ["Cortinariaceae","Inocybaceae","Hymenogastraceae","Crepidotaceae","Tubariaceae","Bolbitiaceae","Strophariaceae"] },
+  { id: "ner", nome: "Agaricales: spore nere", desc: "Coprinellus, Coprinopsis, Psathyrella, Panaeolus",
+    fam: ["Psathyrellaceae","Galeropsidaceae"] },
+  { id: "can", nome: "Cantharellales", desc: "Gallinacci, trombette dei morti, steccherini, Clavulina",
+    fam: ["Cantharellaceae","Hydnaceae","Clavulinaceae"] },
+  { id: "gom", nome: "Gomphales, Phallales, Geastrales", desc: "Ramarie, Gomphus, Clavariadelphus, satirione, clatro, geastri",
+    fam: ["Gomphaceae","Clavariadelphaceae","Phallaceae","Clathraceae","Geastraceae"] },
+  { id: "pol", nome: "Polipori e lignicoli", desc: "Polyporales, Hymenochaetales, Thelephorales, Fistulina, Schizophyllum",
+    fam: ["Fistulinaceae","Polyporaceae","Ganodermataceae","Fomitopsidaceae","Laetiporaceae","Meripilaceae","Grifolaceae","Sparassidaceae","Meruliaceae","Phanerochaetaceae","Irpicaceae","Schizophyllaceae","Hymenochaetaceae","Thelephoraceae","Bankeraceae"] },
+  { id: "gel", nome: "Clavarie e gelatinosi", desc: "Clavaria, Clavulinopsis, Auricularia, Exidia, Tremella, Calocera",
+    fam: ["Clavariaceae","Auriculariaceae","Exidiaceae","Tremellaceae","Dacrymycetaceae"] },
+  { id: "asc", nome: "Ascomycota", desc: "Spugnole, elvelle, pezize, tartufi, Xylaria, Daldinia",
+    fam: ["Morchellaceae","Helvellaceae","Discinaceae","Pezizaceae","Pyronemataceae","Sarcoscyphaceae","Sarcosomataceae","Tuberaceae","Rhizinaceae","Xylariaceae","Hypoxylaceae","Hypocreaceae","Cordycipitaceae","Leotiaceae","Chlorociboriaceae","Geoglossaceae"] },
+  { id: "alt", nome: "Da collocare", desc: "Famiglia non riconosciuta o da verificare", fam: [] },
+];
+const SEC_IDX = Object.fromEntries(SECTORS.map((s, i) => [s.id, i]));
+const FAM2SEC = {}; const FAM_IDX = {};
+SECTORS.forEach(s => s.fam.forEach((f, i) => { FAM2SEC[f] = s.id; FAM_IDX[f] = i; }));
+const ALL_FAMILIES = SECTORS.flatMap(s => s.fam);
+
+const DEFAULT_LAYOUT = {
+  corsie: [
+    { id: "c1", nome: "Corsia 1", dove: "Aiuola lunga a sinistra" },
+    { id: "c2", nome: "Corsia 2", dove: "Aiuola centrale" },
+    { id: "c3", nome: "Corsia 3", dove: "Aiuola lungo la parete destra" },
+    { id: "c4", nome: "Mezza corsia", dove: "Tratto corto in fondo (da confermare)" },
+  ],
+  assegna: { bol: "c1", rus: "c1", ama: "c1", agr: "c1", tri: "c2", ent: "c2", ocr: "c2", ner: "c2", can: "c3", gom: "c3", pol: "c3", gel: "c3", asc: "c4", alt: "c4" },
+};
+
+/* ---------- Riferimento: Genere specie | nome italiano | famiglia | sinonimi e altri nomi (;) ---------- */
+const REF_RAW = `
+Boletus edulis|porcino|Boletaceae|porcino d'autunno;boleto edule
+Boletus aereus|porcino nero|Boletaceae|bronzino;boleto bronzino
+Boletus reticulatus|porcino estivo|Boletaceae|Boletus aestivalis;porcino reticolato
+Boletus pinophilus|porcino dei pini|Boletaceae|Boletus pinicola;porcino rosso
+Butyriboletus regius|boleto reale|Boletaceae|Boletus regius
+Butyriboletus appendiculatus|boleto appendicolato|Boletaceae|Boletus appendiculatus
+Butyriboletus fechtneri||Boletaceae|Boletus fechtneri
+Caloboletus radicans|boleto radicante|Boletaceae|Boletus radicans;Boletus albidus
+Caloboletus calopus|boleto dal piede elegante|Boletaceae|Boletus calopus
+Imperator rhodopurpureus||Boletaceae|Boletus rhodopurpureus
+Imperator torosus||Boletaceae|Boletus torosus
+Rubroboletus satanas|boleto satana|Boletaceae|Boletus satanas
+Rubroboletus legaliae||Boletaceae|Boletus legaliae;Boletus satanoides
+Rubroboletus rhodoxanthus||Boletaceae|Boletus rhodoxanthus
+Rubroboletus lupinus||Boletaceae|Boletus lupinus
+Suillellus luridus|boleto lurido|Boletaceae|Boletus luridus
+Suillellus queletii||Boletaceae|Boletus queletii
+Neoboletus luridiformis|boleto dal piede rosso|Boletaceae|Boletus erythropus;Boletus luridiformis
+Cyanoboletus pulverulentus|boleto pulverulento|Boletaceae|Boletus pulverulentus
+Hemileccinum impolitum|boleto impolito|Boletaceae|Boletus impolitus
+Hemileccinum depilatum||Boletaceae|Boletus depilatus
+Leccinum scabrum|porcinello|Boletaceae|porcinello grigio
+Leccinum aurantiacum|porcinello rosso|Boletaceae|
+Leccinum duriusculum||Boletaceae|
+Leccinellum lepidum|porcinello del leccio|Boletaceae|Leccinum lepidum
+Leccinellum corsicum|porcinello dei cisti|Boletaceae|Leccinum corsicum
+Xerocomus subtomentosus|boleto subtomentoso|Boletaceae|
+Xerocomellus chrysenteron|boleto crisentero|Boletaceae|Xerocomus chrysenteron;Boletus chrysenteron
+Hortiboletus rubellus|boleto rossastro|Boletaceae|Xerocomus rubellus
+Chalciporus piperatus|boleto pepato|Boletaceae|Boletus piperatus
+Tylopilus felleus|boleto amaro|Boletaceae|porcino amaro
+Aureoboletus gentilis|boleto gentile|Boletaceae|Boletus gentilis
+Gyroporus castaneus|boleto castano|Gyroporaceae|
+Gyroporus cyanescens|boleto cianescente|Gyroporaceae|
+Suillus luteus|pinarolo|Suillaceae|boleto giallo;vavosello
+Suillus granulatus|pinarolo granuloso|Suillaceae|
+Suillus bellinii|pinarolo di Bellini|Suillaceae|
+Suillus collinitus|pinarolo collinito|Suillaceae|
+Suillus mediterraneensis|pinarolo mediterraneo|Suillaceae|
+Paxillus involutus|paxillo involuto|Paxillaceae|
+Tapinella atrotomentosa||Tapinellaceae|Paxillus atrotomentosus
+Tapinella panuoides||Tapinellaceae|Paxillus panuoides
+Hygrophoropsis aurantiaca|falso gallinaccio|Hygrophoropsidaceae|
+Gomphidius glutinosus||Gomphidiaceae|
+Chroogomphus rutilus||Gomphidiaceae|Gomphidius rutilus
+Scleroderma citrinum|falso tartufo|Sclerodermataceae|Scleroderma aurantium
+Scleroderma verrucosum||Sclerodermataceae|
+Scleroderma polyrhizum||Sclerodermataceae|
+Pisolithus arhizus||Sclerodermataceae|Pisolithus tinctorius
+Astraeus hygrometricus|stella igrometrica|Diplocystidiaceae|
+Rhizopogon roseolus||Rhizopogonaceae|
+Russula cyanoxantha|colombina maggiore|Russulaceae|
+Russula virescens|colombina verde|Russulaceae|verdone
+Russula vesca|rossola edule|Russulaceae|
+Russula delica||Russulaceae|
+Russula chloroides||Russulaceae|
+Russula torulosa||Russulaceae|
+Russula sanguinaria||Russulaceae|Russula sanguinea
+Russula emetica|rossola emetica|Russulaceae|
+Russula foetens||Russulaceae|
+Russula aurea|colombina dorata|Russulaceae|Russula aurata
+Russula olivacea||Russulaceae|
+Russula lepida||Russulaceae|Russula rosea
+Russula fellea||Russulaceae|
+Lactarius deliciosus|lapacendro buono|Russulaceae|sanguinello
+Lactarius sanguifluus|sanguinello|Russulaceae|
+Lactarius semisanguifluus||Russulaceae|
+Lactarius vinosus||Russulaceae|
+Lactarius chrysorrheus||Russulaceae|
+Lactarius zonarius||Russulaceae|
+Lactarius tesquorum||Russulaceae|
+Lactarius torminosus|lattario torminoso|Russulaceae|
+Lactifluus volemus|lattario volemo|Russulaceae|Lactarius volemus
+Lactifluus vellereus||Russulaceae|Lactarius vellereus
+Lactifluus piperatus|peveraccio|Russulaceae|Lactarius piperatus
+Auriscalpium vulgare||Auriscalpiaceae|
+Heterobasidion annosum||Bondarzewiaceae|
+Stereum hirsutum||Stereaceae|
+Hericium erinaceus|fungo criniera|Hericiaceae|
+Amanita caesarea|ovolo buono|Amanitaceae|ovolo reale
+Amanita phalloides|tignosa verdognola|Amanitaceae|
+Amanita muscaria|ovolo malefico|Amanitaceae|
+Amanita pantherina|tignosa bruna|Amanitaceae|panterina
+Amanita ovoidea|ovolaccio|Amanitaceae|
+Amanita proxima||Amanitaceae|
+Amanita verna|tignosa primaverile|Amanitaceae|
+Amanita citrina|tignosa paglierina|Amanitaceae|
+Amanita rubescens|tignosa vinata|Amanitaceae|
+Amanita vaginata|bubbola grigia|Amanitaceae|
+Amanita crocea||Amanitaceae|
+Amanita fulva|bubbola fulva|Amanitaceae|
+Amanita echinocephala||Amanitaceae|
+Amanita vittadinii||Amanitaceae|
+Amanita gilbertii||Amanitaceae|
+Amanita boudieri||Amanitaceae|
+Amanita curtipes||Amanitaceae|
+Amanita strobiliformis||Amanitaceae|
+Pluteus cervinus|pluteo cervino|Pluteaceae|
+Volvopluteus gloiocephalus|volvaria vischiosa|Pluteaceae|Volvariella gloiocephala;Volvariella speciosa
+Volvariella bombycina|volvaria setosa|Pluteaceae|
+Macrolepiota procera|mazza di tamburo|Agaricaceae|
+Macrolepiota mastoidea||Agaricaceae|
+Macrolepiota excoriata||Agaricaceae|
+Chlorophyllum rhacodes|mazza di tamburo arrossante|Agaricaceae|Macrolepiota rhacodes
+Lepiota cristata|lepiota crestata|Agaricaceae|
+Lepiota brunneoincarnata||Agaricaceae|
+Leucoagaricus leucothites||Agaricaceae|
+Agaricus campestris|prataiolo|Agaricaceae|
+Agaricus arvensis|prataiolo maggiore|Agaricaceae|
+Agaricus augustus|prataiolo augusto|Agaricaceae|
+Agaricus xanthodermus|prataiolo giallastro|Agaricaceae|
+Agaricus bitorquis||Agaricaceae|
+Agaricus sylvicola|prataiolo dei boschi|Agaricaceae|
+Agaricus silvaticus||Agaricaceae|
+Coprinus comatus|coprino chiomato|Agaricaceae|agarico chiomato
+Lycoperdon perlatum|vescia gemmata|Agaricaceae|
+Apioperdon pyriforme|vescia piriforme|Agaricaceae|Lycoperdon pyriforme
+Calvatia gigantea|vescia gigante|Agaricaceae|Langermannia gigantea
+Bovista plumbea|vescia plumbea|Agaricaceae|
+Tricholoma terreum|moretta|Tricholomataceae|
+Tricholoma equestre|tricoloma equestre|Tricholomataceae|Tricholoma auratum;Tricholoma flavovirens
+Tricholoma portentosum|tricoloma portentoso|Tricholomataceae|
+Tricholoma pardinum|tricoloma tigrino|Tricholomataceae|
+Tricholoma saponaceum|tricoloma saponaceo|Tricholomataceae|
+Tricholoma sulphureum|tricoloma sulfureo|Tricholomataceae|
+Tricholoma columbetta|colombina bianca|Tricholomataceae|
+Tricholoma ustale||Tricholomataceae|
+Tricholoma scalpturatum||Tricholomataceae|
+Tricholoma atrosquamosum||Tricholomataceae|
+Lepista nuda|agarico violetto|Tricholomataceae|
+Lepista sordida||Tricholomataceae|
+Lepista personata|piede blu|Tricholomataceae|Lepista saeva
+Clitocybe nebularis|agarico nebbioso|Tricholomataceae|
+Clitocybe odora|clitocibe odorosa|Tricholomataceae|
+Clitocybe dealbata||Tricholomataceae|Clitocybe rivulosa
+Infundibulicybe geotropa|ordinale|Tricholomataceae|Clitocybe geotropa
+Infundibulicybe gibba|imbutino|Tricholomataceae|Clitocybe gibba
+Calocybe gambosa|prugnolo|Lyophyllaceae|fungo di San Giorgio
+Lyophyllum decastes|famigliola grigia|Lyophyllaceae|
+Armillaria mellea|chiodino|Physalacriaceae|famigliola buona
+Desarmillaria tabescens|chiodino senza anello|Physalacriaceae|Armillaria tabescens
+Flammulina velutipes|collibia a piede vellutato|Physalacriaceae|
+Hymenopellis radicata|collibia radicata|Physalacriaceae|Oudemansiella radicata
+Mucidula mucida||Physalacriaceae|Oudemansiella mucida
+Marasmius oreades|gambesecche|Marasmiaceae|
+Gymnopus dryophilus|collibia dei querceti|Omphalotaceae|Collybia dryophila
+Omphalotus olearius|fungo dell'olivo|Omphalotaceae|
+Mycena pura|micena pura|Mycenaceae|
+Mycena rosea|micena rosea|Mycenaceae|
+Pleurotus ostreatus|orecchione|Pleurotaceae|gelone
+Pleurotus eryngii|cardoncello|Pleurotaceae|
+Pleurotus ferulae|cardoncello di ferula|Pleurotaceae|funcia di ferla;Pleurotus eryngii var. ferulae
+Pleurotus nebrodensis|pleuroto dei Nebrodi|Pleurotaceae|funcia di basiliscu;basilisco
+Pleurotus cornucopiae||Pleurotaceae|
+Hygrophorus russula|igroforo rossastro|Hygrophoraceae|
+Hygrophorus latitabundus|lumacone|Hygrophoraceae|Hygrophorus limacinus
+Hygrophorus chrysodon||Hygrophoraceae|
+Hygrophorus eburneus|igroforo eburneo|Hygrophoraceae|
+Hygrophorus cossus||Hygrophoraceae|
+Hygrophorus penarius||Hygrophoraceae|
+Hygrophorus marzuolus|dormiente|Hygrophoraceae|marzuolo
+Hygrocybe conica|igrocibe conica|Hygrophoraceae|
+Hygrocybe punicea||Hygrophoraceae|
+Cuphophyllus pratensis||Hygrophoraceae|Hygrocybe pratensis
+Laccaria laccata||Hydnangiaceae|
+Laccaria amethystina|laccaria ametistina|Hydnangiaceae|
+Entoloma sinuatum|entoloma livido|Entolomataceae|Entoloma lividum
+Entoloma clypeatum||Entolomataceae|
+Clitopilus prunulus||Entolomataceae|
+Cortinarius orellanus|cortinario orellano|Cortinariaceae|
+Cortinarius praestans||Cortinariaceae|
+Cortinarius caperatus||Cortinariaceae|Rozites caperatus
+Cortinarius violaceus|cortinario viola|Cortinariaceae|
+Cortinarius trivialis||Cortinariaceae|
+Cortinarius infractus||Cortinariaceae|
+Inosperma erubescens|inocibe di Patouillard|Inocybaceae|Inocybe erubescens;Inocybe patouillardii
+Inocybe geophylla||Inocybaceae|
+Hebeloma crustuliniforme||Hymenogastraceae|
+Hebeloma sinapizans||Hymenogastraceae|
+Gymnopilus junonius||Hymenogastraceae|Gymnopilus spectabilis
+Galerina marginata||Hymenogastraceae|
+Pholiota squarrosa|foliota squarrosa|Strophariaceae|
+Hypholoma fasciculare|falso chiodino|Strophariaceae|
+Hypholoma lateritium||Strophariaceae|Hypholoma sublateritium
+Stropharia aeruginosa||Strophariaceae|
+Kuehneromyces mutabilis|famigliola mutevole|Strophariaceae|
+Cyclocybe cylindracea|pioppino|Tubariaceae|Agrocybe aegerita;Agrocybe cylindracea
+Agrocybe praecox||Strophariaceae|
+Bolbitius titubans||Bolbitiaceae|Bolbitius vitellinus
+Psathyrella candolleana||Psathyrellaceae|
+Coprinellus micaceus|coprino luccicante|Psathyrellaceae|Coprinus micaceus
+Coprinopsis atramentaria|coprino atramentario|Psathyrellaceae|Coprinus atramentarius
+Coprinopsis picacea|coprino gazza|Psathyrellaceae|Coprinus picaceus
+Lacrymaria lacrymabunda||Psathyrellaceae|
+Cantharellus cibarius|gallinaccio|Cantharellaceae|galletto;finferlo
+Cantharellus amethysteus||Cantharellaceae|
+Craterellus cornucopioides|trombetta dei morti|Cantharellaceae|
+Craterellus lutescens||Cantharellaceae|Cantharellus lutescens
+Craterellus tubaeformis||Cantharellaceae|Cantharellus tubaeformis
+Hydnum repandum|steccherino dorato|Hydnaceae|
+Hydnum rufescens||Hydnaceae|
+Clavulina coralloides||Clavulinaceae|Clavulina cristata
+Clavulina cinerea||Clavulinaceae|
+Ramaria flava|manina gialla|Gomphaceae|
+Ramaria formosa|manina bella|Gomphaceae|ditola rosa
+Ramaria botrytis|manina rossa|Gomphaceae|
+Ramaria stricta||Gomphaceae|
+Gomphus clavatus||Gomphaceae|
+Clavariadelphus pistillaris|clavaria pistillo|Clavariadelphaceae|
+Clavariadelphus truncatus||Clavariadelphaceae|
+Phallus impudicus|satirione|Phallaceae|fallo impudico
+Clathrus ruber|clatro rosso|Phallaceae|gabbia rossa
+Mutinus caninus||Phallaceae|
+Geastrum fimbriatum||Geastraceae|
+Geastrum triplex||Geastraceae|
+Fistulina hepatica|lingua di bue|Fistulinaceae|
+Laetiporus sulphureus|poliporo sulfureo|Laetiporaceae|fungo pollo
+Fomes fomentarius|fomite|Polyporaceae|fungo dell'esca
+Trametes versicolor|coda di tacchino|Polyporaceae|
+Trametes hirsuta||Polyporaceae|
+Cerioporus squamosus|poliporo squamoso|Polyporaceae|Polyporus squamosus
+Lentinus tigrinus||Polyporaceae|
+Ganoderma lucidum|ganoderma lucido|Ganodermataceae|reishi
+Ganoderma applanatum||Ganodermataceae|Ganoderma lipsiense
+Ganoderma resinaceum||Ganodermataceae|
+Fomitopsis pinicola||Fomitopsidaceae|
+Daedalea quercina||Fomitopsidaceae|
+Meripilus giganteus||Meripilaceae|
+Grifola frondosa|grifola|Grifolaceae|signorina
+Sparassis crispa|sparassi crespa|Sparassidaceae|fungo cavolfiore
+Bjerkandera adusta||Phanerochaetaceae|
+Schizophyllum commune||Schizophyllaceae|
+Inonotus hispidus||Hymenochaetaceae|
+Phellinus igniarius||Hymenochaetaceae|
+Fuscoporia torulosa||Hymenochaetaceae|Phellinus torulosus
+Coltricia perennis||Hymenochaetaceae|
+Thelephora terrestris||Thelephoraceae|
+Sarcodon imbricatus||Bankeraceae|
+Clavaria fragilis||Clavariaceae|Clavaria vermicularis
+Clavulinopsis corniculata||Clavariaceae|
+Auricularia auricula-judae|orecchio di Giuda|Auriculariaceae|
+Auricularia mesenterica||Auriculariaceae|
+Exidia glandulosa||Auriculariaceae|
+Tremella mesenterica||Tremellaceae|
+Calocera viscosa||Dacrymycetaceae|
+Morchella esculenta|spugnola gialla|Morchellaceae|
+Morchella elata|spugnola nera|Morchellaceae|Morchella conica
+Morchella semilibera|spugnola semilibera|Morchellaceae|Mitrophora semilibera
+Helvella crispa|elvella crespa|Helvellaceae|
+Helvella lacunosa||Helvellaceae|
+Helvella leucomelaena||Helvellaceae|
+Gyromitra esculenta|falsa spugnola|Discinaceae|
+Peziza badia||Pezizaceae|
+Peziza vesiculosa||Pezizaceae|
+Sarcosphaera coronaria||Pezizaceae|
+Terfezia arenaria|tartufo del deserto|Pezizaceae|terfezia
+Aleuria aurantia|orecchietta arancione|Pyronemataceae|
+Otidea onotica|orecchio d'asino|Pyronemataceae|
+Sarcoscypha coccinea||Sarcoscyphaceae|
+Tuber aestivum|scorzone|Tuberaceae|tartufo estivo
+Tuber borchii|bianchetto|Tuberaceae|marzuolo
+Tuber melanosporum|tartufo nero pregiato|Tuberaceae|
+Tuber magnatum|tartufo bianco pregiato|Tuberaceae|
+Tuber brumale|tartufo nero invernale|Tuberaceae|
+Rhizina undulata||Rhizinaceae|
+Xylaria hypoxylon||Xylariaceae|
+Xylaria polymorpha||Xylariaceae|
+Daldinia concentrica||Hypoxylaceae|
+Hypomyces chrysospermus||Hypocreaceae|
+Cordyceps militaris||Cordycipitaceae|
+Leotia lubrica||Leotiaceae|
+Chlorociboria aeruginascens||Chlorociboriaceae|
+`;
+
+/* ---------- Normalizzazione e confronto approssimato (pensato per la dettatura) ---------- */
+function norm(s) {
+  s = String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  s = s.replace(/var\.|sp\.|spp\./g, " ").replace(/[^a-z\s]/g, " ");
+  s = s.replace(/ae/g, "e").replace(/oe/g, "e").replace(/ph/g, "f").replace(/th/g, "t").replace(/ch/g, "c")
+       .replace(/k/g, "c").replace(/y/g, "i").replace(/j/g, "i").replace(/w/g, "v").replace(/x/g, "s")
+       .replace(/qu/g, "cu").replace(/h/g, "").replace(/([a-z])\1+/g, "$1");
+  return s.replace(/\s+/g, " ").trim();
+}
+function bigrams(s) { const p = " " + s + " "; const out = new Map(); for (let i = 0; i < p.length - 1; i++) { const g = p.slice(i, i + 2); out.set(g, (out.get(g) || 0) + 1); } return out; }
+function dice(a, b) {
+  if (!a || !b) return 0; if (a === b) return 1;
+  const A = bigrams(a), B = bigrams(b); let inter = 0, na = 0, nb = 0;
+  for (const v of A.values()) na += v; for (const v of B.values()) nb += v;
+  for (const [g, v] of A) if (B.has(g)) inter += Math.min(v, B.get(g));
+  return (2 * inter) / (na + nb);
+}
+function score(q, t) {
+  if (!q || !t) return 0; if (q === t) return 1;
+  let s = dice(q, t);
+  if (t.startsWith(q)) s = Math.max(s, 0.72 + 0.28 * q.length / t.length);
+  const qt = q.split(" "), tt = t.split(" ");
+  let sum = 0;
+  for (const a of qt) {
+    let best = 0;
+    for (const b of tt) {
+      const v = a === b ? 1 : (a.length >= 3 && b.startsWith(a) ? 0.85 : dice(a, b));
+      if (v > best) best = v;
+    }
+    sum += best;
+  }
+  const tok = (sum / qt.length) * (qt.length <= tt.length ? 1 : tt.length / qt.length);
+  return Math.max(s, tok * 0.97);
+}
+function slug(sci) { return norm(sci).replace(/\s+/g, "-") || ("x-" + Date.now()); }
+
+const REF = REF_RAW.trim().split("\n").map(line => {
+  const [sci, ita, fam, al] = line.split("|");
+  const aliases = (al || "").split(";").map(x => x.trim()).filter(Boolean);
+  const keys = [sci, ...(ita ? [ita] : []), ...aliases].map(norm);
+  return { scientifico: sci.trim(), italiano: (ita || "").trim(), famiglia: fam.trim(), aliases, keys };
+});
+const REF_BY_ID = new Map(REF.map(r => [slug(r.scientifico), r]));
+/* alias → nome accettato, per riconoscere un sinonimo già in mostra */
+const ALIAS2ID = new Map();
+REF.forEach(r => r.aliases.forEach(a => ALIAS2ID.set(norm(a), slug(r.scientifico))));
+
+/* ---------- Stato e archiviazione ---------- */
+const state = {
+  items: new Map(),      // id → specie
+  layout: structuredClone(DEFAULT_LAYOUT),
+  db: null, sample: null, downloads: null,
+  mode: "attesa",
+};
+const LS_ITEMS = "funghi.items.v1", LS_LAYOUT = "funghi.layout.v1";
+function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function loadLocal() {
+  const it = lsGet(LS_ITEMS); if (it) state.items = new Map(Object.entries(it));
+  const lay = lsGet(LS_LAYOUT); if (lay && lay.corsie) state.layout = lay;
+}
+function saveLocal() { lsSet(LS_ITEMS, Object.fromEntries(state.items)); lsSet(LS_LAYOUT, state.layout); }
+
+async function putItem(item) {
+  state.items.set(item.id, item); renderAll();
+  if (state.db) { try { await state.db.collection("specie").doc(item.id).set(item); } catch (e) { toast("Salvataggio non riuscito: " + (e.message || e.code) + ". Riprova."); } }
+  else saveLocal();
+}
+async function removeItem(id) {
+  state.items.delete(id); renderAll();
+  if (state.db) { try { await state.db.collection("specie").doc(id).delete(); } catch (e) { toast("Eliminazione non riuscita. Riprova."); } }
+  else saveLocal();
+}
+async function putLayout(layout) {
+  state.layout = layout; renderAll();
+  if (state.db) { try { await state.db.doc("config/layout").set(layout); } catch (e) { toast("Schema non salvato. Riprova."); return; } }
+  else saveLocal();
+  toast("Schema e corsie salvati");
+}
+
+/* ---------- Helpers di dominio ---------- */
+const lanes = () => state.layout.corsie;
+const laneById = id => lanes().find(c => c.id === id);
+const laneName = id => (laneById(id) || { nome: "Da collocare" }).nome;
+function sectorOf(fam) { return FAM2SEC[fam] || "alt"; }
+function laneFor(sec) { return (state.layout.assegna || {})[sec] || lanes()[lanes().length - 1].id; }
+function sortKey(it) {
+  const si = SEC_IDX[it.settore] ?? 99, fi = FAM_IDX[it.famiglia] ?? 99;
+  return [si, fi, it.scientifico.toLowerCase()];
+}
+function cmp(a, b) { const A = sortKey(a), B = sortKey(b); for (let i = 0; i < A.length; i++) { if (A[i] < B[i]) return -1; if (A[i] > B[i]) return 1; } return 0; }
+function laneItems(laneId) { return [...state.items.values()].filter(i => i.corsia === laneId).sort(cmp); }
+function positionText(it) {
+  const list = laneItems(it.corsia); const i = list.findIndex(x => x.id === it.id);
+  if (i < 0) return "";
+  const prev = list[i - 1], next = list[i + 1];
+  let t = `${laneName(it.corsia)} · posizione ${i + 1} di ${list.length}`;
+  if (prev && next) t += ` · tra ${prev.scientifico} e ${next.scientifico}`;
+  else if (prev) t += ` · dopo ${prev.scientifico}`;
+  else if (next) t += ` · prima di ${next.scientifico}`;
+  return t;
+}
+function findExisting(sci) {
+  const id = slug(sci);
+  if (state.items.has(id)) return state.items.get(id);
+  const viaAlias = ALIAS2ID.get(norm(sci)); if (viaAlias && state.items.has(viaAlias)) return state.items.get(viaAlias);
+  return null;
+}
+function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, note = "", fonte = "" }) {
+  scientifico = scientifico.trim().replace(/\s+/g, " ");
+  const accepted = ALIAS2ID.get(norm(scientifico)); /* sinonimo → nome accettato */
+  if (accepted && REF_BY_ID.has(accepted)) scientifico = REF_BY_ID.get(accepted).scientifico;
+  scientifico = scientifico.charAt(0).toUpperCase() + scientifico.slice(1);
+  const ref = REF_BY_ID.get(slug(scientifico));
+  if (ref) { italiano = italiano || ref.italiano; famiglia = famiglia || ref.famiglia; }
+  const settore = sectorOf(famiglia);
+  const now = new Date().toISOString();
+  return { id: slug(scientifico), scientifico, italiano, genere: scientifico.split(" ")[0], famiglia, settore,
+           corsia: corsia || laneFor(settore), note, fonte, creato: now, aggiornato: now };
+}
+
+/* Cerca: prima il catalogo, poi il riferimento. */
+function search(qRaw, limit = 8) {
+  const q = norm(qRaw); if (q.length < 2) return [];
+  const out = [];
+  for (const it of state.items.values()) {
+    const keys = [it.scientifico, it.italiano, ...(REF_BY_ID.get(it.id)?.aliases || [])].filter(Boolean).map(norm);
+    const s = Math.max(...keys.map(k => score(q, k)));
+    if (s >= 0.5) out.push({ s: s + 0.05, item: it });
+  }
+  for (const r of REF) {
+    const id = slug(r.scientifico); if (state.items.has(id)) continue;
+    const s = Math.max(...r.keys.map(k => score(q, k)));
+    if (s >= 0.5) out.push({ s, ref: r });
+  }
+  return out.sort((a, b) => b.s - a.s).slice(0, limit);
+}
+
+/* ---------- Claude: riconoscimento di nomi dettati ---------- */
+async function askClaude(text) {
+  if (!state.sample) throw new Error("Il riconoscimento con Claude non è disponibile in questa vista.");
+  const prompt = `Sei un micologo esperto della flora fungina italiana e siciliana. Ricevi un testo dettato a voce con il riconoscimento vocale italiano oppure scritto in fretta: i nomi latini possono essere storpiati (es. "boleto sedulis", "amanita cesarea", "cantarellus cibarius"). Il testo contiene uno o più funghi, con nome scientifico, nome volgare italiano o nome dialettale siciliano.
+
+Per ogni fungo menzionato restituisci il nome scientifico oggi accettato (Species Fungorum), il nome volgare italiano più comune se esiste e la famiglia.
+Usa preferibilmente una di queste famiglie: ${ALL_FAMILIES.join(", ")}. Se nessuna è adatta, indica la famiglia corretta comunque.
+Se è indicato solo il genere scrivi "Genere sp.". Se un frammento non è un fungo, ignoralo.
+
+Rispondi SOLO con JSON in questa forma:
+{"specie":[{"testo":"frammento originale","scientifico":"Genere specie","italiano":"nome o stringa vuota","famiglia":"Famiglia","certezza":"alta|media|bassa","nota":"breve, es. sinonimo usato o dubbio"}]}
+
+Testo:
+"""${text}"""`;
+  const res = await state.sample.json(prompt, { modelTier: "default" });
+  const arr = Array.isArray(res?.specie) ? res.specie : [];
+  return arr.filter(x => x && typeof x.scientifico === "string" && x.scientifico.trim())
+            .map(x => ({ testo: String(x.testo || ""), scientifico: x.scientifico.trim(), italiano: String(x.italiano || "").trim(),
+                         famiglia: String(x.famiglia || "").trim(), certezza: String(x.certezza || ""), nota: String(x.nota || "") }));
+}
+
+/* ---------- UI ---------- */
+const $ = s => document.querySelector(s);
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : String(k));
+  return e;
+}
+let toastTimer;
+function toast(msg) {
+  const root = $("#toast-root"); root.replaceChildren(el("div", { class: "toast", role: "status" }, msg));
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => root.replaceChildren(), 4200);
+}
+
+function names(it) {
+  return el("div", { class: "names" },
+    el("span", { class: "sci" }, it.scientifico),
+    it.italiano ? el("span", { class: "ita" }, it.italiano) : null,
+    el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia)]] || {}).nome].filter(Boolean).join(" · ")));
+}
+
+async function addFrom(data, laneOverride) {
+  const existing = findExisting(data.scientifico);
+  if (existing) { toast(`${existing.scientifico} è già in mostra. ${positionText(existing)}`); return existing; }
+  const it = makeItem({ ...data, corsia: laneOverride || null });
+  await putItem(it);
+  toast(`Aggiunto ${it.scientifico}. ${positionText(it)}`);
+  return it;
+}
+
+/* Una specie */
+function renderResults() {
+  const qv = $("#q").value; const box = $("#results");
+  const hits = search(qv);
+  $("#one-actions").hidden = norm(qv).length < 3;
+  if (!qv.trim()) { box.replaceChildren(); return; }
+  if (!hits.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna corrispondenza nell'elenco. Chiedi a Claude o inseriscilo a mano.")); return; }
+  box.replaceChildren(...hits.map(h => {
+    if (h.item) {
+      return el("button", { class: "card present tap", onclick: () => openEdit(h.item) },
+        names(h.item), el("span", { class: "pill ok" }, "Già in mostra"),
+        el("span", { class: "pos" }, positionText(h.item)));
+    }
+    const r = h.ref, sec = sectorOf(r.famiglia);
+    return el("div", { class: "card" },
+      names({ ...r, settore: sec }),
+      el("button", { class: "btn primary", onclick: async () => { await addFrom(r); $("#q").value = ""; renderResults(); $("#q").focus(); } }, "Aggiungi"),
+      el("span", { class: "pos hint" }, `Andrà in ${laneName(laneFor(sec))}`));
+  }));
+}
+
+async function onAskAI() {
+  const text = $("#q").value.trim(); if (!text) return;
+  const out = $("#ai-out"); const btn = $("#ask-ai");
+  btn.disabled = true; out.replaceChildren(el("div", { class: "hint" }, el("span", { class: "spin" }), " Claude sta riconoscendo il nome…"));
+  try {
+    const list = await askClaude(text);
+    if (!list.length) { out.replaceChildren(el("div", { class: "empty" }, "Claude non ha riconosciuto nessun fungo. Prova a ripetere il nome o inseriscilo a mano.")); return; }
+    out.replaceChildren(el("h3", {}, "Proposta di Claude"), ...list.map(x => {
+      const ex = findExisting(x.scientifico);
+      const item = ex || { ...x, settore: sectorOf(x.famiglia) };
+      return el("div", { class: "card" + (ex ? " present" : "") },
+        names(item),
+        ex ? el("span", { class: "pill ok" }, "Già in mostra")
+           : el("button", { class: "btn primary", onclick: async () => { await addFrom(x); out.replaceChildren(); $("#q").value = ""; renderResults(); } }, "Aggiungi"),
+        el("span", { class: "pos hint" }, ex ? positionText(ex) : [x.certezza && `Certezza ${x.certezza}`, x.nota].filter(Boolean).join(" · ")));
+    }));
+  } catch (e) {
+    const msg = e?.code === "not_granted" ? "Non hai concesso a questa pagina di usare Claude. Puoi farlo dal menu Autorizzazioni dell'artifact."
+              : e?.code === "rate_limited" ? "Troppe richieste ravvicinate. Attendi qualche secondo e riprova."
+              : "Riconoscimento non riuscito: " + (e?.message || e);
+    out.replaceChildren(el("div", { class: "banner warn" }, msg));
+  } finally { btn.disabled = false; }
+}
+
+/* Elenco dettato */
+let reviewRows = [];
+function splitBatch(text) {
+  return text.split(/[\n,;.]+|\s+(?:e|ed|poi|quindi|e poi)\s+/i).map(s => s.trim()).filter(s => norm(s).length >= 3);
+}
+async function onParse() {
+  const text = $("#batch").value.trim(); if (!text) return;
+  const status = $("#parse-status"); const parts = splitBatch(text);
+  reviewRows = []; const unresolved = [];
+  for (const p of parts) {
+    const hits = search(p, 2); const top = hits[0];
+    const gap = hits[1] ? top.s - hits[1].s : 1;
+    if (top && top.s >= 0.82 && gap >= 0.04) {
+      const d = top.item || top.ref;
+      reviewRows.push({ testo: p, scientifico: d.scientifico, italiano: d.italiano, famiglia: d.famiglia, via: "elenco", on: true });
+    } else unresolved.push(p);
+  }
+  if (unresolved.length && state.sample) {
+    status.replaceChildren(el("span", { class: "spin" }), ` Claude riconosce ${unresolved.length} nomi…`);
+    $("#parse").disabled = true;
+    try {
+      const got = await askClaude(unresolved.join("\n"));
+      got.forEach(x => reviewRows.push({ ...x, via: "Claude", on: x.certezza !== "bassa" }));
+    } catch (e) {
+      unresolved.forEach(p => reviewRows.push({ testo: p, scientifico: p, italiano: "", famiglia: "", via: "non riconosciuto", on: false }));
+      toast("Claude non ha risposto. I nomi non riconosciuti sono in fondo, deselezionati.");
+    } finally { $("#parse").disabled = false; }
+  } else {
+    unresolved.forEach(p => reviewRows.push({ testo: p, scientifico: p, italiano: "", famiglia: "", via: "non riconosciuto", on: false }));
+  }
+  status.textContent = `${reviewRows.length} voci da controllare`;
+  renderReview();
+}
+function renderReview() {
+  const box = $("#review");
+  $("#review-actions").hidden = !reviewRows.length;
+  box.replaceChildren(...reviewRows.map((r, i) => {
+    const ex = findExisting(r.scientifico);
+    const cb = el("input", { type: "checkbox", id: "rv" + i, checked: r.on && !ex, disabled: !!ex, onchange: e => { r.on = e.target.checked; } });
+    return el("label", { class: "card" + (ex ? " present" : ""), for: "rv" + i },
+      cb, names({ ...r, settore: sectorOf(r.famiglia) }),
+      ex ? el("span", { class: "pill ok" }, "Già in mostra") : el("span", { class: "pill" + (r.via === "elenco" ? "" : " warn") }, r.via),
+      el("span", { class: "src" }, `Hai detto: "${r.testo}"` + (ex ? ` · ${positionText(ex)}` : "") + (r.nota ? ` · ${r.nota}` : "")));
+  }));
+}
+async function onCommit() {
+  const lane = $("#batch-lane").value || null; let n = 0, dup = 0;
+  for (const r of reviewRows) {
+    if (!r.on) continue;
+    if (findExisting(r.scientifico)) { dup++; continue; }
+    const it = makeItem({ ...r, corsia: lane }); await putItem(it); n++;
+  }
+  reviewRows = []; renderReview(); $("#batch").value = ""; $("#parse-status").textContent = "";
+  toast(`Aggiunte ${n} specie` + (dup ? `, ${dup} erano già in mostra` : ""));
+}
+
+/* Scheda modifica / inserimento manuale */
+function openEdit(it) {
+  const isNew = !it;
+  const cur = it || { scientifico: $("#q").value.trim(), italiano: "", famiglia: "", corsia: "", note: "" };
+  const root = $("#sheet-root"); let confirmDel = false;
+  const famSel = el("select", { id: "e-fam" }, el("option", { value: "" }, "Da verificare"),
+    ...SECTORS.filter(s => s.fam.length).map(s => el("optgroup", { label: s.nome }, ...s.fam.map(f => el("option", { value: f, selected: f === cur.famiglia }, f)))));
+  if (cur.famiglia && !ALL_FAMILIES.includes(cur.famiglia)) famSel.prepend(el("option", { value: cur.famiglia, selected: true }, cur.famiglia));
+  const laneSel = el("select", { id: "e-lane" }, el("option", { value: "" }, "Automatica, secondo lo schema"),
+    ...lanes().map(c => el("option", { value: c.id, selected: c.id === cur.corsia }, `${c.nome} · ${c.dove}`)));
+  const sci = el("input", { type: "text", id: "e-sci", value: cur.scientifico, autocapitalize: "off", spellcheck: "false" });
+  const ita = el("input", { type: "text", id: "e-ita", value: cur.italiano });
+  const note = el("textarea", { id: "e-note", style: "min-height:70px" }, cur.note || "");
+  const delBtn = isNew ? null : el("button", { class: "btn danger", onclick: async () => {
+    if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare"; return; }
+    await removeItem(it.id); close(); toast(`Eliminato ${it.scientifico}`);
+  } }, "Elimina");
+  function close() { root.replaceChildren(); }
+  async function save() {
+    const s = sci.value.trim(); if (!s) { sci.focus(); return; }
+    const fam = famSel.value, sec = sectorOf(fam);
+    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: laneSel.value || laneFor(sec), note: note.value.trim() });
+    if (isNew) {
+      if (findExisting(s)) { toast(`${s} è già in mostra`); return; }
+      await putItem(base);
+    } else {
+      base.creato = it.creato || base.creato;
+      if (base.id !== it.id) await removeItem(it.id);
+      await putItem(base);
+    }
+    close(); toast(`Salvato. ${positionText(state.items.get(base.id))}`);
+  }
+  root.replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) close(); } },
+    el("div", { class: "sheet", role: "dialog", "aria-label": isNew ? "Nuova specie" : "Modifica specie" },
+      el("h2", {}, isNew ? "Nuova specie" : it.scientifico),
+      isNew ? null : el("p", { class: "hint" }, positionText(it)),
+      el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
+      el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
+      el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
+      el("div", { class: "field" }, el("label", { for: "e-lane" }, "Corsia"), laneSel),
+      el("div", { class: "field" }, el("label", { for: "e-note" }, "Note"), note),
+      el("div", { class: "row" }, el("button", { class: "btn primary", onclick: save }, "Salva"), el("button", { class: "btn ghost", onclick: close }, "Chiudi"), delBtn))));
+  (isNew ? sci : ita).focus();
+}
+
+/* Catalogo */
+function renderCatalog() {
+  const f = norm($("#filter").value); const box = $("#catalog");
+  let list = [...state.items.values()].sort(cmp);
+  if (f) list = list.filter(i => [i.scientifico, i.italiano, i.famiglia, i.genere].some(x => norm(x).includes(f)));
+  if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Aggiungi la prima specie dalla scheda Aggiungi, una alla volta oppure dettando un elenco di una corsia.")); return; }
+  if (!list.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna specie corrisponde al filtro.")); return; }
+  const groups = [];
+  for (const s of SECTORS) {
+    const items = list.filter(i => i.settore === s.id); if (!items.length) continue;
+    const kids = []; let lastFam = null;
+    for (const it of items) {
+      if (it.famiglia !== lastFam) { kids.push(el("div", { class: "fam" }, it.famiglia || "Famiglia da verificare")); lastFam = it.famiglia; }
+      kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) }, names(it), el("span", { class: "pill" }, laneName(it.corsia))));
+    }
+    groups.push(el("div", { class: "group" }, el("header", {}, el("h2", {}, s.nome), el("span", { class: "num" }, items.length)), ...kids));
+  }
+  box.replaceChildren(...groups);
+}
+
+/* Corsie */
+let selLane = "c1";
+function renderLanes() {
+  const room = $("#room");
+  room.replaceChildren(...lanes().slice(0, 4).map((c, i) => el("button", { class: "bed " + ["c1","c2","c3","c4"][i], "aria-pressed": String(selLane === c.id), onclick: () => { selLane = c.id; renderLanes(); } },
+    el("b", {}, c.nome), el("span", { class: "n" }, laneItems(c.id).length), el("small", {}, c.dove))));
+  if (!laneById(selLane)) selLane = lanes()[0].id;
+  const c = laneById(selLane); const items = laneItems(selLane);
+  const secs = SECTORS.filter(s => laneFor(s.id) === selLane).map(s => s.nome);
+  const kids = [el("h2", {}, `${c.nome} · ${c.dove}`), el("p", { class: "hint" }, secs.length ? "Settori previsti: " + secs.join(", ") : "Nessun settore assegnato in Schema.")];
+  if (!items.length) kids.push(el("div", { class: "empty" }, "Nessuna specie in questa corsia."));
+  let lastSec = null;
+  items.forEach((it, i) => {
+    if (it.settore !== lastSec) { kids.push(el("h3", {}, SECTORS[SEC_IDX[it.settore]]?.nome || "Da collocare")); lastSec = it.settore; }
+    kids.push(el("button", { class: "card tap", onclick: () => openEdit(it) },
+      el("div", { class: "names" }, el("span", {}, el("span", { class: "num" }, i + 1), el("span", { class: "sci" }, it.scientifico)), it.italiano ? el("span", { class: "ita" }, it.italiano) : null),
+      el("span", { class: "meta hint" }, it.famiglia)));
+  });
+  $("#lane-list").replaceChildren(...kids);
+}
+
+/* Schema */
+let draft = null;
+function renderSchema(from = state.layout) {
+  draft = structuredClone(from);
+  $("#sectors").replaceChildren(...SECTORS.map((s, i) => el("div", { class: "sector" },
+    el("div", { class: "head" }, el("span", { class: "idx" }, i + 1), el("h2", {}, s.nome)),
+    el("p", { class: "desc" }, s.desc),
+    el("select", { id: "sec-" + s.id, "aria-label": "Corsia per " + s.nome, onchange: e => { draft.assegna[s.id] = e.target.value; } },
+      ...draft.corsie.map(c => el("option", { value: c.id, selected: (draft.assegna || {})[s.id] === c.id }, c.nome))))));
+  $("#lanes-edit").replaceChildren(...draft.corsie.map((c, i) => el("div", { class: "sector" },
+    el("div", { class: "field" }, el("label", { for: "ln-" + c.id }, "Nome"), el("input", { type: "text", id: "ln-" + c.id, value: c.nome, oninput: e => { draft.corsie[i].nome = e.target.value; } })),
+    el("div", { class: "field" }, el("label", { for: "ld-" + c.id }, "Dove si trova"), el("input", { type: "text", id: "ld-" + c.id, value: c.dove, oninput: e => { draft.corsie[i].dove = e.target.value; } })))));
+}
+
+function renderBatchLanes() {
+  const sel = $("#batch-lane"); const v = sel.value;
+  sel.replaceChildren(el("option", { value: "" }, "Automatica, secondo lo schema"), ...lanes().map(c => el("option", { value: c.id }, `${c.nome} · ${c.dove}`)));
+  sel.value = v;
+}
+
+function renderHeader() {
+  const n = state.items.size; $("#count").textContent = n === 1 ? "1 specie" : `${n} specie`;
+  const m = $("#mode");
+  m.className = "mode" + (state.mode === "locale" ? " local" : "");
+  m.textContent = state.mode === "cloud" ? "Salvato online" : state.mode === "locale" ? "Solo su questo dispositivo" : "Connessione…";
+}
+function renderAll() {
+  renderHeader(); renderBatchLanes();
+  if (!$("#v-add").hidden) { renderResults(); renderReview(); }
+  if (!$("#v-cat").hidden) renderCatalog();
+  if (!$("#v-lanes").hidden) renderLanes();
+}
+
+/* CSV */
+function csv() {
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [["Corsia","Posizione","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunto il"]];
+  for (const c of lanes()) laneItems(c.id).forEach((it, i) => rows.push([c.nome, i + 1, SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
+  return "﻿" + rows.map(r => r.map(q).join(";")).join("\r\n");
+}
+function plainList() {
+  return lanes().map(c => `${c.nome} (${c.dove})\n` + laneItems(c.id).map((it, i) => `${i + 1}. ${it.scientifico}${it.italiano ? " – " + it.italiano : ""}`).join("\n")).join("\n\n");
+}
+
+/* ---------- Eventi ---------- */
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+  document.querySelectorAll("section.view[id^=v-]").forEach(s => s.hidden = s.id !== b.dataset.v);
+  if (b.dataset.v === "v-schema") renderSchema();
+  renderAll(); window.scrollTo(0, 0);
+}));
+$("#m-one").addEventListener("click", () => { $("#one").hidden = false; $("#many").hidden = true; $("#m-one").setAttribute("aria-pressed", "true"); $("#m-many").setAttribute("aria-pressed", "false"); });
+$("#m-many").addEventListener("click", () => { $("#one").hidden = true; $("#many").hidden = false; $("#m-one").setAttribute("aria-pressed", "false"); $("#m-many").setAttribute("aria-pressed", "true"); });
+let qTimer; $("#q").addEventListener("input", () => { clearTimeout(qTimer); $("#ai-out").replaceChildren(); qTimer = setTimeout(renderResults, 120); });
+$("#q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); renderResults(); } });
+$("#ask-ai").addEventListener("click", onAskAI);
+$("#manual").addEventListener("click", () => openEdit(null));
+$("#parse").addEventListener("click", onParse);
+$("#commit").addEventListener("click", onCommit);
+$("#clear-review").addEventListener("click", () => { reviewRows = []; renderReview(); $("#parse-status").textContent = ""; });
+$("#filter").addEventListener("input", renderCatalog);
+$("#save-layout").addEventListener("click", async () => {
+  const before = state.layout; await putLayout(draft);
+  /* le specie seguono la nuova assegnazione se erano nella corsia prevista dallo schema precedente */
+  for (const it of state.items.values()) {
+    const oldAuto = (before.assegna || {})[it.settore], newAuto = laneFor(it.settore);
+    if (it.corsia === oldAuto && oldAuto !== newAuto) await putItem({ ...it, corsia: newAuto, aggiornato: new Date().toISOString() });
+  }
+  renderSchema();
+});
+$("#reset-layout").addEventListener("click", () => { renderSchema(DEFAULT_LAYOUT); toast("Predefinito caricato. Tocca Salva per confermare."); });
+$("#export").addEventListener("click", async () => {
+  if (!state.items.size) { toast("Il catalogo è vuoto"); return; }
+  const name = `catalogo-funghi-${new Date().toISOString().slice(0, 10)}.csv`;
+  if (state.downloads) {
+    try { await state.downloads.save({ filename: name, data: csv() }); toast("File CSV pronto"); return; }
+    catch (e) { if (e?.code === "declined") return; }
+  }
+  toast("Il download non è disponibile qui. Usa Copia elenco.");
+});
+$("#copy").addEventListener("click", async () => {
+  const t = plainList();
+  try { await navigator.clipboard.writeText(t); toast("Elenco copiato"); }
+  catch { openTextSheet(t); }
+});
+function openTextSheet(t) {
+  const ta = el("textarea", { id: "copy-area", readonly: true, style: "min-height:50vh" }, t);
+  $("#sheet-root").replaceChildren(el("div", { class: "sheet-bg", onclick: e => { if (e.target === e.currentTarget) $("#sheet-root").replaceChildren(); } },
+    el("div", { class: "sheet" }, el("h2", {}, "Elenco per corsia"), el("p", { class: "hint" }, "Tieni premuto per selezionare e copiare."), ta,
+      el("button", { class: "btn", onclick: () => $("#sheet-root").replaceChildren() }, "Chiudi"))));
+  ta.select();
+}
+
+/* ---------- Avvio ---------- */
+loadLocal(); renderAll();
+(async function boot() {
+  const c = window.claude;
+  if (!c || typeof c.use !== "function") { state.mode = "locale"; renderHeader(); return; }
+  c.use("sample").then(s => { state.sample = s; }).catch(() => {});
+  c.use("downloads").then(d => { state.downloads = d; }).catch(() => {});
+  let db = null; try { db = await c.use("db"); } catch {}
+  if (!db) { state.mode = "locale"; renderHeader(); return; }
+  state.db = db; state.mode = "cloud"; state.items = new Map(); renderAll();
+  db.collection("specie").onSnapshot(snap => {
+    const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.scientifico) m.set(d.id, { ...v, id: d.id }); });
+    state.items = m; renderAll();
+  }, e => { toast("Collegamento al catalogo interrotto. Ricarica la pagina."); });
+  db.doc("config/layout").onSnapshot(d => {
+    const v = d.exists ? d.data() : null;
+    state.layout = v && Array.isArray(v.corsie) ? structuredClone(v) : structuredClone(DEFAULT_LAYOUT);
+    if (!$("#v-schema").hidden) renderSchema();
+    renderAll();
+  }, () => {});
+})();
+</script>
