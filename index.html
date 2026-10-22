@@ -1520,6 +1520,7 @@ async function askMic() {
 }
 function micHelp(code) {
   const why = !SR ? "questo browser non ha il riconoscimento vocale"
+    : code === "finestra bloccata" ? "il visualizzatore non lascia aprire la scheda di dettatura"
     : micPolicy === false ? "il visualizzatore di claude.ai non concede il microfono a questa pagina"
     : ["NotAllowedError", "not-allowed", "SecurityError"].includes(code) ? "Chrome non ha il permesso del microfono per claude.ai. Tocca l'icona a sinistra dell'indirizzo, poi Autorizzazioni, Microfono, Consenti, e ricarica la pagina"
     : ["NotFoundError", "NotReadableError", "audio-capture"].includes(code) ? "il microfono non è disponibile, forse lo sta usando un'altra app"
@@ -1528,6 +1529,45 @@ function micHelp(code) {
     : "errore imprevisto";
   toast(`Detta non funziona: ${why}. Codice: ${code}, microfono nel riquadro: ${micPolicy === null ? "non noto" : micPolicy ? "sì" : "no"}.`, { label: "OK", fn: () => {} });
 }
+// The claude.ai frame may not use the microphone, but a tab it opens is a normal top-level page that may:
+// dictation runs there and each result is posted back into the field here.
+const DETTA_PAGE = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detta</title><style>
+body{margin:0;font:18px/1.4 system-ui,sans-serif;background:#1d2420;color:#eef2ee;display:grid;gap:16px;padding:20px;min-height:100vh;box-sizing:border-box;align-content:start}
+h1{margin:0;font-size:1.3rem}small{color:#a9b5ad}
+button{font:inherit;font-weight:700;padding:18px;border-radius:12px;border:2px solid #5fb8a8;background:#5fb8a8;color:#0d1512}
+button.on{background:#c0533f;border-color:#c0533f;color:#fff}button.ghost{background:none;color:#eef2ee}
+#t{min-height:120px;padding:12px;border-radius:12px;background:#28302b;white-space:pre-wrap}
+</style></head><body><h1>Detta i nomi</h1><small>Pronuncia i nomi con una pausa tra una specie e l'altra. Il testo arriva subito nell'app.</small>
+<button id="go">Inizia a dettare</button><div id="t"></div><button id="done" class="ghost">Fatto, torna all'app</button><small id="st"></small>
+<script>
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, finals = "", go = document.getElementById("go"), t = document.getElementById("t"), st = document.getElementById("st");
+var last = ""; function send(text, fine) { last = text; t.textContent = text; try { opener.postMessage({ funghiDetta: text, fine: !!fine }, "*"); } catch (e) { st.textContent = "L'app non è più aperta: copia il testo da qui."; } }
+function stop() { if (rec) rec.stop(); }
+go.onclick = function () {
+  if (rec) { stop(); return; }
+  if (!SR) { st.textContent = "Questo browser non ha il riconoscimento vocale."; return; }
+  rec = new SR(); rec.lang = "it-IT"; rec.continuous = true; rec.interimResults = true;
+  rec.onresult = function (e) { var interim = ""; for (var i = e.resultIndex; i < e.results.length; i++) { var x = e.results[i][0].transcript.trim(); if (!x) continue; if (e.results[i].isFinal) finals += (finals ? ", " : "") + x; else interim += (interim ? " " : "") + x; } send(finals + (interim ? (finals ? ", " : "") + interim : "")); };
+  rec.onerror = function (e) { if (e.error !== "no-speech" && e.error !== "aborted") st.textContent = "Errore del microfono: " + e.error + (e.error === "not-allowed" ? ". Consenti il microfono quando Chrome lo chiede, poi riprova." : ""); };
+  rec.onend = function () { rec = null; go.className = ""; go.textContent = "Continua a dettare"; };
+  try { rec.start(); go.className = "on"; go.textContent = "Stop"; st.textContent = ""; } catch (e) { st.textContent = "Non riesco ad avviare la dettatura: " + e.message; rec = null; }
+};
+document.getElementById("done").onclick = function () { stop(); send(last, true); setTimeout(function () { window.close(); }, 150); };
+window.send = send;
+<\/script></body></html>`;
+let dettaWin = null, dettaTarget = null, dettaBase = "";
+window.addEventListener("message", e => {
+  if (!dettaWin || e.source !== dettaWin || !e.data || typeof e.data.funghiDetta !== "string" || !dettaTarget) return;
+  dettaTarget.value = dettaBase + e.data.funghiDetta; dettaTarget.dispatchEvent(new Event("input"));
+  if (e.data.fine) { dettaWin = null; dettaTarget.focus(); }
+});
+function openDetta(target) {
+  dettaTarget = target; dettaBase = target.value.trim() ? target.value.trim().replace(/[,;]?$/, ", ") : "";
+  try { if (dettaWin && !dettaWin.closed) dettaWin.close(); } catch {}
+  dettaWin = window.open(URL.createObjectURL(new Blob([DETTA_PAGE], { type: "text/html" })), "funghi-detta");
+  if (!dettaWin) { micHelp("finestra bloccata"); return false; }
+  return true;
+}
 function micButton(target) {
   const label = el("span", {}, "Detta");
   const b = el("button", { class: "btn mic", type: "button" },
@@ -1535,11 +1575,12 @@ function micButton(target) {
   b.querySelector("svg").innerHTML = '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>';
   b.addEventListener("click", async () => {
     if (activeRec) { activeRec.stop(); return; }
+    if (micPolicy === false) { openDetta(target); return; }
     if (!SR) { micHelp("nessun SpeechRecognition"); return; }
     b.disabled = true; label.textContent = "…";
     const denied = await askMic();
     b.disabled = false; label.textContent = "Detta";
-    if (denied) { micHelp(denied); return; }
+    if (denied) { if (!openDetta(target)) micHelp(denied); return; }
     let rec; try { rec = new SR(); } catch (e) { micHelp((e && e.name) || "SR"); return; }
     rec.lang = "it-IT"; rec.continuous = true; rec.interimResults = true;
     const base = target.value.trim() ? target.value.trim().replace(/[,;]?$/, ", ") : "";
