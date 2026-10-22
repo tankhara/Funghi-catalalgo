@@ -20,7 +20,9 @@ Zones are numbered in the order a visitor walks them. Spot 1 is where each zone 
 | Zona 2 · Polipori | Back-left corner by the window | Polypores |
 | Zona 3 · U fondo | The bend of the U at the back, left to right | Amanita, Agaricus, white-spored gilled fungi |
 | Zona 4 · U destra | Right arm of the U, from the back towards the exit | Pink-, brown- and dark-spored gilled fungi, chanterelles |
-| Zona 5 · Parete | About 3 m on the right wall, before the exit and sales stand | Corals, jelly fungi, Ascomycota, others |
+| Zona 5 · Parete | About 3 m on the right wall, before the door | Corals, jelly fungi, Ascomycota, others |
+
+One door at the front serves as both entrance and exit, with the souvenir stand next to it. A table of logs before the window corner is decoration only and holds no species.
 
 The sector assignment is provisional until the official ordering scheme is in. Names and assignments can be changed in Schema.
 

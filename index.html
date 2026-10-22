@@ -182,6 +182,9 @@ textarea { min-height: 96px; resize: vertical; }
 .plan.compact .bed .n { font-size: 1.15rem; }
 .salabox { background: var(--sunk); border-radius: var(--r); padding: 12px; }
 .salabox h3 { margin: 0; }
+.plan .deco { grid-column: 1; grid-row: 2; align-self: end; min-height: 70px; border: 2px dashed var(--line); border-radius: 6px; color: var(--muted); font-size: .68rem; font-weight: 700; display: grid; place-items: center; }
+.plan .deco span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+.plan .foot .porta { border-top: 4px solid var(--fg); padding-top: 3px; text-align: center; color: var(--fg); font-weight: 700; }
 .plan .walk { font-size: .8rem; color: var(--fg); }
 .plan .door { font-size: .72rem; color: var(--muted); text-align: center; letter-spacing: .05em; text-transform: uppercase; }
 
@@ -1692,8 +1695,9 @@ function planEls(sel, pick) {
   return [
     el("div", { class: "door" }, "Fondo sala"),
     el("div", { class: "room" }, ...lanes().filter(c => PLAN_SPOT[c.id]).map(c => el("button", { class: "bed " + PLAN_SPOT[c.id], "aria-pressed": String(sel === c.id), "aria-label": c.nome, onclick: () => pick(c.id) },
-      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length)))),
-    el("div", { class: "foot" }, el("span"), el("span", { style: "grid-column: 2 / 4" }, "Ingresso · entra e gira a sinistra"), el("span"), el("span", { style: "grid-column: 5 / 7; text-align: right" }, "Uscita · banco vendita")),
+      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length))),
+      el("div", { class: "deco", title: "Tronchi e allestimento, niente specie" }, el("span", {}, "Tronchi"))),
+    el("div", { class: "foot" }, el("span", { style: "grid-column: 1 / 3" }, "← Entra e gira a sinistra"), el("span", { class: "porta", style: "grid-column: 3 / 5" }, "Porta · ingresso e uscita"), el("span", { style: "grid-column: 5 / 7; text-align: right" }, "Banco souvenir")),
   ];
 }
 let selLane = "c1", hlSlot = null;
