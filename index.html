@@ -268,7 +268,7 @@ textarea { min-height: 96px; resize: vertical; }
     <div class="field">
       <div class="labelrow"><label for="cap-text">Specie in questo posto</label><span data-mic="cap-text"></span></div>
       <textarea id="cap-text" class="big" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Russula cyanoxantha, Lactarius deterrimus"></textarea>
-      <p class="hint">Tocca Detta e pronuncia i nomi con una pausa tra una specie e l'altra.</p>
+      <p class="hint" id="dict-hint">Tocca Detta e pronuncia i nomi con una pausa tra una specie e l'altra.</p>
     </div>
     <div class="row">
       <label class="btn wide" for="cap-photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="cap-photo-label">Scatta foto</span></label>
@@ -1508,11 +1508,16 @@ async function onRunCommit() {
 
 /* ---------- Dettatura con pulsante (Web Speech, se il browser e la pagina lo consentono) ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let micBlocked = false, activeRec = null;
+// The claude.ai viewer frame does not grant the microphone: detect it up front and point to the keyboard mic instead.
+const KEYBOARD_HINT = "Tocca il campo e usa il microfono della tastiera: pronuncia i nomi con una pausa tra una specie e l'altra.";
+const micPolicyOff = (() => { try { return document.featurePolicy ? !document.featurePolicy.allowsFeature("microphone") : false; } catch { return false; } })();
+let micBlocked = !SR || micPolicyOff || lsGet("funghi.micBlocked") === true, activeRec = null;
+if (micBlocked) $("#dict-hint").textContent = KEYBOARD_HINT;
 function micUnavailable() {
-  if (micBlocked) return; micBlocked = true;
+  if (micBlocked) return; micBlocked = true; lsSet("funghi.micBlocked", true);
   document.querySelectorAll(".btn.mic").forEach(x => x.remove());
-  toast("Il microfono non è consentito in questa pagina. Per ora usa il microfono della tastiera.");
+  $("#dict-hint").textContent = KEYBOARD_HINT;
+  toast("Il microfono non è consentito in questa pagina. Usa il microfono della tastiera.");
 }
 function micButton(target) {
   if (!SR || micBlocked) return null;
