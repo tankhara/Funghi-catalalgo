@@ -1,0 +1,192 @@
+[
+  {
+    "huggingface": "Load failed",
+    "id": "diag",
+    "jsdelivr": "Load failed",
+    "microfono": null,
+    "quando": "2026-10-23T07:29:46.681Z",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.1 Mobile/15E148 Safari/604.1",
+    "wasm": true,
+    "worker": true
+  },
+  {
+    "creato": "2026-10-22T21:18:23.507Z",
+    "file": "20261022_192418.mp4",
+    "formato": "wav 16 kHz mono, base64",
+    "id": "sala-audio",
+    "parti": [
+      "ad83644b0c0d62ed0996c0e7beed3ee4"
+    ],
+    "secondi": 54
+  },
+  {
+    "creato": "2026-10-22T21:18:20.742Z",
+    "file": "20261022_192418.mp4",
+    "frames": [
+      {
+        "asset": "8a6d533522c63716dd31cb6ee5f217a7",
+        "ordine": 1,
+        "url": "/_blob/8a6d533522c63716dd31cb6ee5f217a7"
+      },
+      {
+        "asset": "15cd46445626c1abf3e57cd326f682dd",
+        "ordine": 2,
+        "url": "/_blob/15cd46445626c1abf3e57cd326f682dd"
+      },
+      {
+        "asset": "5b1f7cc848bd1f843de2038e04ac119b",
+        "ordine": 3,
+        "url": "/_blob/5b1f7cc848bd1f843de2038e04ac119b"
+      },
+      {
+        "asset": "2fcc3a2728229e6c8ecbaf3bb6d6022d",
+        "ordine": 4,
+        "url": "/_blob/2fcc3a2728229e6c8ecbaf3bb6d6022d"
+      },
+      {
+        "asset": "eefc93c99ed1a3c7e9d6b5207eded3b6",
+        "ordine": 5,
+        "url": "/_blob/eefc93c99ed1a3c7e9d6b5207eded3b6"
+      },
+      {
+        "asset": "fac3b4e05a228bcbd90982f01f709315",
+        "ordine": 6,
+        "url": "/_blob/fac3b4e05a228bcbd90982f01f709315"
+      },
+      {
+        "asset": "e656a0f0da79f3f74bca0cc8f9e35ab6",
+        "ordine": 7,
+        "url": "/_blob/e656a0f0da79f3f74bca0cc8f9e35ab6"
+      },
+      {
+        "asset": "8b317220d4f44dabdc3329e4dbaf065f",
+        "ordine": 8,
+        "url": "/_blob/8b317220d4f44dabdc3329e4dbaf065f"
+      },
+      {
+        "asset": "32a9442a5e1dd07bc13ae64a607eb1e7",
+        "ordine": 9,
+        "url": "/_blob/32a9442a5e1dd07bc13ae64a607eb1e7"
+      },
+      {
+        "asset": "e2b62c8f14df4248d65694d4f9b783b9",
+        "ordine": 10,
+        "url": "/_blob/e2b62c8f14df4248d65694d4f9b783b9"
+      },
+      {
+        "asset": "9c458b79b0760275a98bba7b12e934cc",
+        "ordine": 11,
+        "url": "/_blob/9c458b79b0760275a98bba7b12e934cc"
+      },
+      {
+        "asset": "6e67ccc903e859cf1dac66fa061ed9ae",
+        "ordine": 12,
+        "url": "/_blob/6e67ccc903e859cf1dac66fa061ed9ae"
+      },
+      {
+        "asset": "708125d26a5c414d87dc0feca281ddd9",
+        "ordine": 13,
+        "url": "/_blob/708125d26a5c414d87dc0feca281ddd9"
+      },
+      {
+        "asset": "74d876ffff2f6cb6c263367869218b1c",
+        "ordine": 14,
+        "url": "/_blob/74d876ffff2f6cb6c263367869218b1c"
+      },
+      {
+        "asset": "af2038b07aee59401be9414c0ef85fa2",
+        "ordine": 15,
+        "url": "/_blob/af2038b07aee59401be9414c0ef85fa2"
+      },
+      {
+        "asset": "69c3691ca0d0af4802c44dc7f486fe2f",
+        "ordine": 16,
+        "url": "/_blob/69c3691ca0d0af4802c44dc7f486fe2f"
+      },
+      {
+        "asset": "0902c85dde5e6829c691cc0d0612b49b",
+        "ordine": 17,
+        "url": "/_blob/0902c85dde5e6829c691cc0d0612b49b"
+      },
+      {
+        "asset": "f8d7864dfe7c2d865d29736f30c787b7",
+        "ordine": 18,
+        "url": "/_blob/f8d7864dfe7c2d865d29736f30c787b7"
+      },
+      {
+        "asset": "f778c929922688985fc42639d056aae4",
+        "ordine": 19,
+        "url": "/_blob/f778c929922688985fc42639d056aae4"
+      },
+      {
+        "asset": "a691706bdcb6196246cf4dbba2f73744",
+        "ordine": 20,
+        "url": "/_blob/a691706bdcb6196246cf4dbba2f73744"
+      },
+      {
+        "asset": "e2f22a67a6529b6d4d1d2aa8284698b4",
+        "ordine": 21,
+        "url": "/_blob/e2f22a67a6529b6d4d1d2aa8284698b4"
+      },
+      {
+        "asset": "bc2f0b0cfeb8653174c8fa3ea7387bd6",
+        "ordine": 22,
+        "url": "/_blob/bc2f0b0cfeb8653174c8fa3ea7387bd6"
+      },
+      {
+        "asset": "4ccf92782cca86aadbe9a5fe9bad6ddd",
+        "ordine": 23,
+        "url": "/_blob/4ccf92782cca86aadbe9a5fe9bad6ddd"
+      },
+      {
+        "asset": "390169a32461cb06123983ff90d75731",
+        "ordine": 24,
+        "url": "/_blob/390169a32461cb06123983ff90d75731"
+      },
+      {
+        "asset": "8a3588fb6f5839764cc02a3a05ba6278",
+        "ordine": 25,
+        "url": "/_blob/8a3588fb6f5839764cc02a3a05ba6278"
+      },
+      {
+        "asset": "2130807a6850005c0a73c20ab53ab954",
+        "ordine": 26,
+        "url": "/_blob/2130807a6850005c0a73c20ab53ab954"
+      },
+      {
+        "asset": "dcb38007c968aa7d41116b9ea3e539bb",
+        "ordine": 27,
+        "url": "/_blob/dcb38007c968aa7d41116b9ea3e539bb"
+      }
+    ],
+    "id": "sala"
+  },
+  {
+    "fase": "fatto",
+    "fatto": 11,
+    "file": "20261022_220207.mp4",
+    "id": "upload-corrente",
+    "indice": 11,
+    "inizio": "2026-10-22T21:17:52.097Z",
+    "quando": "2026-10-22T21:18:37.945Z",
+    "spazio": {
+      "file": 385,
+      "maxFile": 5000,
+      "maxMB": 1024,
+      "usatiMB": 184
+    },
+    "totale": 11,
+    "versione": 24
+  },
+  {
+    "id": "versione",
+    "quando": "2026-10-22T21:16:30Z",
+    "v": 24
+  },
+  {
+    "id": "v-2131-50",
+    "lingua": "en-GB",
+    "quando": "2026-10-22T21:31:00Z",
+    "testo": "Understood. After your go ahead tomorrow, I back up and clear today's photos, keep all species, attach new photos of the replanted beds, and read the printed cards to confirm or correct names."
+  }
+]
