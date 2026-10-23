@@ -179,7 +179,7 @@ textarea { min-height: 96px; resize: vertical; }
 /* Room plan */
 .plan { background: var(--sunk); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
 .plan .room, .plan .foot { display: grid; grid-template-columns: .6fr 1fr .3fr 1fr .25fr .75fr; gap: 6px; }
-.plan .room { grid-template-rows: 58px 1fr; min-height: 260px; }
+.plan .room { grid-template-rows: 58px 1fr auto; min-height: 260px; }
 .plan .foot { font-size: .7rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
 .plan .bed {
   border-radius: 6px; padding: 8px; color: var(--bed-fg); text-align: left;
@@ -187,25 +187,25 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .plan .bed[aria-pressed="true"] { outline: 4px solid var(--accent); outline-offset: 2px; }
 .plan .bed b { font-size: .82rem; line-height: 1.2; }
-.plan .pc2 b, .plan .pc5 b { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: start; white-space: nowrap; }
-.plan .pc2, .plan .pc5 { justify-items: center; padding-inline: 2px; }
+.plan .pc2 b, .plan .pc5 b, .plan .pc6 b { writing-mode: vertical-rl; transform: rotate(180deg); justify-self: start; white-space: nowrap; }
+.plan .pc2, .plan .pc5, .plan .pc6 { justify-items: center; padding-inline: 2px; }
 .plan .bed small { font-size: .72rem; opacity: .85; overflow-wrap: anywhere; }
 .plan .bed .n { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.plan .pc1 { grid-column: 2; grid-row: 2; }
+.plan .pc1 { grid-column: 2; grid-row: 2 / 4; }
 .plan .pc2 { grid-column: 1; grid-row: 1 / 3; align-self: start; min-height: 120px; }
 .plan .pc3 { grid-column: 2 / 5; grid-row: 1; grid-auto-flow: column; align-items: center; justify-content: space-between; border-radius: 8px 8px 0 0; padding-block: 4px; }
-.plan .pc4 { grid-column: 4; grid-row: 2; }
-.plan .pc5 { grid-column: 6; grid-row: 2; align-self: end; min-height: 110px; }
+.plan .pc4 { grid-column: 4; grid-row: 2 / 4; }
+.plan .pc5 { grid-column: 6; grid-row: 2 / 4; align-self: end; min-height: 110px; }
+.plan .pc6 { grid-column: 1; grid-row: 3; align-self: end; min-height: 90px; }
 .plan.compact { padding: 10px; gap: 6px; }
-.plan.compact .room { grid-template-rows: 46px 1fr; min-height: 180px; }
+.plan.compact .room { grid-template-rows: 46px 1fr auto; min-height: 180px; }
 .plan.compact .pc2 { min-height: 90px; }
 .plan.compact .pc5 { min-height: 80px; }
+.plan.compact .pc6 { min-height: 70px; }
 .plan.compact .bed { padding: 6px; border-width: 4px; }
 .plan.compact .bed .n { font-size: 1.15rem; }
 .salabox { background: var(--sunk); border-radius: var(--r); padding: 12px; }
 .salabox h3 { margin: 0; }
-.plan .deco { grid-column: 1; grid-row: 2; align-self: end; min-height: 70px; border: 2px dashed var(--line); border-radius: 6px; color: var(--muted); font-size: .68rem; font-weight: 700; display: grid; place-items: center; }
-.plan .deco span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
 .plan .foot .banco { border: 2px solid var(--line); border-radius: 6px; padding: 3px; text-align: center; color: var(--fg); font-weight: 700; }
 .plan .foot .porta { border-top: 4px solid var(--fg); padding-top: 3px; text-align: center; color: var(--fg); font-weight: 700; }
 .plan .walk { font-size: .8rem; color: var(--fg); }
@@ -359,7 +359,7 @@ textarea { min-height: 96px; resize: vertical; }
     <div class="field">
       <div class="labelrow"><label for="q">Dov'è? C'è già?</label><span data-mic="q"></span></div>
       <input id="q" class="big" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="es. Lactarius blennius">
-      <p class="hint">Per spostare una specie detta: "sposta Russula virescens in zona 4 posto 2". Vale anche "all'angolo polipori" o "alla parete".</p>
+      <p class="hint">Per spostare una specie detta: "sposta Russula virescens in zona 4 posto 2". Vale anche "all'angolo polipori", "ai tronchi" o "alla parete".</p>
     </div>
     <div id="results" class="list"></div>
     <div id="ai-out" class="list"></div>
@@ -433,7 +433,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 24;
+const APP_VERSION = 25;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -481,6 +481,7 @@ const DEFAULT_LAYOUT = {
   /* in ordine di visita */
   corsie: [
     { id: "c1", nome: "Zona 1 · U sinistra", dove: "U centrale, braccio sinistro: dall'ingresso verso il fondo" },
+    { id: "c6", nome: "Zona Tronchi", dove: "Parete sinistra vicino alla porta, prima dell'angolo dei polipori" },
     { id: "c2", nome: "Zona 2 · Polipori", dove: "Angolo della finestra, in fondo a sinistra" },
     { id: "c3", nome: "Zona 3 · U fondo", dove: "U centrale, la curva in fondo, da sinistra a destra" },
     { id: "c4", nome: "Zona 4 · U destra", dove: "U centrale, braccio destro: dal fondo verso l'uscita" },
@@ -488,6 +489,19 @@ const DEFAULT_LAYOUT = {
   ],
   assegna: { igr: "c1", tri: "c1", ent: "c1", pol: "c2", ama: "c3", agr: "c3", plu: "c3", ner: "c3", cor: "c3", pax: "c4", bol: "c4", rus: "c4", can: "c5", gas: "c5", gel: "c5", asc: "c5", alt: "c5" },
 };
+
+/* Zone predefinite mancanti in uno schema salvato prima (es. c6 Tronchi): aggiunte nella posizione del percorso, nomi già salvati intatti */
+function withDefaultLanes(lay) {
+  if (!lay || !Array.isArray(lay.corsie)) return structuredClone(DEFAULT_LAYOUT);
+  const out = { ...lay, corsie: lay.corsie.slice(), assegna: { ...(lay.assegna || {}) } };
+  DEFAULT_LAYOUT.corsie.forEach((d, i) => {
+    if (out.corsie.some(c => c.id === d.id)) return;
+    let at = 0;
+    for (let j = i - 1; j >= 0; j--) { const k = out.corsie.findIndex(c => c.id === DEFAULT_LAYOUT.corsie[j].id); if (k >= 0) { at = k + 1; break; } }
+    out.corsie.splice(at, 0, { ...d });
+  });
+  return out;
+}
 
 /* ---------- Riferimento ----------
    Righe "Genere specie | nome italiano | famiglia | sinonimi e altri nomi (;)"
@@ -1020,7 +1034,7 @@ function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); 
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 function loadLocal() {
   const it = lsGet(LS_ITEMS); if (it) state.items = new Map(Object.entries(it));
-  const lay = lsGet(LS_LAYOUT); if (lay && lay.corsie) state.layout = lay;
+  const lay = lsGet(LS_LAYOUT); if (lay && Array.isArray(lay.corsie)) state.layout = withDefaultLanes(lay);
   const c = lsGet(LS_CAP); if (c) { cap.corsia = c.corsia || "c1"; cap.posto = c.posto || 1; }
 }
 function saveLocal() { if (!state.db) { lsSet(LS_ITEMS, Object.fromEntries(state.items)); lsSet(LS_LAYOUT, state.layout); } }
@@ -1737,13 +1751,14 @@ document.querySelectorAll("[data-mic]").forEach(s => { const b = micButton(docum
 const NUMW = { uno: 1, una: 1, due: 2, tre: 3, quattro: 4, cinque: 5, sei: 6, sette: 7, otto: 8, nove: 9, dieci: 10, undici: 11, dodici: 12, tredici: 13, quattordici: 14, quindici: 15, sedici: 16, diciassette: 17, diciotto: 18, diciannove: 19, venti: 20, ventuno: 21, ventidue: 22, ventitre: 23, ventiquattro: 24, venticinque: 25, trenta: 30 };
 const toNum = t => /^\d+$/.test(t) ? +t : NUMW[String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f\s]/g, "")] ?? null;
 function parseMove(text) {
-  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:(?:in|nella|nel|alla|al|a)\s+|all['’]\s*)((?:(?:zona|corsia|sezione|tavolo)\s+(?:dei\s+|della\s+)?)?(?:parete(?:\s+destra)?|angolo(?:\s+(?:della\s+)?(?:finestra|dei\s+polipori|polipori))?|u\s+(?:sinistra|fondo|destra)|\S+))(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
+  const m = text.trim().replace(/[.!]$/, "").match(/^sposta(?:re)?\s+(.+?)\s+(?:(?:in|nella|nel|nei|alla|al|ai|a)\s+|all['’]\s*)((?:(?:zona|corsia|sezione|tavolo)\s+(?:dei\s+|della\s+)?)?(?:parete(?:\s+destra)?|angolo(?:\s+(?:della\s+)?(?:finestra|dei\s+polipori|polipori))?|u\s+(?:sinistra|fondo|destra)|\S+))(?:\s*,?\s*(?:al\s+)?(?:posto|posizione|numero)\s+(\S+))?$/i);
   if (!m) return null;
   const lt = m[2].toLowerCase().replace(/^(zona|corsia|sezione|tavolo)\s+((dei|della)\s+)?/, "");
   const byName = re => lanes().find(c => re.test(c.nome))?.id || lanes().find(c => re.test(c.dove))?.id;
   let lane = null;
   if (/^(mezza|polipor|finestr|angolo)/.test(lt)) lane = byName(/polipor|finestr|angolo/i);
   else if (/^parete/.test(lt)) lane = byName(/parete/i);
+  else if (/^tronch/.test(lt)) lane = byName(/tronch/i);
   else if (/^(u\s+)?(fondo|curva)/.test(lt)) lane = byName(/fondo|curva/i);
   else if (/^u\s+(sinistr|destr)/.test(lt)) lane = byName(new RegExp("u " + lt.split(/\s+/)[1].slice(0, 6), "i"));
   else { const n = toNum(lt); if (n) lane = (lanes().find(c => new RegExp("^(zona|corsia|sezione|tavolo)\\s+" + n + "\\b", "i").test(c.nome.trim())) || laneById("c" + n))?.id; }
@@ -1917,14 +1932,15 @@ function openSlot(c, p) {
 }
 
 /* ---------- MAPPA ---------- */
-const PLAN_SPOT = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4", c5: "pc5" };
+const PLAN_SPOT = { c1: "pc1", c2: "pc2", c3: "pc3", c4: "pc4", c5: "pc5", c6: "pc6" };
+// Plan label: "Zona 2 · Polipori" on two lines; a name without " · " (Zona Tronchi) splits at its first space
+const planLabel = nome => { const p = String(nome).split(" · "); return p.length > 1 ? p : (String(nome).match(/^(\S+)\s+(.+)$/)?.slice(1) || [String(nome)]); };
 // Room plan (used on Registra as the zone picker and on Mappa): back wall on top, entrance bottom left, exit bottom right.
 function planEls(sel, pick) {
   return [
     el("div", { class: "door" }, "Fondo sala"),
     el("div", { class: "room" }, ...lanes().filter(c => PLAN_SPOT[c.id]).map(c => el("button", { class: "bed " + PLAN_SPOT[c.id], "aria-pressed": String(sel === c.id), "aria-label": c.nome, onclick: () => pick(c.id) },
-      el("b", {}, ...c.nome.split(" · ").flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length))),
-      el("div", { class: "deco", title: "Tronchi e allestimento, niente specie" }, el("span", {}, "Tronchi"))),
+      el("b", {}, ...planLabel(c.nome).flatMap((t, i) => i ? [el("br"), t] : [t])), el("span", { class: "n" }, laneItems(c.id).length)))),
     el("div", { class: "foot" }, el("span", { class: "porta", style: "grid-column: 1 / 3" }, "Porta · ingresso e uscita"), el("span", { style: "grid-column: 3 / 5; text-align: center" }, "← uscita lungo il fronte"), el("span", { class: "banco", style: "grid-column: 5 / 7" }, "Banco souvenir")),
   ];
 }
@@ -2364,7 +2380,7 @@ loadLocal(); goTab(lsGet(LS_TAB) || "v-cap", false); histReplace({ v: curTab });
   }, () => {});
   db.doc("config/layout").onSnapshot(d => {
     const v = d.exists ? d.data() : null;
-    state.layout = v && Array.isArray(v.corsie) ? structuredClone(v) : structuredClone(DEFAULT_LAYOUT);
+    state.layout = v && Array.isArray(v.corsie) ? withDefaultLanes(structuredClone(v)) : structuredClone(DEFAULT_LAYOUT);
     if (visible("v-schema")) renderSchema();
     renderAll();
   }, () => {});
