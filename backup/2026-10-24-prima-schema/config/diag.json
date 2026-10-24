@@ -1,0 +1,9 @@
+{
+  "huggingface": "Failed to fetch",
+  "jsdelivr": "Failed to fetch",
+  "microfono": false,
+  "quando": "2026-10-24T15:58:03.321Z",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+  "wasm": true,
+  "worker": true
+}

@@ -1,0 +1,16 @@
+{
+  "fase": "fatto",
+  "fatto": 1,
+  "file": "20261024_165500.mp4",
+  "indice": 1,
+  "inizio": "2026-10-24T14:56:17.683Z",
+  "quando": "2026-10-24T14:58:55.532Z",
+  "spazio": {
+    "file": 1224,
+    "maxFile": 5000,
+    "maxMB": 1024,
+    "usatiMB": 353
+  },
+  "totale": 1,
+  "versione": 29
+}

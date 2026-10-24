@@ -1,0 +1,5 @@
+Backup prima della modifica dello Schema (v30) e del ripristino di config/sala.
+Fatto il 2026-10-24 alle 18:04 ora di Sicilia.
+config/: tutti i documenti della collezione config letti dal db live (diag, sala, sala-audio, upload-corrente, versione, voce).
+config/layout NON esiste nel db: lo Schema usa DEFAULT_LAYOUT nel codice della pagina (APP_VERSION 29).
+invii-sala/: i record invii/ dei video 20261024_142710 (pianta della sala) e 20261024_165500 (lattari, ora in config/sala).
