@@ -134,6 +134,14 @@ textarea { min-height: 96px; resize: vertical; }
 .slotnow.nophoto { grid-template-columns: 1fr; }
 .thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: var(--line); display: block; }
 .thumb.lg { width: 96px; height: 96px; }
+/* Scheda specie: foto con Rifai foto / Dalla galleria / Togli foto */
+.phedit { display: flex; gap: 12px; align-items: flex-start; }
+.phedit .ph { background: none; border: 0; padding: 0; flex: none; }
+.phedit .thumb.none { display: grid; place-items: center; background: none; border: 1.5px dashed var(--muted); color: var(--muted); font-size: .75rem; text-align: center; flex: none; }
+.phedit .acts { display: grid; gap: 8px; justify-items: start; min-width: 0; }
+.phedit .acts .row { gap: 6px; }
+.phedit .acts .hint { margin: 0; }
+.phedit .acts .hint:empty { display: none; }
 .preview { max-height: 180px; border-radius: var(--r); object-fit: cover; }
 
 .list { display: grid; gap: 8px; }
@@ -469,7 +477,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 27;
+const APP_VERSION = 28;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1113,7 +1121,12 @@ const allItems = () => [...state.items.values()];
 function laneItems(c) { return allItems().filter(i => i.corsia === c).sort((a, b) => (a.posto ?? 1e9) - (b.posto ?? 1e9) || cmp(a, b)); }
 function slotItems(c, p) { return allItems().filter(i => i.corsia === c && i.posto === p).sort(cmp); }
 const photoSpots = f => Array.isArray(f.posti) ? f.posti : (f.posto ? [f.posto] : []);
-function slotPhotos(c, p) { return [...state.photos.values()].filter(f => f.corsia === c && photoSpots(f).includes(p)).sort((a, b) => (b.creato || "").localeCompare(a.creato || "")); }
+/* Ordine delle foto: quelle staccate da tutte le specie (Togli foto) in fondo, poi quelle rifatte a mano dalla scheda, poi la più recente */
+const hasId = (a, id) => Array.isArray(a) && a.includes(id);
+const photoDetached = f => Array.isArray(f.tolte) && f.tolte.length > 0 && !(Array.isArray(f.specie) && f.specie.length);
+const photoOrder = (a, b) => (photoDetached(a) - photoDetached(b)) || ((b.manuale ? 1 : 0) - (a.manuale ? 1 : 0)) || (b.creato || "").localeCompare(a.creato || "");
+function slotPhotos(c, p) { return [...state.photos.values()].filter(f => f.corsia === c && photoSpots(f).includes(p)).sort(photoOrder); }
+const spotPhoto = (c, p) => slotPhotos(c, p).find(f => !photoDetached(f)) || null;
 function maxPosto(c) {
   let m = 0;
   for (const i of state.items.values()) if (i.corsia === c && i.posto > m) m = i.posto;
@@ -1279,6 +1292,25 @@ async function resolveText(text) {
 }
 
 /* ---------- Foto ---------- */
+// Foto dritta (orientamento EXIF applicato), lato lungo al massimo 1600 px, JPEG 0.85
+async function uprightJpeg(file, max = 1600, q = 0.85) {
+  let src = null, w = 0, h = 0, url = null;
+  try { src = await createImageBitmap(file, { imageOrientation: "from-image" }); w = src.width; h = src.height; }
+  catch {
+    url = URL.createObjectURL(file);
+    src = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error("non riesco a leggere la foto, prova a scattarla di nuovo")); im.src = url; });
+    w = src.naturalWidth; h = src.naturalHeight;
+  }
+  try {
+    if (!w || !h) throw new Error("la foto risulta vuota, prova a scattarla di nuovo");
+    const k = Math.min(1, max / Math.max(w, h));
+    const cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(w * k)); cv.height = Math.max(1, Math.round(h * k));
+    cv.getContext("2d").drawImage(src, 0, 0, cv.width, cv.height);
+    const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", q));
+    if (!blob) throw new Error("non riesco a preparare la foto, chiudi qualche app e riprova");
+    return blob;
+  } finally { try { if (src && src.close) src.close(); } catch {} if (url) URL.revokeObjectURL(url); }
+}
 async function compress(file) {
   try {
     const bmp = await createImageBitmap(file);
@@ -1470,7 +1502,7 @@ function renderCapture() {
   $("#cap-plan").replaceChildren(...planEls(cap.corsia, id => setSlot(id, maxPosto(id) || 1)));
   $("#cap-lanes").replaceChildren(...lanes().filter(c => !PLAN_SPOT[c.id]).map(c => el("button", { "aria-pressed": String(c.id === cap.corsia), onclick: () => setSlot(c.id, maxPosto(c.id) || 1) }, c.nome)));
   const pn = $("#p-num"); if (document.activeElement !== pn) pn.value = cap.posto;
-  const here = slotItems(cap.corsia, cap.posto), ph = slotPhotos(cap.corsia, cap.posto)[0];
+  const here = slotItems(cap.corsia, cap.posto), ph = spotPhoto(cap.corsia, cap.posto);
   const txt = here.length ? [el("b", {}, "Qui ora: "), here.map(i => i.scientifico).join(", ")] : [`${laneName(cap.corsia)}, posto ${cap.posto}: ancora vuoto.`];
   const last = maxPosto(cap.corsia);
   $("#slot-now").replaceChildren(el("div", { class: "slotnow" + (ph ? "" : " nophoto") },
@@ -1948,11 +1980,14 @@ function closeSheetDom() { $("#sheet-root").replaceChildren(); nav.sheet = false
 function photoIndex() {
   const m = new Map();
   for (const f of state.photos.values()) for (const id of Array.isArray(f.specie) ? f.specie : []) {
-    const o = m.get(id); if (!o || (f.creato || "") > (o.creato || "")) m.set(id, f);
+    const o = m.get(id); if (!o || photoOrder(f, o) < 0) m.set(id, f);
   }
   return m;
 }
-function photoFor(it, idx = photoIndex()) { return idx.get(it.id) || (it.posto ? slotPhotos(it.corsia, it.posto)[0] : null) || null; }
+// Senza foto propria: quella del posto, ma non una staccata da questa specie né una rifatta a mano per un'altra specie
+function photoFor(it, idx = photoIndex()) {
+  return idx.get(it.id) || (it.posto ? slotPhotos(it.corsia, it.posto).find(f => !photoDetached(f) && !hasId(f.tolte, it.id) && !(f.manuale && !hasId(f.specie, it.id))) : null) || null;
+}
 function cardThumb(it, ph) {
   if (!ph) return el("span", { class: "cthumb none" }, "senza foto");
   return el("button", { class: "cthumb", type: "button", "aria-label": "Foto di " + it.scientifico, onclick: () => openPhoto(ph, it) },
@@ -1986,6 +2021,69 @@ function openPlace(r) {
       toast(`Aggiunta ${fin.scientifico} · ${where(fin)}`, { label: "Annulla", fn: undo });
     } }, "Aggiungi"), el("button", { class: "btn ghost", onclick: () => close() }, "Chiudi")));
 }
+/* Scheda specie: Rifai foto (fotocamera o galleria) diventa la foto della specie; Togli foto stacca la specie dalla foto mostrata.
+   Nessuna foto o asset viene cancellato: chi condivide la vecchia foto la tiene. */
+function photoEditor(it) {
+  const box = el("div", { class: "phedit" });
+  const status = el("p", { class: "hint", role: "status", "aria-live": "polite" });
+  const mkInput = cam => {
+    const i = el("input", { type: "file", accept: "image/*", capture: cam ? "environment" : null, hidden: true, class: cam ? "e-cam" : "e-gal" });
+    i.addEventListener("change", () => { const f = i.files && i.files[0]; if (f) retake(f); i.value = ""; });
+    return i;
+  };
+  const camIn = mkInput(true), galIn = mkInput(false);
+  let busy = false, confirm = false, confirmT = 0;
+  const live = () => state.items.get(it.id) || it;
+  function render() {
+    const ph = photoFor(live());
+    const thumb = ph ? el("button", { class: "ph", type: "button", "aria-label": "Apri la foto di " + it.scientifico, onclick: () => openPhoto(ph, live()) }, photoThumb(ph, "thumb lg"))
+                     : el("span", { class: "thumb lg none" }, "senza foto");
+    const take = el("button", { class: "btn", type: "button", id: "e-retake", disabled: busy, onclick: () => camIn.click() }, ph ? "📷 Rifai foto" : "📷 Nuova foto");
+    const gal = el("button", { class: "btn ghost small", type: "button", id: "e-gallery", disabled: busy, onclick: () => galIn.click() }, "Dalla galleria");
+    const off = ph ? el("button", { class: "btn small danger", type: "button", id: "e-unphoto", disabled: busy, onclick: () => detach(ph) }, confirm ? "Tocca di nuovo per togliere" : "Togli foto") : null;
+    box.replaceChildren(thumb, el("div", { class: "acts" }, take, el("div", { class: "row" }, gal, off), status), camIn, galIn);
+  }
+  const done = msg => { busy = false; status.textContent = ""; render(); if (msg) toast(msg); };
+  async function retake(file) {
+    if (busy) return;
+    if (!state.assets || !state.db) { toast("Archivio non collegato: ricarica la pagina e riprova."); return; }
+    busy = true; confirm = false; render(); status.textContent = "Invio foto…";
+    try {
+      const blob = await uprightJpeg(file);
+      const asset = (await upAsset(blob, "image/jpeg")).id;
+      const sp = live();
+      const p = { id: asset, asset, corsia: sp.corsia || "", posti: sp.posto ? [sp.posto] : [], specie: [sp.id], creato: new Date().toISOString().replace(/\.\d+Z$/, "Z"), manuale: true };
+      await dbSet("foto/" + asset, p);
+      state.photos.set(asset, p); renderAll();
+      done("Foto aggiornata");
+    } catch (e) { done("Foto non aggiornata: " + errMsg(e) + "."); }
+  }
+  async function detach(ph) {
+    if (busy) return;
+    if (!confirm) { confirm = true; render(); clearTimeout(confirmT); confirmT = setTimeout(() => { if (confirm && !busy) { confirm = false; render(); } }, 6000); return; }
+    confirm = false; clearTimeout(confirmT);
+    if (!state.db) { toast("Archivio non collegato: ricarica la pagina e riprova."); render(); return; }
+    busy = true; render(); status.textContent = "Tolgo la foto…";
+    try {
+      // Rilegge il documento appena prima di scrivere e cambia solo specie, tolte e pins: gli altri campi e le altre specie restano come sono
+      const ref = state.db.doc("foto/" + ph.id);
+      const snap = await ref.get();
+      if (!snap.exists) throw new Error("questa foto non c'è più nell'archivio, ricarica la pagina");
+      const d = snap.data() || {};
+      const patch = { specie: (Array.isArray(d.specie) ? d.specie : []).filter(x => x !== it.id), tolte: [...new Set([...(Array.isArray(d.tolte) ? d.tolte : []), it.id])] };
+      if (Array.isArray(d.pins)) patch.pins = d.pins.filter(x => !(x && x.id === it.id));
+      try { await ref.update(patch); }
+      catch (e) {
+        if (e && e.code === "quota_exceeded") throw quotaErr();
+        if (e && e.code === "unavailable") { await sleep(1000 + Math.random() * 1000); await ref.update(patch); } else throw e;
+      }
+      state.photos.set(ph.id, { ...d, ...patch, id: ph.id }); renderAll();
+      done("Foto tolta da " + it.scientifico);
+    } catch (e) { done("Foto non tolta: " + errMsg(e) + "."); }
+  }
+  render();
+  return box;
+}
 function openEdit(it) {
   const isNew = !it;
   const cur = it || { scientifico: $("#q").value.trim(), italiano: "", famiglia: "", corsia: "", posto: null, note: "" };
@@ -1999,7 +2097,7 @@ function openEdit(it) {
   const ita = el("input", { type: "text", id: "e-ita", value: cur.italiano });
   const note = el("textarea", { id: "e-note", style: "min-height:70px" }, cur.note || "");
   const com = el("select", { id: "e-com" }, el("option", { value: "" }, "Non indicata"), ...COMMEST.map(([k, l]) => el("option", { value: k, selected: k === comOf(cur) }, l)));
-  const ph = it ? photoFor(it) : null;
+  const phBox = isNew ? null : photoEditor(it);
   const delBtn = isNew ? null : el("button", { class: "btn danger", onclick: async () => {
     if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare"; return; }
     await removeItem(it.id); close(); toast(`Eliminata ${it.scientifico}`);
@@ -2019,7 +2117,7 @@ function openEdit(it) {
   const close = sheet(
     el("h2", { class: isNew ? "" : "sci" }, isNew ? "Nuova specie" : it.scientifico, isNew ? null : edTag(it)),
     isNew ? null : el("p", {}, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))),
-    ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0;justify-self:start", onclick: () => openPhoto(ph, it) }, photoThumb(ph, "thumb lg")) : null,
+    phBox,
     el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
     el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
     el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
@@ -2079,7 +2177,7 @@ function renderMap() {
   if (max) {
     const strip = el("div", { class: "strip" });
     for (let p = 1; p <= max; p++) {
-      const here = slotItems(selLane, p), ph = slotPhotos(selLane, p)[0];
+      const here = slotItems(selLane, p), ph = spotPhoto(selLane, p);
       strip.append(el("div", { class: "spot" + (hlSlot === p ? " hl" : ""), id: `spot-${selLane}-${p}` },
         el("span", { class: "no" }, p),
         ph ? el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, photoThumb(ph)) : el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, el("span", { class: "noimg" }, "senza foto")),
