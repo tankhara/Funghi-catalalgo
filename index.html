@@ -469,7 +469,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 26;
+const APP_VERSION = 27;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1376,11 +1376,23 @@ async function sendRoomAudio(file, step = () => {}) {
     for (let i = 0; i < len; i++) { let s = 0; for (let c = 0; c < nch; c++) s += ch[c][i]; wav.setInt16(44 + i * 2, Math.max(-1, Math.min(1, s / nch)) * 0x7fff, true); }
     ch.length = 0;
     let b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(new Blob([wav.buffer])); });
-    const PART = 12 * 1024 * 1024, n = Math.ceil(b64.length / PART), parts = [];
+    // Parts of 4 MB: one 9 MB part (a 3.5 min clip) was refused twice with store_unavailable while 6 MB parts went through.
+    // A part still refused after upAsset's retry is split in half and sent again, down to 1 MB (sizes stay multiples of 4).
+    const PART = 4 * 1024 * 1024, MIN_PART = 1024 * 1024, n = Math.ceil(b64.length / PART), parts = [];
+    let sentB = 0;
+    const sendPart = async (a, b) => {
+      try { const id = (await upAsset(new Blob([b64.slice(a, b)], { type: "text/plain" }), "text/plain")).id; sentB += b - a; return [id]; }
+      catch (e) {
+        if (!(e && e.code === "store_unavailable") || b - a <= MIN_PART) throw e;
+        await sleep(3000 + Math.random() * 3000);
+        const m = a + Math.floor((b - a) / 8) * 4;
+        return [...await sendPart(a, m), ...await sendPart(m, b)];
+      }
+    };
     step("invio voce");
     for (let i = 0; i < n; i++) {
       st.textContent = `Invio la voce: parte ${i + 1} di ${n}.`;
-      parts.push((await upAsset(new Blob([b64.slice(i * PART, (i + 1) * PART)], { type: "text/plain" }), "text/plain")).id);
+      parts.push(...await sendPart(i * PART, Math.min(b64.length, (i + 1) * PART)));
     }
     b64 = null;
     const rec = { parti: parts, formato: `wav ${rate === 16000 ? "16 kHz" : rate + " Hz"} mono, base64`, secondi: sec, file: file.name, creato: new Date().toISOString() };
@@ -1564,39 +1576,81 @@ async function imageMax() { try { return Math.max(1, Math.min(20, (await state.s
 function withTimeout(p, ms, msg) {
   let t; return Promise.race([p, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(msg)), ms); })]).finally(() => clearTimeout(t));
 }
+// Phones can leave a seek unanswered (no seeked, no error) for one stretch of a video. Each frame gets a short wait and one
+// retry at a slightly shifted time, then it is skipped and the video is reopened, so one bad spot never costs the whole file.
+// If seeking keeps failing, the rest is captured by playing the video through (muted, faster) instead of seeking.
 async function videoFrames(file, max, status = $("#run-status"), every = 3, urls = true) {
-  const url = URL.createObjectURL(file); let cv = null;
-  const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto";
-  const seekTo = t => withTimeout(new Promise(res => { v.onseeked = () => res(); v.currentTime = t; }), 10000, "seek");
-  try {
+  const url = URL.createObjectURL(file); let cv = null, v = null;
+  const close = () => { if (!v) return; v.onerror = v.onseeked = v.onloadeddata = null; try { v.pause(); v.removeAttribute("src"); v.load(); } catch {} v = null; };
+  const open = async () => {
+    close(); v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto";
     await withTimeout(new Promise((res, rej) => {
       v.onloadeddata = res;
       v.onerror = () => rej(new Error("il telefono non riesce ad aprire questo video" + (v.error && v.error.code ? ` (errore ${v.error.code})` : "") + ". Prova a registrarlo di nuovo"));
       v.src = url;
     }), 30000, "il video non si apre (tempo scaduto). Prova a registrarlo di nuovo, più corto");
+    v.onerror = null;
     try { await withTimeout(v.play(), 3000, "play"); } catch {}
     try { v.pause(); } catch {}
+  };
+  const seekTo = (t, ms) => withTimeout(new Promise((res, rej) => {
+    if (v.error) return rej(new Error("decode"));
+    if (!v.seeking && v.readyState >= 2 && Math.abs(v.currentTime - t) < 0.001) return res();
+    v.onerror = () => rej(new Error("decode")); v.onseeked = () => res(); v.currentTime = t;
+  }), ms, "seek").finally(() => { if (v) v.onerror = v.onseeked = null; });
+  const info = () => v ? `${v.videoWidth}x${v.videoHeight}, stato ${v.readyState}${v.error ? ", errore " + v.error.code : ""}` : "chiuso";
+  try {
+    await open();
     if (!v.videoWidth || !v.videoHeight) throw new Error("il telefono legge il file ma non le immagini del video (formato non supportato, forse HEVC). Registra con la fotocamera normale e riprova");
     let d = v.duration;
-    if (!isFinite(d) || d <= 0) { try { await seekTo(1e7); } catch {} d = v.duration; }
+    if (!isFinite(d) || d <= 0) { try { await seekTo(1e7, 10000); } catch {} d = v.duration; }
     if (!isFinite(d) || d <= 0) throw new Error("durata del video non leggibile");
     const n = Math.max(4, Math.min(max, Math.round(d / every)));
-    const out = []; let miss = 0;
+    const at = i => Math.min(d - 0.05, d * (i + 0.5) / n), shift = Math.min(0.5, d / n / 3);
+    const out = []; let run = 0, skipped = 0, i = 0;
     const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
     cv = document.createElement("canvas"); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
     const g = cv.getContext("2d");
-    for (let i = 0; i < n; i++) {
-      status.textContent = `Estraggo i fotogrammi: ${i + 1} di ${n}`;
-      try { await seekTo(Math.min(d - 0.05, d * (i + 0.5) / n)); }
-      catch { if (++miss >= 3) throw new Error(`il video si blocca mentre estraggo i fotogrammi (al ${i + 1} di ${n})`); continue; }
-      miss = 0;
+    const grab = async () => {
       g.drawImage(v, 0, 0, cv.width, cv.height);
       const blob = await withTimeout(new Promise(r => cv.toBlob(r, "image/jpeg", 0.8)), 10000, "toBlob").catch(() => null);
       if (blob) out.push({ blob, url: urls ? URL.createObjectURL(blob) : null });
+    };
+    for (; i < n; i++) {
+      status.textContent = `Estraggo i fotogrammi: ${i + 1} di ${n}`;
+      const t = at(i), t2 = t + shift < d - 0.05 ? t + shift : Math.max(0, t - shift);
+      let ok = false;
+      for (const [x, ms] of [[t, 6000], [t2, 4000]]) { try { await seekTo(x, ms); ok = true; break; } catch {} }
+      if (ok) { run = 0; await grab(); continue; }
+      skipped++;
+      if (++run >= 4) break;  // seeking is not working here: play the rest instead
+      try { await open(); } catch { break; }
     }
-    if (!out.length) throw new Error("nessun fotogramma estratto dal video");
+    if (i < n) {
+      // Play-through from the first frame not taken (or the start), grabbing each target as playback passes it
+      status.textContent = `Estraggo i fotogrammi riproducendo il video: ${out.length} di ${n}`;
+      try { await open(); } catch {}
+      if (v && !v.error) {
+        let j = i - run + 1; if (j < 0) j = 0;
+        try { v.playbackRate = 2; } catch {}
+        try { if (j > 0) await seekTo(Math.max(0, at(j) - 1), 4000); } catch {}
+        try { await withTimeout(v.play(), 5000, "play"); } catch {}
+        let last = v.currentTime, still = Date.now();
+        while (j < n && !v.ended && !v.error && Date.now() - still < 8000) {
+          await new Promise(r => setTimeout(r, 40));
+          if (v.currentTime !== last) { last = v.currentTime; still = Date.now(); }
+          if (v.currentTime >= at(j)) {
+            while (j + 1 < n && v.currentTime >= at(j + 1)) j++;
+            await grab(); j++;
+            status.textContent = `Estraggo i fotogrammi riproducendo il video: ${out.length} di ${n}`;
+          }
+        }
+        try { v.pause(); } catch {}
+      }
+    }
+    if (!out.length) throw new Error(`il video si blocca mentre estraggo i fotogrammi (nessuno su ${n}; ${info()})`);
     return out;
-  } finally { v.onerror = v.onseeked = v.onloadeddata = null; try { v.removeAttribute("src"); v.load(); } catch {} URL.revokeObjectURL(url); if (cv) cv.width = cv.height = 0; }
+  } finally { close(); URL.revokeObjectURL(url); if (cv) cv.width = cv.height = 0; }
 }
 function clearRun() { run.frames.forEach(f => URL.revokeObjectURL(f.url)); run.frames = []; run.rows = []; run.kind = null; $("#run-video").value = ""; $("#run-photos").value = ""; }
 async function onRunFiles(files, kind) {
