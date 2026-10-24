@@ -1,0 +1,65 @@
+{
+ "when": "2026-10-24T18:40Z",
+ "total_listed": {
+  "files": 1450,
+  "MB": 541.3
+ },
+ "classes": {
+  "a_referenced": {
+   "files": 1183,
+   "MB": 200.8,
+   "split": {
+    "invii_frame_lists_only": {
+     "files": 656,
+     "MB": 101.5
+    },
+    "foto": {
+     "files": 498,
+     "MB": 94.8
+    },
+    "config_sala": {
+     "files": 29,
+     "MB": 4.5
+    }
+   }
+  },
+  "b_duplicates_of_referenced": {
+   "files": 118,
+   "MB": 19.4,
+   "groups_with_2plus_copies": 104
+  },
+  "c_unreferenced_frames": {
+   "files": 79,
+   "MB": 26.6
+  },
+  "d_audio_parts": {
+   "files": 36,
+   "MB": 85.8
+  },
+  "e_wrong_video_200211": {
+   "files": 17,
+   "MB": 4.0
+  },
+  "f_libraries_models_asr": {
+   "files": 12,
+   "MB": 122.7
+  },
+  "f_unreferenced_text": {
+   "files": 1,
+   "MB": 2.3
+  },
+  "new_after_cutoff_untouched": {
+   "files": 4,
+   "MB": 79.7
+  }
+ },
+ "to_delete": {
+  "files": 136,
+  "MB": 16.1
+ },
+ "notes": [
+  "foto doc 33ee74d7929bd0e58143fb3b986b1d60 points at an asset that is not in the store",
+  "page source (live_v16 v31) references no asset ids directly; ASR shards listed in asr_assets.json are not loaded by v31 (it fetches Whisper from huggingface/jsdelivr)",
+  "walk 193233: 69 orphan frames 17:39-17:45 plus 39 v31 frames are all kept"
+ ]
+}

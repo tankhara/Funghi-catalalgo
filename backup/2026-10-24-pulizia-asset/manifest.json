@@ -1,0 +1,1233 @@
+{
+ "artifact": "https://claude.ai/artifact/FXWkEdQvcnxFn6hSibBKzM",
+ "made": "2026-10-24",
+ "cutoff_untouched_after": "2026-10-24T18:10:00Z",
+ "count": 136,
+ "bytes": 16121716,
+ "items": [
+  {
+   "id": "546bc2366aa2deb6cfd9b1cf32a206c6",
+   "sha": "498ea8a06ee4ecb20c22717d93d8c149c1cc4bcacaf8bd0293d6b440c975cf4f",
+   "type": "image/jpeg",
+   "size": 92737,
+   "created": "2026-10-22T17:46:03.043785Z",
+   "reason": "exact sha256 duplicate; kept copy 8a6d533522c63716dd31cb6ee5f217a7 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/546bc2366aa2deb6cfd9b1cf32a206c6.jpg"
+  },
+  {
+   "id": "174cc93c520b0bf5ae73bff193e2ec53",
+   "sha": "4346aed1f9f88c37e2d14e3e34b25a8c68ff85e93f59c99583b273df757d8208",
+   "type": "image/jpeg",
+   "size": 112940,
+   "created": "2026-10-22T17:46:04.050312Z",
+   "reason": "exact sha256 duplicate; kept copy 15cd46445626c1abf3e57cd326f682dd is referenced by db:invii",
+   "local_copy": "cleanup/deleted/174cc93c520b0bf5ae73bff193e2ec53.jpg"
+  },
+  {
+   "id": "05c16fd3dfdf13bd1af1345793d87f04",
+   "sha": "a186488eb5e485c6467214099127857082df056f688c7e7c3a5cebfb808cc6d5",
+   "type": "image/jpeg",
+   "size": 60902,
+   "created": "2026-10-22T17:46:04.922232Z",
+   "reason": "exact sha256 duplicate; kept copy 5b1f7cc848bd1f843de2038e04ac119b is referenced by db:invii",
+   "local_copy": "cleanup/deleted/05c16fd3dfdf13bd1af1345793d87f04.jpg"
+  },
+  {
+   "id": "d9bdcda5cefc0cbe0c608d1b87eb7e33",
+   "sha": "13f6a3220566d40b6654fb0bcee9c436da7b666e04ab26049df1326700397f72",
+   "type": "image/jpeg",
+   "size": 89658,
+   "created": "2026-10-22T17:46:05.818432Z",
+   "reason": "exact sha256 duplicate; kept copy 2fcc3a2728229e6c8ecbaf3bb6d6022d is referenced by db:invii",
+   "local_copy": "cleanup/deleted/d9bdcda5cefc0cbe0c608d1b87eb7e33.jpg"
+  },
+  {
+   "id": "cc202aa30d121a151a54b6e67046aea3",
+   "sha": "6168f7dc06a1c49ea7b498f7f936e5b1ded934928b30d4d7633bf92af023b7d2",
+   "type": "image/jpeg",
+   "size": 89604,
+   "created": "2026-10-22T17:46:06.71893Z",
+   "reason": "exact sha256 duplicate; kept copy eefc93c99ed1a3c7e9d6b5207eded3b6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/cc202aa30d121a151a54b6e67046aea3.jpg"
+  },
+  {
+   "id": "e68fe142c6324f2fa7e641e4f0dac390",
+   "sha": "35aa40ae8dfd5253c1d6fec37553491c1859b51400f240d336da7f3d9cf0bbe8",
+   "type": "image/jpeg",
+   "size": 62815,
+   "created": "2026-10-22T17:46:07.56829Z",
+   "reason": "exact sha256 duplicate; kept copy fac3b4e05a228bcbd90982f01f709315 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/e68fe142c6324f2fa7e641e4f0dac390.jpg"
+  },
+  {
+   "id": "a6f58101767020836d963732e3289e11",
+   "sha": "bd75c848bd07809b3d719d59f47396145129239399ab014e2c7eba900cd387cf",
+   "type": "image/jpeg",
+   "size": 74922,
+   "created": "2026-10-22T17:46:08.434363Z",
+   "reason": "exact sha256 duplicate; kept copy e656a0f0da79f3f74bca0cc8f9e35ab6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a6f58101767020836d963732e3289e11.jpg"
+  },
+  {
+   "id": "3b79b1505f42aae428194ae530b5cdb7",
+   "sha": "0ed9a2c81dabb6b37b106629ec0aba28a7cb07efb3a327b664ade777744b5a79",
+   "type": "image/jpeg",
+   "size": 96728,
+   "created": "2026-10-22T17:46:09.338984Z",
+   "reason": "exact sha256 duplicate; kept copy 8b317220d4f44dabdc3329e4dbaf065f is referenced by db:invii",
+   "local_copy": "cleanup/deleted/3b79b1505f42aae428194ae530b5cdb7.jpg"
+  },
+  {
+   "id": "5385fe74540d9920228fc09a5c83b9fa",
+   "sha": "9683ba0310ca53a70eeb274fe94b38f148f7ba90b9090ba733dc905acc371437",
+   "type": "image/jpeg",
+   "size": 101807,
+   "created": "2026-10-22T17:46:10.451897Z",
+   "reason": "exact sha256 duplicate; kept copy 32a9442a5e1dd07bc13ae64a607eb1e7 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/5385fe74540d9920228fc09a5c83b9fa.jpg"
+  },
+  {
+   "id": "652af1f19d4075a35a4c6704314b3589",
+   "sha": "6fbac0df80a821229e8be5b5a462338b2ab33f4d0c807f85a3bf7e620a84295a",
+   "type": "image/jpeg",
+   "size": 90338,
+   "created": "2026-10-22T17:46:11.368665Z",
+   "reason": "exact sha256 duplicate; kept copy e2b62c8f14df4248d65694d4f9b783b9 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/652af1f19d4075a35a4c6704314b3589.jpg"
+  },
+  {
+   "id": "8c0c7027ab896f5b29c80bfe9cca142c",
+   "sha": "b267d8e8f891076c90185ce5fab28572b806378d0b988c413d1c18c211104059",
+   "type": "image/jpeg",
+   "size": 96576,
+   "created": "2026-10-22T17:46:12.471905Z",
+   "reason": "exact sha256 duplicate; kept copy 9c458b79b0760275a98bba7b12e934cc is referenced by db:invii",
+   "local_copy": "cleanup/deleted/8c0c7027ab896f5b29c80bfe9cca142c.jpg"
+  },
+  {
+   "id": "a0202bda88e7b5d31d306f485312a2c0",
+   "sha": "38e028cdd0bb4c6959d45dd52203265943e7ff9a9ebde4145dadff281b207a17",
+   "type": "image/jpeg",
+   "size": 95359,
+   "created": "2026-10-22T17:46:13.41486Z",
+   "reason": "exact sha256 duplicate; kept copy 6e67ccc903e859cf1dac66fa061ed9ae is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a0202bda88e7b5d31d306f485312a2c0.jpg"
+  },
+  {
+   "id": "1c6e6b60ce64966c165b91716c23abce",
+   "sha": "b26677c2b25adb97d527b50bb772fda8974a3aaec88bfce2796e9c5eeece4c4a",
+   "type": "image/jpeg",
+   "size": 158345,
+   "created": "2026-10-22T17:46:14.369384Z",
+   "reason": "exact sha256 duplicate; kept copy 708125d26a5c414d87dc0feca281ddd9 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/1c6e6b60ce64966c165b91716c23abce.jpg"
+  },
+  {
+   "id": "f1395988189219afceb9a06e580fcece",
+   "sha": "38dd0dcca34e20c9330fe3db1b436301234f20370d3b3f333f61db872cbad542",
+   "type": "image/jpeg",
+   "size": 57808,
+   "created": "2026-10-22T17:46:15.179511Z",
+   "reason": "exact sha256 duplicate; kept copy 74d876ffff2f6cb6c263367869218b1c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/f1395988189219afceb9a06e580fcece.jpg"
+  },
+  {
+   "id": "2c0a5c1984a24086894cde12a50167ea",
+   "sha": "84b7b1da54ded6777746e1f6e55f1f77aef3a3d6c7b7f0a1646b17bcaf3e5d96",
+   "type": "image/jpeg",
+   "size": 100888,
+   "created": "2026-10-22T17:46:16.066915Z",
+   "reason": "exact sha256 duplicate; kept copy af2038b07aee59401be9414c0ef85fa2 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/2c0a5c1984a24086894cde12a50167ea.jpg"
+  },
+  {
+   "id": "bb0abd2376968a8d02fcf83444327eb0",
+   "sha": "867f22e623cf05c848a39591645ccabfe3354b5c1c41730e219c05e61ed25a41",
+   "type": "image/jpeg",
+   "size": 95525,
+   "created": "2026-10-22T17:46:16.961772Z",
+   "reason": "exact sha256 duplicate; kept copy 69c3691ca0d0af4802c44dc7f486fe2f is referenced by db:invii",
+   "local_copy": "cleanup/deleted/bb0abd2376968a8d02fcf83444327eb0.jpg"
+  },
+  {
+   "id": "dff23f1339d7423477a7d1594e71e421",
+   "sha": "1b78f798eac6bd888cad2bdf0ff2f0c4b4f0c16a8e3191a0c8160efd3f6ae6de",
+   "type": "image/jpeg",
+   "size": 131612,
+   "created": "2026-10-22T17:46:17.877952Z",
+   "reason": "exact sha256 duplicate; kept copy 0902c85dde5e6829c691cc0d0612b49b is referenced by db:invii",
+   "local_copy": "cleanup/deleted/dff23f1339d7423477a7d1594e71e421.jpg"
+  },
+  {
+   "id": "ab12d52cfa239b3b25cf8131f9c6e0f3",
+   "sha": "04a22cb7891a0707501004f0566d584a878333d0eb0f0a375fd418b92cee4bca",
+   "type": "image/jpeg",
+   "size": 114200,
+   "created": "2026-10-22T17:46:18.734576Z",
+   "reason": "exact sha256 duplicate; kept copy f8d7864dfe7c2d865d29736f30c787b7 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/ab12d52cfa239b3b25cf8131f9c6e0f3.jpg"
+  },
+  {
+   "id": "0810a5a0dc63dd839c0bcdf0702b3951",
+   "sha": "5f1a303662447cd88b9618034305b038d539bcfec837bf10aeead83415779c7c",
+   "type": "image/jpeg",
+   "size": 115856,
+   "created": "2026-10-22T17:46:19.563163Z",
+   "reason": "exact sha256 duplicate; kept copy f778c929922688985fc42639d056aae4 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/0810a5a0dc63dd839c0bcdf0702b3951.jpg"
+  },
+  {
+   "id": "2099b2d11bb3cad657cc13c3b4d638b4",
+   "sha": "50f876a2774b8d66c0ad50da99150ae6948ed8e7382025fd9ac7f2f2806e7c38",
+   "type": "image/jpeg",
+   "size": 121761,
+   "created": "2026-10-22T17:46:20.444023Z",
+   "reason": "exact sha256 duplicate; kept copy a691706bdcb6196246cf4dbba2f73744 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/2099b2d11bb3cad657cc13c3b4d638b4.jpg"
+  },
+  {
+   "id": "c51b786c201c61221666dfff15af54c6",
+   "sha": "087ae6fef65958d381539f953e4d4111358c4594829a060629272b0049f672e0",
+   "type": "image/jpeg",
+   "size": 95641,
+   "created": "2026-10-22T17:46:21.315533Z",
+   "reason": "exact sha256 duplicate; kept copy e2f22a67a6529b6d4d1d2aa8284698b4 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/c51b786c201c61221666dfff15af54c6.jpg"
+  },
+  {
+   "id": "712bbde8b00926f58d803d2e674df389",
+   "sha": "7a91f5b6311a81747cdfd1429ee3d50269f06fe699f9b0eed4f4b40c0bbe84dc",
+   "type": "image/jpeg",
+   "size": 138045,
+   "created": "2026-10-22T17:46:22.268524Z",
+   "reason": "exact sha256 duplicate; kept copy bc2f0b0cfeb8653174c8fa3ea7387bd6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/712bbde8b00926f58d803d2e674df389.jpg"
+  },
+  {
+   "id": "9319612f089fd177f613861097b7c2a8",
+   "sha": "765aeb89a7df3da6b7051fb3a3ead45c4d57c5c23199eeeda77217e7cc778cbc",
+   "type": "image/jpeg",
+   "size": 69072,
+   "created": "2026-10-22T17:46:23.102279Z",
+   "reason": "exact sha256 duplicate; kept copy 4ccf92782cca86aadbe9a5fe9bad6ddd is referenced by db:invii",
+   "local_copy": "cleanup/deleted/9319612f089fd177f613861097b7c2a8.jpg"
+  },
+  {
+   "id": "8769381d9d2fd7ecb102e4d000cf8146",
+   "sha": "cb374b82151b7d4e780dae0689598b828ed6b300982284fde91b838e8df90c1a",
+   "type": "image/jpeg",
+   "size": 71517,
+   "created": "2026-10-22T17:46:23.898484Z",
+   "reason": "exact sha256 duplicate; kept copy 390169a32461cb06123983ff90d75731 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/8769381d9d2fd7ecb102e4d000cf8146.jpg"
+  },
+  {
+   "id": "08d6b85cf2bc6c0776d89fd26ac3b473",
+   "sha": "66e5dcd0cef8cae978f47d782b07bbe3c594a5805637ad7847fad3835d856ef0",
+   "type": "image/jpeg",
+   "size": 77928,
+   "created": "2026-10-22T17:46:24.758259Z",
+   "reason": "exact sha256 duplicate; kept copy 8a3588fb6f5839764cc02a3a05ba6278 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/08d6b85cf2bc6c0776d89fd26ac3b473.jpg"
+  },
+  {
+   "id": "7055fd3a2b1dd55d075bb2ff12bb1361",
+   "sha": "d27d4c80758b047ac70166b3788310cd258558c779ddef7c58e08a5341f61fed",
+   "type": "image/jpeg",
+   "size": 81075,
+   "created": "2026-10-22T17:46:25.635702Z",
+   "reason": "exact sha256 duplicate; kept copy 2130807a6850005c0a73c20ab53ab954 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/7055fd3a2b1dd55d075bb2ff12bb1361.jpg"
+  },
+  {
+   "id": "90cb99b9159809d8a7ce0f131ab05cb3",
+   "sha": "c6fcf8e7c1c44b0b05e851a50839f06de1855bc8f302228a8cf8796c0f1d9e98",
+   "type": "image/jpeg",
+   "size": 77128,
+   "created": "2026-10-22T17:46:26.483692Z",
+   "reason": "exact sha256 duplicate; kept copy dcb38007c968aa7d41116b9ea3e539bb is referenced by db:invii",
+   "local_copy": "cleanup/deleted/90cb99b9159809d8a7ce0f131ab05cb3.jpg"
+  },
+  {
+   "id": "824ef9e5e7e98749f2d891e823793457",
+   "sha": "3466e15b814fda6047fdb7e9dc82659078eadfa77388a6b9b1fa355f4c3efc12",
+   "type": "image/jpeg",
+   "size": 94409,
+   "created": "2026-10-22T19:19:03.661389Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/824ef9e5e7e98749f2d891e823793457.jpg"
+  },
+  {
+   "id": "5c753e7ee6ab1aa4f6f92bf911f7220f",
+   "sha": "6994c3993cad8ebba61f8c6493aab63c631e26551828e75a783e474837cea4de",
+   "type": "image/jpeg",
+   "size": 100213,
+   "created": "2026-10-22T19:19:05.038124Z",
+   "reason": "exact sha256 duplicate; kept copy 452ede8d5f799431dfd2d3c875ad0c3d is referenced by db:invii",
+   "local_copy": "cleanup/deleted/5c753e7ee6ab1aa4f6f92bf911f7220f.jpg"
+  },
+  {
+   "id": "74a549159d2861294272d33c87c95805",
+   "sha": "3466e15b814fda6047fdb7e9dc82659078eadfa77388a6b9b1fa355f4c3efc12",
+   "type": "image/jpeg",
+   "size": 94409,
+   "created": "2026-10-22T19:23:30.334655Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/74a549159d2861294272d33c87c95805.jpg"
+  },
+  {
+   "id": "b1dfd017475b8ef24f0eaa35a384d678",
+   "sha": "6994c3993cad8ebba61f8c6493aab63c631e26551828e75a783e474837cea4de",
+   "type": "image/jpeg",
+   "size": 100213,
+   "created": "2026-10-22T19:23:31.302107Z",
+   "reason": "exact sha256 duplicate; kept copy 452ede8d5f799431dfd2d3c875ad0c3d is referenced by db:invii",
+   "local_copy": "cleanup/deleted/b1dfd017475b8ef24f0eaa35a384d678.jpg"
+  },
+  {
+   "id": "53f8332dec7a9d332b97ec8f9b5c3e68",
+   "sha": "ebe493b592bff0c91ad55fce33add0e2a0e1743ac9aa1a3e28a08690dfc44cdf",
+   "type": "image/jpeg",
+   "size": 149268,
+   "created": "2026-10-22T19:23:32.278456Z",
+   "reason": "exact sha256 duplicate; kept copy 3ccc717213cf53d1f4c01bca2443afad is referenced by db:invii",
+   "local_copy": "cleanup/deleted/53f8332dec7a9d332b97ec8f9b5c3e68.jpg"
+  },
+  {
+   "id": "54d8dcbee5669b334b0499c460661761",
+   "sha": "7b9f72c1895ba4d24f1f5afac5202d279aab9db54b715d2f9aae8311c3410714",
+   "type": "image/jpeg",
+   "size": 156449,
+   "created": "2026-10-22T19:23:33.277787Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/54d8dcbee5669b334b0499c460661761.jpg"
+  },
+  {
+   "id": "53ca77113191fc0e4292df307176b371",
+   "sha": "72955b276d91e93c3c7c6e850eebb53d60083b88a502cdfbfa8dc9830ad2f937",
+   "type": "image/jpeg",
+   "size": 153436,
+   "created": "2026-10-22T19:23:34.204028Z",
+   "reason": "exact sha256 duplicate; kept copy 49ae3ed0b7f37f7153fd8d395589b59c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/53ca77113191fc0e4292df307176b371.jpg"
+  },
+  {
+   "id": "7ed66f1260eded950e3e804c778dd88c",
+   "sha": "eda47fa965d6bdb972e640627f55331581a5ef02ed6404949153993fc384f4c1",
+   "type": "image/jpeg",
+   "size": 105621,
+   "created": "2026-10-22T19:23:35.03166Z",
+   "reason": "exact sha256 duplicate; kept copy a756cf1e6aa0f4920b86a684a353d87e is referenced by db:invii",
+   "local_copy": "cleanup/deleted/7ed66f1260eded950e3e804c778dd88c.jpg"
+  },
+  {
+   "id": "3a7a65658e1ed667a2c0652ee3fcbb64",
+   "sha": "26fe5be8034932c88074b92e7737a3fd6d670e186579e7f380d32dc3e920ce82",
+   "type": "image/jpeg",
+   "size": 106542,
+   "created": "2026-10-22T19:23:35.929541Z",
+   "reason": "exact sha256 duplicate; kept copy ac711a28660634879be89df3d3564e87 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/3a7a65658e1ed667a2c0652ee3fcbb64.jpg"
+  },
+  {
+   "id": "62ada288f102dec0fafcef8cc33c038a",
+   "sha": "cbbe10da2171d2b23d10e5a0bb34fb122cbcfd779360401100364bbe71a6786d",
+   "type": "image/jpeg",
+   "size": 85237,
+   "created": "2026-10-22T19:23:36.761268Z",
+   "reason": "exact sha256 duplicate; kept copy 7383206463575a4abca5ab4d36db962a is referenced by db:invii",
+   "local_copy": "cleanup/deleted/62ada288f102dec0fafcef8cc33c038a.jpg"
+  },
+  {
+   "id": "625de0e5bdd22efc68c8175a7743f803",
+   "sha": "b3c5d4cb6320abc7959c24580ac874f30000dfb8ed1796de8fbfec8f993ee047",
+   "type": "image/jpeg",
+   "size": 82631,
+   "created": "2026-10-22T19:23:37.57462Z",
+   "reason": "exact sha256 duplicate; kept copy 01d0a9b68ab2b8ec12eac46ba58982b1 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/625de0e5bdd22efc68c8175a7743f803.jpg"
+  },
+  {
+   "id": "6ba26283b96f566a1c6eb621e1f9ab3c",
+   "sha": "231d49652de8903f16706d0018b94e35212ecf929d343bbc1bede0fed9e87dd2",
+   "type": "image/jpeg",
+   "size": 88058,
+   "created": "2026-10-22T19:23:38.447094Z",
+   "reason": "exact sha256 duplicate; kept copy 46e40ba93d3fd53259d17cb73d2c0020 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/6ba26283b96f566a1c6eb621e1f9ab3c.jpg"
+  },
+  {
+   "id": "a9a147c22c9d9d3c9e8c6297b271ba42",
+   "sha": "4388c24e8bae6f08edd601246c4b07fb18f1799d8709e0c0cb2df84a92d63013",
+   "type": "image/jpeg",
+   "size": 98188,
+   "created": "2026-10-22T19:23:39.321133Z",
+   "reason": "exact sha256 duplicate; kept copy 5d790bbb3373099d69b11db187aeecc5 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a9a147c22c9d9d3c9e8c6297b271ba42.jpg"
+  },
+  {
+   "id": "4d457bd6759aa424d3b0ecd21fbda20f",
+   "sha": "e82015f5801baff7da23df71e487209d62425ac01384383ffb9a7d2c774cb3f5",
+   "type": "image/jpeg",
+   "size": 133319,
+   "created": "2026-10-22T19:30:19.071446Z",
+   "reason": "exact sha256 duplicate; kept copy 2464982ca99d43d786f3df6aaaa676d3 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/4d457bd6759aa424d3b0ecd21fbda20f.jpg"
+  },
+  {
+   "id": "8bff65fea19f56e971e8a29445712b3d",
+   "sha": "39daf78474c2fbc9ac2e9fd3c3985881fe29a5c2a069cdf662ee7e21ed92a9e5",
+   "type": "image/jpeg",
+   "size": 139872,
+   "created": "2026-10-22T19:30:20.014236Z",
+   "reason": "exact sha256 duplicate; kept copy 0b30d90d3ac933cd4081fdc37fe908ba is referenced by db:invii",
+   "local_copy": "cleanup/deleted/8bff65fea19f56e971e8a29445712b3d.jpg"
+  },
+  {
+   "id": "cb20175a8ba88fcf78e7f77b7892ae45",
+   "sha": "09970d4fa2f3e8b2d76bb0c7d00f9b06e3e7bef3d907231a33302e2ccbc1279e",
+   "type": "image/jpeg",
+   "size": 117122,
+   "created": "2026-10-22T19:30:20.87745Z",
+   "reason": "exact sha256 duplicate; kept copy 645256c539bd21ef74f5fb18c5cbaa6e is referenced by db:invii",
+   "local_copy": "cleanup/deleted/cb20175a8ba88fcf78e7f77b7892ae45.jpg"
+  },
+  {
+   "id": "c32115c9161dd94047cd7b0a799e3339",
+   "sha": "c452ab2bd7a4c27e169304ffc6dadc7e608cfaecd3cf9cc5eabc787e241a237e",
+   "type": "image/jpeg",
+   "size": 96669,
+   "created": "2026-10-22T19:30:21.68796Z",
+   "reason": "exact sha256 duplicate; kept copy e8458e21ed97f6b9013ef677a207488f is referenced by db:invii",
+   "local_copy": "cleanup/deleted/c32115c9161dd94047cd7b0a799e3339.jpg"
+  },
+  {
+   "id": "4dc0f22b0407c81eb57ac5b79ce3a84f",
+   "sha": "6ad694ef45fb550c0943425bc2ed6d2b483b2c3a21f0dcb2b05daa6711d09469",
+   "type": "image/jpeg",
+   "size": 94835,
+   "created": "2026-10-22T19:30:22.487851Z",
+   "reason": "exact sha256 duplicate; kept copy 872144bbbfd3a58f8fc22c965bb4a1c1 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/4dc0f22b0407c81eb57ac5b79ce3a84f.jpg"
+  },
+  {
+   "id": "601d1dda03486a54dfe3568a8ad8ca51",
+   "sha": "ffc92553f9f64eea54851d8465f527f63dbe3cea9e9789ffdc318360c6d284a1",
+   "type": "image/jpeg",
+   "size": 82962,
+   "created": "2026-10-22T19:30:23.2766Z",
+   "reason": "exact sha256 duplicate; kept copy 20e97938040d55c3b389c8dada715a85 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/601d1dda03486a54dfe3568a8ad8ca51.jpg"
+  },
+  {
+   "id": "d815392aa8d6cfec6b4eb39dba4a9fac",
+   "sha": "69abae93d16fff93cf099f402f440d670b588765a3a20db0177937aec2889554",
+   "type": "image/jpeg",
+   "size": 91266,
+   "created": "2026-10-22T19:30:24.130836Z",
+   "reason": "exact sha256 duplicate; kept copy 7afbf26140c87f5c597f93ad413379c6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/d815392aa8d6cfec6b4eb39dba4a9fac.jpg"
+  },
+  {
+   "id": "6547095457f0ec110c4c926d930b7023",
+   "sha": "69abae93d16fff93cf099f402f440d670b588765a3a20db0177937aec2889554",
+   "type": "image/jpeg",
+   "size": 91266,
+   "created": "2026-10-22T19:31:06.539104Z",
+   "reason": "exact sha256 duplicate; kept copy 7afbf26140c87f5c597f93ad413379c6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/6547095457f0ec110c4c926d930b7023.jpg"
+  },
+  {
+   "id": "b24749e5cdb959e354389d9e606480f3",
+   "sha": "7521cd760efac1bb40b72e686edd31d016ff79f022398fbb875862e8c26b9888",
+   "type": "image/jpeg",
+   "size": 112407,
+   "created": "2026-10-22T19:31:07.424579Z",
+   "reason": "exact sha256 duplicate; kept copy 341645f5c406d287971adebf847d0dea is referenced by db:invii",
+   "local_copy": "cleanup/deleted/b24749e5cdb959e354389d9e606480f3.jpg"
+  },
+  {
+   "id": "e382b234fd1d1c0632264c541cde9feb",
+   "sha": "f150b6f984344cb981bb5effebd86471b666ce9d96b40ab707698b80ab3a2da3",
+   "type": "image/jpeg",
+   "size": 114006,
+   "created": "2026-10-22T19:31:08.27732Z",
+   "reason": "exact sha256 duplicate; kept copy 541834f79ffb8481e48b124d5be3f627 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/e382b234fd1d1c0632264c541cde9feb.jpg"
+  },
+  {
+   "id": "6db704ef6fe2a8fc62b62ef39f02f0fa",
+   "sha": "553f8410cb87db5ca18ba2a85b82c7ccccfc365d3984bd0ae33227081ac8fbc4",
+   "type": "image/jpeg",
+   "size": 118464,
+   "created": "2026-10-22T19:31:09.164152Z",
+   "reason": "exact sha256 duplicate; kept copy 45e7925c613c000618093fe3effdadd2 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/6db704ef6fe2a8fc62b62ef39f02f0fa.jpg"
+  },
+  {
+   "id": "895d89342e2ab01d55bb8045a2cb3785",
+   "sha": "1eab3fcd332ce66c1fb28d6427f3cc3f9988810d5c6803095b2a5440e3494ffd",
+   "type": "image/jpeg",
+   "size": 99393,
+   "created": "2026-10-22T19:31:10.071178Z",
+   "reason": "exact sha256 duplicate; kept copy 6f4d2da6d25771fd826267b4e04703b7 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/895d89342e2ab01d55bb8045a2cb3785.jpg"
+  },
+  {
+   "id": "6fc9597f0eb9d3c09a81e7a5a1bb75ea",
+   "sha": "b5ac4e99807c640b52350d31c5de5c3a746dd6cd994cb9544461f1fa7dd12936",
+   "type": "image/jpeg",
+   "size": 83566,
+   "created": "2026-10-22T19:31:11.201269Z",
+   "reason": "exact sha256 duplicate; kept copy 3fac3e61a680b43581f04262e6086858 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/6fc9597f0eb9d3c09a81e7a5a1bb75ea.jpg"
+  },
+  {
+   "id": "b51162d14b2a314e91fd6d02ce8d9399",
+   "sha": "611a6112ff2167624e5795895120b7e859ed8de324a4c9e9d7c8b418bd470cc7",
+   "type": "image/jpeg",
+   "size": 93986,
+   "created": "2026-10-22T19:31:12.054699Z",
+   "reason": "exact sha256 duplicate; kept copy ff1471332a8254253c66dfcf86ee690d is referenced by db:invii",
+   "local_copy": "cleanup/deleted/b51162d14b2a314e91fd6d02ce8d9399.jpg"
+  },
+  {
+   "id": "8be5cd038834bead46f2ccd5e32fcbce",
+   "sha": "85525f698c85576ceab3d5f5e365fa05668371de2bb66467fa7000ecab8296ed",
+   "type": "image/jpeg",
+   "size": 117847,
+   "created": "2026-10-22T19:31:12.95321Z",
+   "reason": "exact sha256 duplicate; kept copy 78f5d9b6cf4128c48d2fc06c6d4d463f is referenced by db:invii",
+   "local_copy": "cleanup/deleted/8be5cd038834bead46f2ccd5e32fcbce.jpg"
+  },
+  {
+   "id": "308b291fe956ca846ba96bfb5e8269ca",
+   "sha": "2c910a5afe730a4f5e213a1c7ab87b62af8cff52c15f2ff17a2b8517a4bb9078",
+   "type": "image/jpeg",
+   "size": 159962,
+   "created": "2026-10-22T19:34:46.852176Z",
+   "reason": "exact sha256 duplicate; kept copy 65e1fff510337d9fb2adbfbaacb52270 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/308b291fe956ca846ba96bfb5e8269ca.jpg"
+  },
+  {
+   "id": "7db1b5d3c779f0605c9106035e8e34cf",
+   "sha": "c07e944047dc30cfac22efdac4c361857c3c2ac405aeefef32b184375f9746a7",
+   "type": "image/jpeg",
+   "size": 102485,
+   "created": "2026-10-22T19:34:47.743426Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/7db1b5d3c779f0605c9106035e8e34cf.jpg"
+  },
+  {
+   "id": "7b206a12a07bbc8cb4a7689df7a31636",
+   "sha": "f4bb31d4c2ad24e819848363ab24201b70da25733a27b1e49721c2c32ab1597a",
+   "type": "image/jpeg",
+   "size": 101466,
+   "created": "2026-10-22T19:34:48.615995Z",
+   "reason": "exact sha256 duplicate; kept copy 999c6aa03d83427bf89aad901dd914c6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/7b206a12a07bbc8cb4a7689df7a31636.jpg"
+  },
+  {
+   "id": "edb173f1f72bdee8617895b7514bc8ea",
+   "sha": "22b350d4feef0fcd3482b57d258b2a136c87dfc0474b3538db0c248804ca9dbd",
+   "type": "image/jpeg",
+   "size": 90082,
+   "created": "2026-10-22T19:34:49.429972Z",
+   "reason": "exact sha256 duplicate; kept copy f3ef00307cb4220a425da19432ac570e is referenced by db:invii",
+   "local_copy": "cleanup/deleted/edb173f1f72bdee8617895b7514bc8ea.jpg"
+  },
+  {
+   "id": "059994c22fe2c5186b375432e6ef7f4b",
+   "sha": "cfc4059ebcb1b490b0d988d29a693bc1ae77a1e1a0447b8c10153fad9c055950",
+   "type": "image/jpeg",
+   "size": 91451,
+   "created": "2026-10-22T19:34:50.220062Z",
+   "reason": "exact sha256 duplicate; kept copy 01e7f4c6fcf682f940f4043c06a35794 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/059994c22fe2c5186b375432e6ef7f4b.jpg"
+  },
+  {
+   "id": "c87d3fe4d050956442b8265d252898a8",
+   "sha": "8b1a239fe97834980d8ff76ac7fbfbea59090ef14020eefdb4290ae212859bab",
+   "type": "image/jpeg",
+   "size": 75879,
+   "created": "2026-10-22T19:34:51.039834Z",
+   "reason": "exact sha256 duplicate; kept copy 271d031c66bb215607c25a744b1f64a6 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/c87d3fe4d050956442b8265d252898a8.jpg"
+  },
+  {
+   "id": "ecc4579fca0b87e9efa7d5e7cef76564",
+   "sha": "74de62927a6c1bb67d7b657a2ff98f19b152f60ea4dfaab5758d49e488eab547",
+   "type": "image/jpeg",
+   "size": 103219,
+   "created": "2026-10-22T19:34:51.922001Z",
+   "reason": "exact sha256 duplicate; kept copy ae1dac450d4f5f839b218d4bf0f2d236 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/ecc4579fca0b87e9efa7d5e7cef76564.jpg"
+  },
+  {
+   "id": "47623b5e09e6d0128da2ba8982f4731c",
+   "sha": "bd36404f650df01226b7553f24c31b7b107a2f3e1fee9cf4caa2cdffa7a0a7c6",
+   "type": "image/jpeg",
+   "size": 99035,
+   "created": "2026-10-22T19:37:27.209601Z",
+   "reason": "exact sha256 duplicate; kept copy 9b8049e56de8aecda84b99b62c51f9ac is referenced by db:invii",
+   "local_copy": "cleanup/deleted/47623b5e09e6d0128da2ba8982f4731c.jpg"
+  },
+  {
+   "id": "5cc69466eee50bc4a51045e1daefbc23",
+   "sha": "f7a9712a385ccb0ce95a88899f5f9114ac03248977e68eeafbe6524f58f539f3",
+   "type": "image/jpeg",
+   "size": 106516,
+   "created": "2026-10-22T19:37:28.087293Z",
+   "reason": "exact sha256 duplicate; kept copy 653c30fbd4931097610292f21ed7c2a4 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/5cc69466eee50bc4a51045e1daefbc23.jpg"
+  },
+  {
+   "id": "a092f26a833ca1dc450428568d20c783",
+   "sha": "5f981333356c7ef619bcec0fb2aa8b0d8c18e241f77028ac8adec3cf28c5ed9e",
+   "type": "image/jpeg",
+   "size": 122256,
+   "created": "2026-10-22T19:37:28.977657Z",
+   "reason": "exact sha256 duplicate; kept copy d7c6fc33fe2651fceadfca76cd8f4a98 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a092f26a833ca1dc450428568d20c783.jpg"
+  },
+  {
+   "id": "4be3f064426a3d8dc82acf0b98bddb19",
+   "sha": "3d081bbb5154eb6864a533c8102b9bf3ca8912688597bd98c1d91094b48fac38",
+   "type": "image/jpeg",
+   "size": 80729,
+   "created": "2026-10-22T19:37:29.865443Z",
+   "reason": "exact sha256 duplicate; kept copy c26ff8bd1d67e912063cc6b6786f130c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/4be3f064426a3d8dc82acf0b98bddb19.jpg"
+  },
+  {
+   "id": "344a15615130a74b5e528eb2af472868",
+   "sha": "41cbc214022c3361d104245a34a6ef13567ea799513728f4357bcb510bffa41f",
+   "type": "image/jpeg",
+   "size": 78110,
+   "created": "2026-10-22T19:37:30.7189Z",
+   "reason": "exact sha256 duplicate; kept copy 6e281ea3b0a55cbc3c25729b29185a96 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/344a15615130a74b5e528eb2af472868.jpg"
+  },
+  {
+   "id": "a7770a4a6e9310b0a7c046bf7d8394b7",
+   "sha": "1d5a696116e789015f099b7430455c40f348c7303743f7ed80ea35fec455d016",
+   "type": "image/jpeg",
+   "size": 77005,
+   "created": "2026-10-22T19:37:31.569192Z",
+   "reason": "exact sha256 duplicate; kept copy d07a6fa9f705cb2a817e52f461e0c521 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a7770a4a6e9310b0a7c046bf7d8394b7.jpg"
+  },
+  {
+   "id": "e386b667470438367d0f213064eac6bc",
+   "sha": "942d4fdc1e47a848ff09b08db9c7a23f4a357c9ec3bbd1f2bf5f2eb6ad38145c",
+   "type": "image/jpeg",
+   "size": 74671,
+   "created": "2026-10-22T19:37:32.405222Z",
+   "reason": "exact sha256 duplicate; kept copy eee83c7d05d3f965a433dc4be5382853 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/e386b667470438367d0f213064eac6bc.jpg"
+  },
+  {
+   "id": "5805c940a990d2827cc87b7dadeb3cca",
+   "sha": "128384779dc338345dce2ea001ee9192adbadbc32f093b9f8017f59829d29c90",
+   "type": "image/jpeg",
+   "size": 71831,
+   "created": "2026-10-22T19:37:33.304256Z",
+   "reason": "exact sha256 duplicate; kept copy aa383594e4c3938f91fb81add770ff33 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/5805c940a990d2827cc87b7dadeb3cca.jpg"
+  },
+  {
+   "id": "bd624df36b91a57f30807020db4d2145",
+   "sha": "da2532fe9a9908a4814a44677c4b4cf8fa89efdcebfdc68837b1f77648676be6",
+   "type": "image/jpeg",
+   "size": 77345,
+   "created": "2026-10-22T19:37:34.160985Z",
+   "reason": "exact sha256 duplicate; kept copy 0428116c3b048676bf2ea619684f7405 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/bd624df36b91a57f30807020db4d2145.jpg"
+  },
+  {
+   "id": "37b35fcb3c58ef839cd0cb34b54bf6da",
+   "sha": "da2532fe9a9908a4814a44677c4b4cf8fa89efdcebfdc68837b1f77648676be6",
+   "type": "image/jpeg",
+   "size": 77345,
+   "created": "2026-10-22T19:37:42.535044Z",
+   "reason": "exact sha256 duplicate; kept copy 0428116c3b048676bf2ea619684f7405 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/37b35fcb3c58ef839cd0cb34b54bf6da.jpg"
+  },
+  {
+   "id": "2278fa58973a190510aafddcae41decf",
+   "sha": "14c19b7cf5d624c7a2f7710c41b2669780107b4ab41cd513ed4747b5a1e13db8",
+   "type": "image/jpeg",
+   "size": 79908,
+   "created": "2026-10-22T19:37:43.417417Z",
+   "reason": "exact sha256 duplicate; kept copy 6f8e5a886489e5ecb4b25b61ddeedbdb is referenced by db:invii",
+   "local_copy": "cleanup/deleted/2278fa58973a190510aafddcae41decf.jpg"
+  },
+  {
+   "id": "d2625a40ce841e59e45fb603fb015b0e",
+   "sha": "388e09544753347ce41fce4020b4eb9be5f5c9c5fd046917d70fa036cedaa5c0",
+   "type": "image/jpeg",
+   "size": 77443,
+   "created": "2026-10-22T19:37:44.301561Z",
+   "reason": "exact sha256 duplicate; kept copy 66116e2a0114928b108811f32f291983 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/d2625a40ce841e59e45fb603fb015b0e.jpg"
+  },
+  {
+   "id": "0f67317cf783ebc20ba3c43bf7a799b2",
+   "sha": "696dc54a76b02153edeb51654bf115aabaabfc3367dfabd43ba3d47709c9f3c9",
+   "type": "image/jpeg",
+   "size": 82323,
+   "created": "2026-10-22T19:37:45.149307Z",
+   "reason": "exact sha256 duplicate; kept copy a8cec4e5179e77f4f8b5b18297a96744 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/0f67317cf783ebc20ba3c43bf7a799b2.jpg"
+  },
+  {
+   "id": "2ded2d06af9468d4b370b351d6116dc1",
+   "sha": "1372093b3c8b4baa985c36c0d7afecd1aa95ee857938e1049cfd5edbd410554d",
+   "type": "image/jpeg",
+   "size": 63841,
+   "created": "2026-10-22T19:37:45.993021Z",
+   "reason": "exact sha256 duplicate; kept copy e057cf3c61b90bfaad26a6f2d1662ed8 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/2ded2d06af9468d4b370b351d6116dc1.jpg"
+  },
+  {
+   "id": "44b73e7e031ee4c83805872561d64882",
+   "sha": "d71942d639eca262e78d8126978abc4d3ca37295734cc3812d3909d126e74469",
+   "type": "image/jpeg",
+   "size": 62319,
+   "created": "2026-10-22T19:37:46.800711Z",
+   "reason": "exact sha256 duplicate; kept copy ffbba973eeb17c7ff777ac966f0003bd is referenced by db:invii",
+   "local_copy": "cleanup/deleted/44b73e7e031ee4c83805872561d64882.jpg"
+  },
+  {
+   "id": "48fac3d09f72acc9a1a12251ac622446",
+   "sha": "192ff22fd187f4ce6e09f3cd40571ec2cfab169773364ba4f136cacc8078d357",
+   "type": "image/jpeg",
+   "size": 101410,
+   "created": "2026-10-22T19:38:36.051969Z",
+   "reason": "exact sha256 duplicate; kept copy 174f7a8c3cb7841bd454578c9ea3aee4 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/48fac3d09f72acc9a1a12251ac622446.jpg"
+  },
+  {
+   "id": "00a645bcf4c8473c92901f210ff2c2c5",
+   "sha": "711c10a5400f82e93bebdf00bff8901437eb6316faff72848b3771ff4fea0388",
+   "type": "image/jpeg",
+   "size": 152513,
+   "created": "2026-10-22T19:38:36.948209Z",
+   "reason": "exact sha256 duplicate; kept copy a36e5004e3e7e1b5a5778b43aecbdfbf is referenced by db:invii",
+   "local_copy": "cleanup/deleted/00a645bcf4c8473c92901f210ff2c2c5.jpg"
+  },
+  {
+   "id": "23580693271513a5672111336a6a942b",
+   "sha": "65cbdc643a40751d54f5cc7931ee67282917e5b93145ba992d9645d729c94cd6",
+   "type": "image/jpeg",
+   "size": 150402,
+   "created": "2026-10-22T19:38:37.781088Z",
+   "reason": "exact sha256 duplicate; kept copy b72ba7c1e714843e49d1c4c939c0f3c0 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/23580693271513a5672111336a6a942b.jpg"
+  },
+  {
+   "id": "80410872ef2bd601781a239dd8479b91",
+   "sha": "fe8e08d8626ae3fe8e92e83cef9f3c1e5a087ce9d60bba56dd92fea9097d0fb1",
+   "type": "image/jpeg",
+   "size": 128712,
+   "created": "2026-10-22T19:38:38.666013Z",
+   "reason": "exact sha256 duplicate; kept copy 890ed156a7b3857bcc507e465b3634b2 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/80410872ef2bd601781a239dd8479b91.jpg"
+  },
+  {
+   "id": "a85726be2cfee110d9e0cabea9fa53c9",
+   "sha": "274807e7cf3c4d204b89aff95b3b979602ffa2aabf008da624a40ee97feb0c32",
+   "type": "image/jpeg",
+   "size": 124402,
+   "created": "2026-10-22T19:38:39.52803Z",
+   "reason": "exact sha256 duplicate; kept copy 66df4f3887e1d5216952b908780c432f is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a85726be2cfee110d9e0cabea9fa53c9.jpg"
+  },
+  {
+   "id": "61f125a1ee4b363422565da677372a9b",
+   "sha": "30c00bdad9a35059ff1baf25d98c4f884eee4dc9f25d719a0dc171bb6a800ce9",
+   "type": "image/jpeg",
+   "size": 115305,
+   "created": "2026-10-22T19:38:40.422371Z",
+   "reason": "exact sha256 duplicate; kept copy 53c643de1562d6826347f69129e41434 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/61f125a1ee4b363422565da677372a9b.jpg"
+  },
+  {
+   "id": "7e277e763dba25a222e2e5f2980494fb",
+   "sha": "e82015f5801baff7da23df71e487209d62425ac01384383ffb9a7d2c774cb3f5",
+   "type": "image/jpeg",
+   "size": 133319,
+   "created": "2026-10-22T20:17:23.970392Z",
+   "reason": "exact sha256 duplicate; kept copy 2464982ca99d43d786f3df6aaaa676d3 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/7e277e763dba25a222e2e5f2980494fb.jpg"
+  },
+  {
+   "id": "845e330eb4f984fcd7cb5e2df19a7e50",
+   "sha": "39daf78474c2fbc9ac2e9fd3c3985881fe29a5c2a069cdf662ee7e21ed92a9e5",
+   "type": "image/jpeg",
+   "size": 139872,
+   "created": "2026-10-22T20:17:24.916868Z",
+   "reason": "exact sha256 duplicate; kept copy 0b30d90d3ac933cd4081fdc37fe908ba is referenced by db:invii",
+   "local_copy": "cleanup/deleted/845e330eb4f984fcd7cb5e2df19a7e50.jpg"
+  },
+  {
+   "id": "930931ee7e2a704bb516e964aa658a58",
+   "sha": "09970d4fa2f3e8b2d76bb0c7d00f9b06e3e7bef3d907231a33302e2ccbc1279e",
+   "type": "image/jpeg",
+   "size": 117122,
+   "created": "2026-10-22T20:17:25.684211Z",
+   "reason": "exact sha256 duplicate; kept copy 645256c539bd21ef74f5fb18c5cbaa6e is referenced by db:invii",
+   "local_copy": "cleanup/deleted/930931ee7e2a704bb516e964aa658a58.jpg"
+  },
+  {
+   "id": "f6bbc2849a4d50cfe2f06d1bd6a98efc",
+   "sha": "3466e15b814fda6047fdb7e9dc82659078eadfa77388a6b9b1fa355f4c3efc12",
+   "type": "image/jpeg",
+   "size": 94409,
+   "created": "2026-10-22T20:18:49.015092Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/f6bbc2849a4d50cfe2f06d1bd6a98efc.jpg"
+  },
+  {
+   "id": "937e71e6deeee97bdaf6f24876ae18c7",
+   "sha": "6994c3993cad8ebba61f8c6493aab63c631e26551828e75a783e474837cea4de",
+   "type": "image/jpeg",
+   "size": 100213,
+   "created": "2026-10-22T20:18:50.434244Z",
+   "reason": "exact sha256 duplicate; kept copy 452ede8d5f799431dfd2d3c875ad0c3d is referenced by db:invii",
+   "local_copy": "cleanup/deleted/937e71e6deeee97bdaf6f24876ae18c7.jpg"
+  },
+  {
+   "id": "b1c558087b5321be7f36e66e4c1bed40",
+   "sha": "ebe493b592bff0c91ad55fce33add0e2a0e1743ac9aa1a3e28a08690dfc44cdf",
+   "type": "image/jpeg",
+   "size": 149268,
+   "created": "2026-10-22T20:18:51.609344Z",
+   "reason": "exact sha256 duplicate; kept copy 3ccc717213cf53d1f4c01bca2443afad is referenced by db:invii",
+   "local_copy": "cleanup/deleted/b1c558087b5321be7f36e66e4c1bed40.jpg"
+  },
+  {
+   "id": "15f75f19f147555c163524954f247bbc",
+   "sha": "7b9f72c1895ba4d24f1f5afac5202d279aab9db54b715d2f9aae8311c3410714",
+   "type": "image/jpeg",
+   "size": 156449,
+   "created": "2026-10-22T20:18:52.586716Z",
+   "reason": "unreferenced frame from a retried or partial upload of 22-23 Oct",
+   "local_copy": "cleanup/deleted/15f75f19f147555c163524954f247bbc.jpg"
+  },
+  {
+   "id": "366a9d0571f22b5fcf63620a134075be",
+   "sha": "72955b276d91e93c3c7c6e850eebb53d60083b88a502cdfbfa8dc9830ad2f937",
+   "type": "image/jpeg",
+   "size": 153436,
+   "created": "2026-10-22T20:18:53.831112Z",
+   "reason": "exact sha256 duplicate; kept copy 49ae3ed0b7f37f7153fd8d395589b59c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/366a9d0571f22b5fcf63620a134075be.jpg"
+  },
+  {
+   "id": "1efe8cbaca5eddb98ae8f26bfab47039",
+   "sha": "eda47fa965d6bdb972e640627f55331581a5ef02ed6404949153993fc384f4c1",
+   "type": "image/jpeg",
+   "size": 105621,
+   "created": "2026-10-22T20:18:54.66581Z",
+   "reason": "exact sha256 duplicate; kept copy a756cf1e6aa0f4920b86a684a353d87e is referenced by db:invii",
+   "local_copy": "cleanup/deleted/1efe8cbaca5eddb98ae8f26bfab47039.jpg"
+  },
+  {
+   "id": "d666228207de3b04e41a143734e95809",
+   "sha": "26fe5be8034932c88074b92e7737a3fd6d670e186579e7f380d32dc3e920ce82",
+   "type": "image/jpeg",
+   "size": 106542,
+   "created": "2026-10-22T20:18:55.506955Z",
+   "reason": "exact sha256 duplicate; kept copy ac711a28660634879be89df3d3564e87 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/d666228207de3b04e41a143734e95809.jpg"
+  },
+  {
+   "id": "6f7d9d90e0b6ed95803b033053e6af1f",
+   "sha": "cbbe10da2171d2b23d10e5a0bb34fb122cbcfd779360401100364bbe71a6786d",
+   "type": "image/jpeg",
+   "size": 85237,
+   "created": "2026-10-22T20:18:56.391153Z",
+   "reason": "exact sha256 duplicate; kept copy 7383206463575a4abca5ab4d36db962a is referenced by db:invii",
+   "local_copy": "cleanup/deleted/6f7d9d90e0b6ed95803b033053e6af1f.jpg"
+  },
+  {
+   "id": "a5dbd9af86ffad66fc00710483ed6b95",
+   "sha": "b3c5d4cb6320abc7959c24580ac874f30000dfb8ed1796de8fbfec8f993ee047",
+   "type": "image/jpeg",
+   "size": 82631,
+   "created": "2026-10-22T20:18:57.30773Z",
+   "reason": "exact sha256 duplicate; kept copy 01d0a9b68ab2b8ec12eac46ba58982b1 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a5dbd9af86ffad66fc00710483ed6b95.jpg"
+  },
+  {
+   "id": "21f782fbfbaf197e122f729fc50fdb4c",
+   "sha": "231d49652de8903f16706d0018b94e35212ecf929d343bbc1bede0fed9e87dd2",
+   "type": "image/jpeg",
+   "size": 88058,
+   "created": "2026-10-22T20:18:58.378727Z",
+   "reason": "exact sha256 duplicate; kept copy 46e40ba93d3fd53259d17cb73d2c0020 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/21f782fbfbaf197e122f729fc50fdb4c.jpg"
+  },
+  {
+   "id": "30efb29523c31409a127a244337f64eb",
+   "sha": "4388c24e8bae6f08edd601246c4b07fb18f1799d8709e0c0cb2df84a92d63013",
+   "type": "image/jpeg",
+   "size": 98188,
+   "created": "2026-10-22T20:18:59.343608Z",
+   "reason": "exact sha256 duplicate; kept copy 5d790bbb3373099d69b11db187aeecc5 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/30efb29523c31409a127a244337f64eb.jpg"
+  },
+  {
+   "id": "036b994684b94cbfa5b5520c13ae22b6",
+   "sha": "94e7435df41f238ba00b410e1ea3999dbd4d5972ac51840a67a9d97503b07204",
+   "type": "image/jpeg",
+   "size": 102999,
+   "created": "2026-10-22T20:19:00.229922Z",
+   "reason": "exact sha256 duplicate; kept copy bc07e57f499c0933f6bf2ca17828d301 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/036b994684b94cbfa5b5520c13ae22b6.jpg"
+  },
+  {
+   "id": "84f73fd7152b05626be6b6479ca58dea",
+   "sha": "7127201d9a40748fd10753e2f4c478ba3915fcfdbb393f8e8c89d2247745485f",
+   "type": "image/jpeg",
+   "size": 82838,
+   "created": "2026-10-22T20:19:00.976345Z",
+   "reason": "exact sha256 duplicate; kept copy 7eff33329bb3e468c9672802dcba4f47 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/84f73fd7152b05626be6b6479ca58dea.jpg"
+  },
+  {
+   "id": "20863cda195dad371d5bb33ea4a7fde1",
+   "sha": "54494b1fea969e9857c8185198cc3d36f6521dccdef178ed50536ef8be0f4683",
+   "type": "image/jpeg",
+   "size": 91839,
+   "created": "2026-10-22T20:19:01.905942Z",
+   "reason": "exact sha256 duplicate; kept copy e328e5ce7a279639bf83c5104d2a303c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/20863cda195dad371d5bb33ea4a7fde1.jpg"
+  },
+  {
+   "id": "1d5b047831323bedbdbbd9dca255ea15",
+   "sha": "06ae13e29fc9f7e83c8baae967f5dca55255c0ef47206e7203e00ac63695b64e",
+   "type": "image/jpeg",
+   "size": 138616,
+   "created": "2026-10-22T20:19:02.741299Z",
+   "reason": "exact sha256 duplicate; kept copy 552ec3142f73612f6019535559aa49db is referenced by db:invii",
+   "local_copy": "cleanup/deleted/1d5b047831323bedbdbbd9dca255ea15.jpg"
+  },
+  {
+   "id": "3ce7087f0f0783b909be4bac5bdbd19b",
+   "sha": "f76427ddf9f67a5cdfdb66c1d2125970a9eecb6a44b481d40023a70c70b180a8",
+   "type": "image/jpeg",
+   "size": 95233,
+   "created": "2026-10-22T20:19:03.490239Z",
+   "reason": "exact sha256 duplicate; kept copy 1224aeb6e48dbb27c9dc0dffba318f79 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/3ce7087f0f0783b909be4bac5bdbd19b.jpg"
+  },
+  {
+   "id": "8d0a42335d2ceb0c932e604d8bb0cd54",
+   "sha": "31ff98cb56c19d9aa7ce994acdb7bd25635d2e63772621c9d60e44d0392d6ba8",
+   "type": "image/jpeg",
+   "size": 101246,
+   "created": "2026-10-22T20:19:04.320445Z",
+   "reason": "exact sha256 duplicate; kept copy 960ebcc267a258c9f0c19d6e2cdc9bc2 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/8d0a42335d2ceb0c932e604d8bb0cd54.jpg"
+  },
+  {
+   "id": "4c9c5846939d2d75b10fd4c0e2a0a417",
+   "sha": "7585b1af29380dbf44888280249ed8d831434e7b6abc2468d9611801249f181b",
+   "type": "image/jpeg",
+   "size": 109806,
+   "created": "2026-10-22T20:19:05.231393Z",
+   "reason": "exact sha256 duplicate; kept copy b0adec04dc6ec9869dc404d17a7d5c68 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/4c9c5846939d2d75b10fd4c0e2a0a417.jpg"
+  },
+  {
+   "id": "a96cc2f27656192288c9c436368f56ba",
+   "sha": "acca24810df780be18df9417133b32227b2a491807d43c0faa5cb00b25a01192",
+   "type": "image/jpeg",
+   "size": 108060,
+   "created": "2026-10-22T20:19:06.128861Z",
+   "reason": "exact sha256 duplicate; kept copy 2f6000c4488fabb8c96dd35bf4fb3c65 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a96cc2f27656192288c9c436368f56ba.jpg"
+  },
+  {
+   "id": "cb91469bd37dba63dc1f87a524d4005e",
+   "sha": "29a1102809e069c9455d241625481b8f3783858148d725a00d8d4cd1cbb5df65",
+   "type": "image/jpeg",
+   "size": 115715,
+   "created": "2026-10-22T20:19:07.026749Z",
+   "reason": "exact sha256 duplicate; kept copy ef11f0a6435ef5df969ef1cbd28217a9 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/cb91469bd37dba63dc1f87a524d4005e.jpg"
+  },
+  {
+   "id": "94e58bae763f7b52d7a353c69d862d78",
+   "sha": "8b68fa0555d6038fd6fd24b903e53c1b062b91f119bfdfcfeb02fb4470d8875e",
+   "type": "image/jpeg",
+   "size": 101497,
+   "created": "2026-10-22T20:19:07.889411Z",
+   "reason": "exact sha256 duplicate; kept copy a53a34594a6aed7c2a3eeba9e675f8da is referenced by db:invii",
+   "local_copy": "cleanup/deleted/94e58bae763f7b52d7a353c69d862d78.jpg"
+  },
+  {
+   "id": "a832897985672190bae6ea60983554f9",
+   "sha": "8b68fa0555d6038fd6fd24b903e53c1b062b91f119bfdfcfeb02fb4470d8875e",
+   "type": "image/jpeg",
+   "size": 101497,
+   "created": "2026-10-22T20:20:17.932276Z",
+   "reason": "exact sha256 duplicate; kept copy a53a34594a6aed7c2a3eeba9e675f8da is referenced by db:invii",
+   "local_copy": "cleanup/deleted/a832897985672190bae6ea60983554f9.jpg"
+  },
+  {
+   "id": "bc7aae38c060ec9c5392cfd6cfa4ddae",
+   "sha": "bd36404f650df01226b7553f24c31b7b107a2f3e1fee9cf4caa2cdffa7a0a7c6",
+   "type": "image/jpeg",
+   "size": 99035,
+   "created": "2026-10-22T20:24:34.456952Z",
+   "reason": "exact sha256 duplicate; kept copy 9b8049e56de8aecda84b99b62c51f9ac is referenced by db:invii",
+   "local_copy": "cleanup/deleted/bc7aae38c060ec9c5392cfd6cfa4ddae.jpg"
+  },
+  {
+   "id": "d1e3b3deb2779c7bf2d4f75c4a9ff197",
+   "sha": "f7a9712a385ccb0ce95a88899f5f9114ac03248977e68eeafbe6524f58f539f3",
+   "type": "image/jpeg",
+   "size": 106516,
+   "created": "2026-10-22T20:24:35.426585Z",
+   "reason": "exact sha256 duplicate; kept copy 653c30fbd4931097610292f21ed7c2a4 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/d1e3b3deb2779c7bf2d4f75c4a9ff197.jpg"
+  },
+  {
+   "id": "130e53f3ae68a9cf9aeb5e7479db333f",
+   "sha": "3d081bbb5154eb6864a533c8102b9bf3ca8912688597bd98c1d91094b48fac38",
+   "type": "image/jpeg",
+   "size": 80729,
+   "created": "2026-10-22T20:24:36.289214Z",
+   "reason": "exact sha256 duplicate; kept copy c26ff8bd1d67e912063cc6b6786f130c is referenced by db:invii",
+   "local_copy": "cleanup/deleted/130e53f3ae68a9cf9aeb5e7479db333f.jpg"
+  },
+  {
+   "id": "0049b7db4d1cb762713bd1b744185357",
+   "sha": "41cbc214022c3361d104245a34a6ef13567ea799513728f4357bcb510bffa41f",
+   "type": "image/jpeg",
+   "size": 78110,
+   "created": "2026-10-22T20:24:37.094885Z",
+   "reason": "exact sha256 duplicate; kept copy 6e281ea3b0a55cbc3c25729b29185a96 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/0049b7db4d1cb762713bd1b744185357.jpg"
+  },
+  {
+   "id": "f00505a810fc26e0a4d1f3f5283bc1ad",
+   "sha": "1d5a696116e789015f099b7430455c40f348c7303743f7ed80ea35fec455d016",
+   "type": "image/jpeg",
+   "size": 77005,
+   "created": "2026-10-22T20:24:37.949022Z",
+   "reason": "exact sha256 duplicate; kept copy d07a6fa9f705cb2a817e52f461e0c521 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/f00505a810fc26e0a4d1f3f5283bc1ad.jpg"
+  },
+  {
+   "id": "0fc87163ac3744a46791c3c549d89375",
+   "sha": "942d4fdc1e47a848ff09b08db9c7a23f4a357c9ec3bbd1f2bf5f2eb6ad38145c",
+   "type": "image/jpeg",
+   "size": 74671,
+   "created": "2026-10-22T20:24:38.97792Z",
+   "reason": "exact sha256 duplicate; kept copy eee83c7d05d3f965a433dc4be5382853 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/0fc87163ac3744a46791c3c549d89375.jpg"
+  },
+  {
+   "id": "3f7bd04c092aff9eebae8de240ca5af5",
+   "sha": "128384779dc338345dce2ea001ee9192adbadbc32f093b9f8017f59829d29c90",
+   "type": "image/jpeg",
+   "size": 71831,
+   "created": "2026-10-22T20:24:39.868695Z",
+   "reason": "exact sha256 duplicate; kept copy aa383594e4c3938f91fb81add770ff33 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/3f7bd04c092aff9eebae8de240ca5af5.jpg"
+  },
+  {
+   "id": "b1ee261bec3d691e2da7d0822e288bee",
+   "sha": "c23ae960e82257df31ff9c8f669cb595042b828f24c51a6e0be2f711165af77e",
+   "type": "image/jpeg",
+   "size": 91080,
+   "created": "2026-10-22T21:05:29.28432Z",
+   "reason": "exact sha256 duplicate; kept copy d785bb6ac781873f616e1f8fed1d09a5 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/b1ee261bec3d691e2da7d0822e288bee.jpg"
+  },
+  {
+   "id": "ff72fa1667fe89abfe136c3f27648f37",
+   "sha": "841f985adeca9dcf156043be2507ab18cf2a46338e71f5ae08b4b1c4ea5c52dd",
+   "type": "image/jpeg",
+   "size": 174220,
+   "created": "2026-10-24T12:11:26.71764Z",
+   "reason": "exact sha256 duplicate; kept copy a0d9c8443a0fc3afbbe841ed4e3cdea0 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/ff72fa1667fe89abfe136c3f27648f37.jpg"
+  },
+  {
+   "id": "afe79d4eb07c2db18368de4db9497250",
+   "sha": "939a18effff7fe99945330e2df4608df026c2177f8820f34bc49f1dd7ac79199",
+   "type": "image/jpeg",
+   "size": 120868,
+   "created": "2026-10-24T12:14:06.021877Z",
+   "reason": "exact sha256 duplicate; kept copy 9da63b2a9ee5e971c4e1ff7432362257 is referenced by db:invii",
+   "local_copy": "cleanup/deleted/afe79d4eb07c2db18368de4db9497250.jpg"
+  },
+  {
+   "id": "67070eb875efd935f66a70a9e7cbc5c2",
+   "sha": "176aef8acca91b999b3706f4900a5a15a8f7957f6048cea5229824e241f2b74a",
+   "type": "image/jpeg",
+   "size": 118192,
+   "created": "2026-10-24T12:35:25.331951Z",
+   "reason": "exact sha256 duplicate; kept copy eff98b835ff75085ddc2dfffc340fafa is referenced by db:invii",
+   "local_copy": "cleanup/deleted/67070eb875efd935f66a70a9e7cbc5c2.jpg"
+  },
+  {
+   "id": "6b17dc3532dcb748592d23a9cd486a35",
+   "sha": "c3fe4472bef9a6c59a3418f2622c862def40104dcea181f7c54ae83d21ccb2eb",
+   "type": "image/jpeg",
+   "size": 210076,
+   "created": "2026-10-24T18:03:11.153551Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/6b17dc3532dcb748592d23a9cd486a35.jpg"
+  },
+  {
+   "id": "e17895be01bf0a5b573e3bf1db65da84",
+   "sha": "3c0d481eb11dc8610346392322432be89fd45b117dce4a34bf07b811ce04f27e",
+   "type": "image/jpeg",
+   "size": 251703,
+   "created": "2026-10-24T18:03:12.998239Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/e17895be01bf0a5b573e3bf1db65da84.jpg"
+  },
+  {
+   "id": "a0dd5140009523f2d383e61551930aac",
+   "sha": "791b543389b08bda0fac299c8d7b3d4cd354459f2ed3bfcd0b8b0f86c4e13d48",
+   "type": "image/jpeg",
+   "size": 232169,
+   "created": "2026-10-24T18:03:14.038151Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/a0dd5140009523f2d383e61551930aac.jpg"
+  },
+  {
+   "id": "bbe3b19915d5d2e67450ada8bf0020d1",
+   "sha": "798a88c7c132adf3d78a42fc13f569ac808742d9eef39990ae4afe584c6f8f16",
+   "type": "image/jpeg",
+   "size": 257204,
+   "created": "2026-10-24T18:03:15.05032Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/bbe3b19915d5d2e67450ada8bf0020d1.jpg"
+  },
+  {
+   "id": "d4ad2f5f89d84164254bbc23efc97936",
+   "sha": "ef235ca63353bed8654b3655b3d6852d0dd524c59150351628bab678e97061c1",
+   "type": "image/jpeg",
+   "size": 235086,
+   "created": "2026-10-24T18:03:15.952679Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/d4ad2f5f89d84164254bbc23efc97936.jpg"
+  },
+  {
+   "id": "ac45b56f95d5e312bb1a0866c810a271",
+   "sha": "de41ff734ad0faa64fbbeed5d1d4d7bd18541cc0ac789f195eb925fbe27e1def",
+   "type": "image/jpeg",
+   "size": 254829,
+   "created": "2026-10-24T18:03:16.836747Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/ac45b56f95d5e312bb1a0866c810a271.jpg"
+  },
+  {
+   "id": "8dd3e582af067de554620320fcc57af9",
+   "sha": "f7bd613598ee1ed25884dc52a198f7bf3c04fe5099169a0644997ffe681ae053",
+   "type": "image/jpeg",
+   "size": 257737,
+   "created": "2026-10-24T18:03:17.701858Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/8dd3e582af067de554620320fcc57af9.jpg"
+  },
+  {
+   "id": "628574adb6e6c0a23a3188ff3405c48b",
+   "sha": "ca610d8e9c60c69d9bf43d0af6b3f75e7001ea90160c5ce567475c50aebeb097",
+   "type": "image/jpeg",
+   "size": 263780,
+   "created": "2026-10-24T18:03:18.784433Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/628574adb6e6c0a23a3188ff3405c48b.jpg"
+  },
+  {
+   "id": "9e9a79f43feff99e0ece72c844abdf87",
+   "sha": "a0e259071067982abb298a8ed4fae5899c336fb4fc19189e734c2130adb86015",
+   "type": "image/jpeg",
+   "size": 245327,
+   "created": "2026-10-24T18:03:19.637865Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/9e9a79f43feff99e0ece72c844abdf87.jpg"
+  },
+  {
+   "id": "7a66d98d10cdd6fbb38df5da73b6d99d",
+   "sha": "9554455ae60994182fca6f4f646ef40a8c0ec7d1caa78ac42267bf991d164adb",
+   "type": "image/jpeg",
+   "size": 271410,
+   "created": "2026-10-24T18:03:20.894772Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/7a66d98d10cdd6fbb38df5da73b6d99d.jpg"
+  },
+  {
+   "id": "f68cf7a51c78063780b8fa15aa6d058c",
+   "sha": "a63be13dc5c2bc985b65d8b24549d318396e1b81337d3a4198a1d2e096dbb594",
+   "type": "image/jpeg",
+   "size": 272877,
+   "created": "2026-10-24T18:03:24.858697Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/f68cf7a51c78063780b8fa15aa6d058c.jpg"
+  },
+  {
+   "id": "7ddef04af622b005fa28546e82f81934",
+   "sha": "50dfa56b088442df09c4070de8432724d2b50c1f3e808b7142e927b898a5535c",
+   "type": "image/jpeg",
+   "size": 275840,
+   "created": "2026-10-24T18:03:28.768409Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/7ddef04af622b005fa28546e82f81934.jpg"
+  },
+  {
+   "id": "efd56d479f4019306b97bc593ab51e5b",
+   "sha": "decf4acacad6105fe54ac219e7ccfabcd50654965beb48ab7732d0538c14ff7b",
+   "type": "image/jpeg",
+   "size": 250092,
+   "created": "2026-10-24T18:03:29.849048Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/efd56d479f4019306b97bc593ab51e5b.jpg"
+  },
+  {
+   "id": "6ee376f4935ce18b62aa7f72772123b6",
+   "sha": "768f2a97a18a033fbef92288fccc7b3eae43f0a2905c3659967536146501dbce",
+   "type": "image/jpeg",
+   "size": 123826,
+   "created": "2026-10-24T18:04:03.449038Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/6ee376f4935ce18b62aa7f72772123b6.jpg"
+  },
+  {
+   "id": "0003d8545cc9fb08741565214d4a3ea5",
+   "sha": "9b675e1bf761bd383312ecfd14335214d408297eb346086ef6b02ac34b7c98ac",
+   "type": "image/jpeg",
+   "size": 208721,
+   "created": "2026-10-24T18:04:16.662554Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/0003d8545cc9fb08741565214d4a3ea5.jpg"
+  },
+  {
+   "id": "28ca79c3cc2e488a615fef9e1f3c521f",
+   "sha": "6ac54e56da162971eee105e34af37272d15e0b8e3bfcc23bb8f38e10e0a4953b",
+   "type": "image/jpeg",
+   "size": 161147,
+   "created": "2026-10-24T18:04:17.684319Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/28ca79c3cc2e488a615fef9e1f3c521f.jpg"
+  },
+  {
+   "id": "9080d499977295961045c24faf51166e",
+   "sha": "dc3cd10ce24b072314e2742d975973b5d4dc81dc84ab0b3e28a2cef951a598a1",
+   "type": "image/jpeg",
+   "size": 197518,
+   "created": "2026-10-24T18:04:18.553153Z",
+   "reason": "wrong video 20261024_200211.mp4 (Patrick asked to ignore it)",
+   "local_copy": "cleanup/deleted/9080d499977295961045c24faf51166e.jpg"
+  }
+ ]
+}
