@@ -156,6 +156,7 @@ textarea { min-height: 96px; resize: vertical; }
 .phedit .acts .row { gap: 6px; }
 .phedit .acts .hint { margin: 0; }
 .phedit .acts .hint:empty { display: none; }
+.phedit .acts .hint.bad { color: var(--danger); font-weight: 600; }
 .preview { max-height: 180px; border-radius: var(--r); object-fit: cover; }
 
 .list { display: grid; gap: 8px; }
@@ -507,7 +508,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 34;
+const APP_VERSION = 35;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1379,6 +1380,22 @@ async function compress(file) {
     return blob || file;
   } catch { return file; }
 }
+// Species-sheet photo: each try has a timeout (a phone link can hang with no error), transient errors are retried with backoff
+const PHOTO_T = { base: 45000, perMB: 10000 };
+async function upPhoto(blob, onTry = () => {}) {
+  for (let a = 0; ; a++) {
+    onTry(a + 1);
+    try { return await withTimeout(upAsset(blob, "image/jpeg"), PHOTO_T.base + blob.size / 1048576 * PHOTO_T.perMB, "\u0000t"); }
+    catch (e) {
+      const err = e && e.message === "\u0000t" && !e.code ? Object.assign(new Error("l'archivio non risponde"), { code: "timeout" }) : e;
+      if ((err && err.code === "quota") || a >= RETRY.tries - 1 || !transient(err)) throw err;
+      await sleep(backoff(a));
+    }
+  }
+}
+// A photo the camera was opened for: if the phone reloads the page while the camera is open, the next start says so
+const LS_FOTO = "funghi-foto-in-attesa";
+const fotoAttesa = v => { try { v ? sessionStorage.setItem(LS_FOTO, JSON.stringify(v)) : sessionStorage.removeItem(LS_FOTO); } catch {} };
 async function uploadPhoto(blob) {
   if (!state.assets) return null;
   const res = await state.assets.upload(blob, { type: blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg" });
@@ -2427,11 +2444,15 @@ function photoEditor(it) {
   const status = el("p", { class: "hint", role: "status", "aria-live": "polite" });
   const mkInput = cam => {
     const i = el("input", { type: "file", accept: "image/*", capture: cam ? "environment" : null, hidden: true, class: cam ? "e-cam" : "e-gal" });
-    i.addEventListener("change", () => { const f = i.files && i.files[0]; if (f) retake(f); i.value = ""; });
+    i.addEventListener("change", () => { fotoAttesa(null); const f = i.files && i.files[0]; if (f) retake(f); i.value = ""; });
     return i;
   };
+  // the mark is cleared when the page comes back by itself (photo chosen or cancelled); only a reload leaves it for the next start
+  const pick = inp => { fotoAttesa({ id: it.id, nome: it.scientifico, t: Date.now() });
+    const back = () => { if (document.visibilityState !== "visible") return; document.removeEventListener("visibilitychange", back); window.removeEventListener("focus", back); setTimeout(() => fotoAttesa(null), 1500); };
+    document.addEventListener("visibilitychange", back); window.addEventListener("focus", back); inp.click(); };
   const camIn = mkInput(true), galIn = mkInput(false);
-  let busy = false, confirm = false, confirmT = 0, gi = 0, keep = null;
+  let busy = false, confirm = false, confirmT = 0, gi = 0, keep = null, pending = null, lasting = null;
   const live = () => state.items.get(it.id) || it;
   function render() {
     const list = photosFor(live());
@@ -2442,25 +2463,39 @@ function photoEditor(it) {
     const thumb = list.length ? gallery(list, { start: gi, onTap: i => openPhoto(list[i], live()),
         onShow: i => { if (i !== gi) { gi = i; if (confirm) { confirm = false; clearTimeout(confirmT); } const b = box.querySelector("#e-unphoto"); if (b) b.textContent = "Togli foto"; } } })
                      : el("span", { class: "thumb lg none" }, "senza foto");
-    const take = el("button", { class: "btn", type: "button", id: "e-retake", disabled: busy, onclick: () => camIn.click() }, ph ? "📷 Rifai foto" : "📷 Nuova foto");
-    const gal = el("button", { class: "btn ghost small", type: "button", id: "e-gallery", disabled: busy, onclick: () => galIn.click() }, "Dalla galleria");
+    const take = el("button", { class: "btn", type: "button", id: "e-retake", disabled: busy, onclick: () => pick(camIn) }, ph ? "📷 Rifai foto" : "📷 Nuova foto");
+    const gal = el("button", { class: "btn ghost small", type: "button", id: "e-gallery", disabled: busy, onclick: () => pick(galIn) }, "Dalla galleria");
     const off = ph ? el("button", { class: "btn small danger", type: "button", id: "e-unphoto", disabled: busy, onclick: () => detach(list[gi]) }, confirm ? "Tocca di nuovo per togliere" : "Togli foto") : null;
-    box.replaceChildren(thumb, el("div", { class: "acts" }, take, el("div", { class: "row" }, gal, off), status), camIn, galIn);
+    // a failed save stays on screen with Riprova until it works or another photo is chosen
+    const again = pending && !busy ? el("button", { class: "btn small primary", type: "button", id: "e-retry", onclick: () => save() }, "Riprova") : null;
+    if (!busy) status.textContent = lasting || "";
+    status.classList.toggle("bad", !!(pending && !busy));
+    box.replaceChildren(thumb, el("div", { class: "acts" }, take, el("div", { class: "row" }, gal, off), status, again), camIn, galIn);
   }
-  const done = msg => { busy = false; status.textContent = ""; render(); if (msg) toast(msg); };
-  async function retake(file) {
-    if (busy) return;
-    if (!state.assets || !state.db) { toast("Archivio non collegato: ricarica la pagina e riprova."); return; }
-    busy = true; confirm = false; render(); status.textContent = "Invio foto…";
+  const done = msg => { busy = false; render(); if (msg) toast(msg); };
+  // Saving a photo: prepare it once, upload it once (kept for Riprova), then write its foto doc; every step has retries and a timeout
+  async function save() {
+    if (busy || !pending) return;
+    if (!state.assets || !state.db) { lasting = "Foto non salvata: archivio non collegato. Ricarica la pagina e scegli di nuovo la foto."; pending = null; render(); toast(lasting, { stay: true }); return; }
+    busy = true; confirm = false; lasting = null; render();
+    const P = pending, say = t => { status.textContent = t; };
     try {
-      const blob = await uprightJpeg(file);
-      const asset = (await upAsset(blob, "image/jpeg")).id;
+      if (!P.blob) { say("Preparo la foto…"); P.blob = await uprightJpeg(P.file); }
+      if (!P.asset) P.asset = (await upPhoto(P.blob, n => say(n > 1 ? `Invio foto… (tentativo ${n})` : "Invio foto…"))).id;
+      say("Registro la foto…");
       const sp = live();
-      const p = { id: asset, asset, corsia: sp.corsia || "", posti: sp.posto ? [sp.posto] : [], specie: [sp.id], creato: new Date().toISOString().replace(/\.\d+Z$/, "Z"), manuale: true };
-      await dbSet("foto/" + asset, p);
-      state.photos.set(asset, p); keep = asset; renderAll();
-      done("Foto aggiornata");
-    } catch (e) { done("Foto non aggiornata: " + errMsg(e) + "."); }
+      const p = P.doc || (P.doc = { id: P.asset, asset: P.asset, corsia: sp.corsia || "", posti: sp.posto ? [sp.posto] : [], specie: [sp.id], creato: new Date().toISOString().replace(/\.\d+Z$/, "Z"), manuale: true });
+      await withTimeout(dbSet("foto/" + P.asset, p, true), 90000, "la registrazione della foto non risponde");
+      state.photos.set(P.asset, p); keep = P.asset; pending = null; lasting = "Foto salvata."; renderAll();
+      done("Foto salvata");
+    } catch (e) {
+      lasting = "Foto non salvata: " + errMsg(e) + ". Tocca Riprova" + (P.asset ? " (la foto è già nell'archivio, manca solo la registrazione)." : ".");
+      done(); toast("Foto non salvata: " + errMsg(e) + ".", { label: "Riprova", fn: () => save(), stay: true });
+    }
+  }
+  function retake(file) {
+    if (busy) return;
+    pending = { file }; save();
   }
   async function detach(ph) {
     if (busy) return;
@@ -3063,6 +3098,8 @@ loadLocal(); goTab(lsGet(LS_TAB) || "v-cap", false); histReplace({ v: curTab });
   state.db = db; state.mode = "cloud"; state.items = new Map(); renderAll();
   voceListen(db);
   versionListen(db);
+  try { const fa = JSON.parse(sessionStorage.getItem(LS_FOTO) || "null"); fotoAttesa(null);
+    if (fa && Date.now() - fa.t < 30 * 60000) toast(`La foto di ${fa.nome} non è arrivata: il telefono ha ricaricato la pagina mentre era aperta la fotocamera. Apri la specie e riprova, oppure usa "Dalla galleria".`, { stay: true }); } catch {}
   probeSpeechEnv(db);
   db.collection("specie").onSnapshot(snap => {
     const m = new Map(); snap.docs.forEach(d => { const v = d.data(); if (v && v.scientifico) m.set(d.id, { ...v, id: d.id }); });
