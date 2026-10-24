@@ -418,6 +418,7 @@ textarea { min-height: 96px; resize: vertical; }
       </div>
       <input id="sala-video" type="file" accept="video/*,audio/*" multiple hidden>
       <label class="row" style="gap:8px;align-items:flex-start;font-size:.9rem"><input type="checkbox" id="sala-pianta" style="margin-top:3px"> <span>È il video della pianta della sala: Claude lo usa per ridisegnare la mappa. Lascialo spento per i video dei cartellini.</span></label>
+      <label class="row" style="gap:8px;align-items:flex-start;font-size:.9rem"><input type="checkbox" id="sala-originale" style="margin-top:3px" checked> <span>Invia il video originale (giro completo): il telefono manda il file intero a pezzi e Claude lo legge tutto. Se non entra nell'archivio, il telefono manda i fotogrammi scelti da lui. Togli il segno per mandare solo i fotogrammi.</span></label>
       <p class="hint" id="sala-status" style="white-space:pre-line"></p>
       <button class="btn primary wide" id="sala-retry" hidden>Riprova</button>
     </div>
@@ -492,7 +493,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 31;
+const APP_VERSION = 32;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1480,6 +1481,54 @@ async function sendRoomVideo(file, step = () => {}, pianta = false, riuso = []) 
     st.textContent = "Immagini non inviate: riprova. " + `${got.size - reused > 0 ? got.size - reused : 0} arrivate, le altre no (` + msg + ").";
     return { ok: false, msg, quota: !!(e && e.code === "quota"), parziali };
   } finally { wait.length = 0; }
+}
+
+// Original video for Claude to join and read whole: slices of 19 MiB (the asset cap is 20 MiB), one at a time, each retried like a
+// frame. Slices stored by an earlier try (riuso [{n, asset, da, a, cod}]) are not sent again. If the store refuses the video type,
+// the slices go as base64 text (like the voice), 14 MiB each. invii/<id>-video lists them at the end.
+const RAW = { slice: 19 * 1048576, b64slice: 14 * 1048576, margin: 10 * 1048576 };
+async function sendRawVideo(file, step = () => {}, riuso = []) {
+  const st = $("#sala-status");
+  if (!file) return { ok: false, msg: "nessun file scelto" };
+  if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
+  const type = file.type && file.type.startsWith("video/") ? file.type : "video/mp4", MB = x => Math.round(x / 1048576);
+  const got = new Map((riuso || []).filter(x => x && x.asset && x.a > x.da).map(x => [x.da + ":" + x.cod, x]));
+  let cod = [...got.values()].some(x => x.cod === "base64") ? "base64" : "binario", out = [];
+  const list = () => [...got.values()].sort((x, y) => x.da - y.da || (x.cod < y.cod ? -1 : 1));
+  const b64 = bl => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.onerror = () => rej(r.error); r.readAsDataURL(bl); });
+  const fits = async () => {
+    const sp = await spaceNow(); if (!sp) return;
+    const sl = cod === "base64" ? RAW.b64slice : RAW.slice; let need = 0, files = 0;
+    for (let da = 0; da < file.size; da = Math.min(file.size, da + sl)) if (!got.has(da + ":" + cod)) { need += Math.min(sl, file.size - da) * (cod === "base64" ? 4 / 3 : 1); files++; }
+    const free = sp.maxBytes - sp.bytes - RAW.margin;
+    if (need > free || files > sp.maxFiles - sp.files - 5)
+      throw Object.assign(new Error(`il video originale (${MB(file.size)} MB${cod === "base64" ? `, ${MB(need)} MB come testo` : ""}) non entra nell'archivio (restano ${Math.max(0, MB(free))} MB liberi)`), { code: "spazio" });
+  };
+  try {
+    st.textContent = "Controllo lo spazio per il video originale…"; step("spazio");
+    await fits();
+    for (let da = 0, k = 0; da < file.size; k++) {
+      const sl = cod === "base64" ? RAW.b64slice : RAW.slice, a = Math.min(file.size, da + sl), tot = Math.ceil(file.size / sl), key = da + ":" + cod;
+      if (got.has(key)) { out.push(got.get(key)); da = a; continue; }
+      st.textContent = `Invio il video originale: pezzo ${k + 1} di ${tot}.`; step(`pezzo ${k + 1} di ${tot}`);
+      let r;
+      try {
+        r = cod === "base64" ? await upAsset(new Blob([await b64(file.slice(da, a))], { type: "text/plain" }), "text/plain", true) : await upAsset(file.slice(da, a, type), type, true);
+      } catch (e) {
+        if (cod === "binario" && !transient(e) && !(e && e.code === "quota")) { cod = "base64"; out = []; da = 0; k = -1; await fits(); continue; }  // video type refused: start again as text
+        throw e;
+      }
+      const p = { n: k + 1, asset: r.id, url: r.url, da, a, cod }; got.set(key, p); out.push(p); da = a;
+    }
+    const rec = { pezzi: out.map(p => ({ n: p.n, asset: p.asset, url: p.url, da: p.da, a: p.a })), codifica: cod === "base64" ? "base64 per pezzo" : "binario", size: file.size, type, name: file.name, lastModified: file.lastModified, creato: new Date().toISOString() };
+    await dbSet("invii/" + uploadId(file) + "-video", rec, true);
+    const msg = `Video originale inviato: ${out.length} pezzi, ${MB(file.size)} MB.`;
+    st.textContent = msg; return { ok: true, msg, pezzi: out };
+  } catch (e) {
+    const msg = errMsg(e);
+    st.textContent = "Video originale non inviato: riprova. " + `${got.size} pezzi arrivati (` + msg + ").";
+    return { ok: false, msg, quota: !!(e && e.code === "quota"), spazio: e && e.code === "spazio" ? e.message : "", pezzi: list() };
+  }
 }
 
 // Audio track as 16 kHz mono WAV, base64 in text/plain assets (the asset store takes no audio types), listed in config/sala-audio
@@ -2536,9 +2585,10 @@ async function listDocs(coll) {
 }
 // Frames stored by a failed try, per video id: reused by the next try (also kept in invii-log/<id>.parziali across reloads)
 const salaPart = {}; let salaRetry = null;
-$("#sala-video").addEventListener("change", e => salaSend([...e.target.files], $("#sala-pianta").checked));
+$("#sala-video").addEventListener("change", e => salaSend([...e.target.files], $("#sala-pianta").checked, $("#sala-originale").checked));
 $("#sala-retry").addEventListener("click", () => { if (salaRetry) salaRetry(); });
-async function salaSend(picked, pianta) {
+async function salaSend(picked, pianta, raw = false) {
+  if (pianta) raw = false;  // the room plan is drawn from frames
   const inp = $("#sala-video"), files = picked.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })), st = $("#sala-status");
   if (!files.length) return;
   if (salaBusy) { toast("Sto ancora inviando i video scelti prima: aspetta \"Fatto\".", { stay: true }); return; }
@@ -2596,7 +2646,7 @@ async function salaSend(picked, pianta) {
         await progress({ indice: i + 1, file: f.name, fase: "controllo" });
         const prev = logs && logs.get(id), done = prev && prev.stato === "inviato" ? { st: "si", data: {} } : null;
         const imgDone = done && (prev.cap || (prev.fotogrammi && prev.fotogrammi.secondi <= ROOM_FR.longAfter)) ? done : null;
-        const img = isVid ? imgDone || await look(id + "-img", f) : { st: "si", data: {} };
+        const img = isVid ? raw ? await look(id + "-video", f) : imgDone || await look(id + "-img", f) : { st: "si", data: {} };
         const aud = done || await look(id + "-audio", f);
         if (isVid && img.st === "si") log.immagini = Array.isArray(img.data.frames) ? img.data.frames.length : prev ? prev.immagini ?? null : null;
         if (aud.st === "si") log.voce = aud.data.secondi ?? (prev ? prev.voce ?? null : null);
@@ -2612,11 +2662,26 @@ async function salaSend(picked, pianta) {
           if (img.st === "?") bad.push("immagini: non riesco a controllare se sono già arrivate, quindi non le reinvio");
           else if (img.st === "no") {
             worked = true;
+            let frames = !raw;
+            if (raw) {
+              const r = await sendRawVideo(f, fase => progress({ fase: "video: " + fase }), salaPart["v" + id] || (prev && Array.isArray(prev.pezzi) ? prev.pezzi : []));
+              log.tipo = f.type || ""; if (r.pezzi && r.pezzi.length) log.pezzi = r.pezzi;
+              if (r.ok) { delete salaPart["v" + id]; mark(id + "-video"); log.video = true; ok.push(`video originale inviato in ${r.pezzi.length} pezzi`); }
+              else if (r.spazio) {
+                // the whole file does not fit: the phone picks the frames instead (unless they already arrived)
+                log.videoNonEntra = r.spazio; ok.push(`${r.spazio}, quindi mando i fotogrammi scelti dal telefono`);
+                const im = await look(id + "-img", f);
+                if (im.st === "si") ok.push("immagini già ricevute"); else if (im.st === "?") bad.push("immagini: non riesco a controllare se sono già arrivate, quindi non le reinvio"); else frames = true;
+              }
+              else { salaPart["v" + id] = r.pezzi; log.videoFallito = true; bad.push(`video originale non inviato (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+            }
+            if (frames) {
             const riuso = salaPart[id] || (prev && Array.isArray(prev.parziali) ? prev.parziali : []);
             const r = await sendRoomVideo(f, fase => progress({ fase: "immagini: " + fase }), pianta, riuso);
             if (r.ok) { delete salaPart[id]; mark(id + "-img", "cap" + ROOM_FR.longMax + " " + batch); log.cap = ROOM_FR.longMax; if (img.rifai) log.rifatte = true; if (pianta) log.pianta = true; log.immagini = r.n; if (r.info) log.fotogrammi = r.info; ok.push(`${r.n} immagini inviate` + (img.rifai ? " (più fitte, al posto delle precedenti)" : "") + (r.nota ? ` (${r.nota})` : "") + (r.reused ? ` (${r.reused} riusate dal tentativo prima)` : "")); }
             else { if (r.parziali && r.parziali.length) { salaPart[id] = log.parziali = r.parziali; log.immaginiArrivate = r.parziali.length; } log.immaginiFallite = true; bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
-          } else if (isVid) ok.push("immagini già ricevute");
+            }
+          } else if (isVid) ok.push(raw ? "video originale già ricevuto" : "immagini già ricevute");
           if (stop) bad.push("voce non provata");
           else if (aud.st === "?") bad.push("voce: non riesco a controllare se è già arrivata, quindi non la reinvio");
           else if (aud.st === "no") {
@@ -2627,6 +2692,8 @@ async function salaSend(picked, pianta) {
           log.stato = bad.length ? "incompleto" : "inviato"; log.motivo = [...bad, ...ok].join("; ");
         }
       } catch (err) { log.stato = "incompleto"; log.motivo = errMsg(err); if (err && err.code === "quota") stop = QUOTA_MSG; }
+      const pv = logs && logs.get(id);
+      if (pv && log.stato === "saltato") for (const x of ["fotogrammi", "cap", "pezzi", "tipo"]) if (pv[x] != null && log[x] == null) log[x] = pv[x];
       log.quando = new Date().toISOString();
       out.push(log);
       try { await withTimeout(state.db.doc("invii-log/" + id).set(log), 20000, "tempo scaduto"); } catch (err) { if (err && err.code === "quota_exceeded") stop = QUOTA_MSG; }
@@ -2639,21 +2706,22 @@ async function salaSend(picked, pianta) {
     await progress(nko ? { fase: "incompleto", incompleti: nko, ultimoErrore: out.filter(r => r.stato === "incompleto").map(r => r.file + ": " + r.motivo).join(" | ").slice(0, 500) } : { fase: "fatto", incompleti: 0 });
   } catch (err) { progress({ fase: "interrotto", ultimoErrore: errMsg(err) }); }
   finally {
-    mo.disconnect(); inp.value = ""; inp.disabled = false; $("#sala-pianta").checked = false; lab.style.opacity = ""; lab.style.pointerEvents = "";
+    mo.disconnect(); inp.value = ""; inp.disabled = false; $("#sala-pianta").checked = false; $("#sala-originale").checked = true; lab.style.opacity = ""; lab.style.pointerEvents = "";
     window.removeEventListener("error", onErr); window.removeEventListener("unhandledrejection", onErr);
     try { wl && wl.release(); } catch {}
     salaBusy = false;
   }
-  const ko = out.filter(r => r.stato === "incompleto").length, imgKo = out.some(r => r.immaginiFallite);
+  const ko = out.filter(r => r.stato === "incompleto").length, imgKo = out.some(r => r.immaginiFallite || r.videoFallito);
+  const koMsg = out.some(r => r.videoFallito) ? "Video originale non inviato: riprova." : "Immagini non inviate: riprova.";
   // one-tap retry of the videos not complete, with the same File objects: received parts are skipped, stored frames reused
   const again = files.filter(f => out.some(r => r.stato === "incompleto" && r.file === f.name));
-  if (ko && !stop && again.length) { salaRetry = () => salaSend(again, pianta); $("#sala-retry").hidden = false; }
+  if (ko && !stop && again.length) { salaRetry = () => salaSend(again, pianta, raw); $("#sala-retry").hidden = false; }
   const esito = r => (r.stato === "saltato" ? "già ricevuto, saltato" : r.stato === "inviato" ? "inviato" + (/già ricevut/.test(r.motivo) ? ` (${r.motivo})` : "") : "incompleto: " + r.motivo) + (r.pianta ? "; ora è la pianta della sala" : "");
-  st.textContent = [imgKo && !stop ? "Immagini non inviate: riprova." : ko ? "Invio non completo." : "", "Risultato:", ...out.map(r => `- ${r.file}: ${esito(r)}`),
+  st.textContent = [imgKo && !stop ? koMsg : ko ? "Invio non completo." : "", "Risultato:", ...out.map(r => `- ${r.file}: ${esito(r)}`),
     stop ? stop.charAt(0).toUpperCase() + stop.slice(1) + "." : "",
     ko && !stop ? "Tocca \"Riprova\": manda solo quello che manca (le immagini già arrivate non vengono rimandate). Se hai ricaricato la pagina, scegli di nuovo gli stessi video." : "",
     ko ? "Non ancora finito: non scrivere ancora a Claude." : "Fatto. Scrivi a Claude in chat \"video inviati\"."].filter(Boolean).join("\n");
-  if (ko) toast(imgKo && !stop ? "Immagini non inviate: riprova." : `Invio incompleto per ${ko} video: leggi l'elenco sotto "Scegli video".`, salaRetry ? { label: "Riprova", fn: salaRetry, stay: true } : { stay: true });
+  if (ko) toast(imgKo && !stop ? koMsg : `Invio incompleto per ${ko} video: leggi l'elenco sotto "Scegli video".`, salaRetry ? { label: "Riprova", fn: salaRetry, stay: true } : { stay: true });
 }
 $("#run-photos").addEventListener("change", e => onRunFiles(e.target.files, "foto"));
 $("#run-start").addEventListener("input", () => { run.startTouched = true; });
