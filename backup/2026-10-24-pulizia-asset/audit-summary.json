@@ -58,8 +58,13 @@
   "MB": 16.1
  },
  "notes": [
-  "foto doc 33ee74d7929bd0e58143fb3b986b1d60 points at an asset that is not in the store",
+  "foto doc 33ee74d7929bd0e58143fb3b986b1d60 points at an asset uploaded at 18:26 UTC, after the listing; it exists",
   "page source (live_v16 v31) references no asset ids directly; ASR shards listed in asr_assets.json are not loaded by v31 (it fetches Whisper from huggingface/jsdelivr)",
   "walk 193233: 69 orphan frames 17:39-17:45 plus 39 v31 frames are all kept"
- ]
+ ],
+ "result": {
+  "deleted_files": 136,
+  "freed_MB": 16.1,
+  "store_after": "1318 files, 585.5 MB used at about 18:50 UTC, walk upload at 7 of 15 slices"
+ }
 }
