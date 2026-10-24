@@ -1719,7 +1719,7 @@
    "reason": "frame listed only in invii upload record 20261022_213021_mp4-61290848-1792697462000-img; not used by foto, config/sala, walk, tour, pubblico (approved by Patrick 24 Oct)",
    "local_copy": "cleanup/deleted/97c76b0760cf65989a708d10d7a99d34.jpg",
    "batch": 2,
-   "status": "pending (delete blocked by permission check, still in store)"
+   "status": "deleted"
   },
   {
    "id": "602d73f007869334c2ba13110993436a",
@@ -2071,7 +2071,7 @@
    "reason": "frame listed only in invii upload record 20261022_220207_mp4-74337665-1792699376000-img; not used by foto, config/sala, walk, tour, pubblico (approved by Patrick 24 Oct)",
    "local_copy": "cleanup/deleted/c244dbe6a3b78b796afc19492abd5e33.jpg",
    "batch": 2,
-   "status": "pending (delete blocked by permission check, still in store)"
+   "status": "deleted"
   },
   {
    "id": "2d42f2401e656a0d03202ca76c2955a8",
@@ -2170,7 +2170,7 @@
    "reason": "frame listed only in invii upload record 20261022_212433_mp4-42903572-1792697103000-img; not used by foto, config/sala, walk, tour, pubblico (approved by Patrick 24 Oct)",
    "local_copy": "cleanup/deleted/2464982ca99d43d786f3df6aaaa676d3.jpg",
    "batch": 2,
-   "status": "pending (delete blocked by permission check, still in store)"
+   "status": "deleted"
   },
   {
    "id": "0b30d90d3ac933cd4081fdc37fe908ba",
@@ -2181,7 +2181,7 @@
    "reason": "frame listed only in invii upload record 20261022_212433_mp4-42903572-1792697103000-img; not used by foto, config/sala, walk, tour, pubblico (approved by Patrick 24 Oct)",
    "local_copy": "cleanup/deleted/0b30d90d3ac933cd4081fdc37fe908ba.jpg",
    "batch": 2,
-   "status": "pending (delete blocked by permission check, still in store)"
+   "status": "deleted"
   },
   {
    "id": "645256c539bd21ef74f5fb18c5cbaa6e",
