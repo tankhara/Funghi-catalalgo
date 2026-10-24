@@ -144,6 +144,7 @@ textarea { min-height: 96px; resize: vertical; }
 .card .names { min-width: 0; display: grid; gap: 1px; }
 .card .names .sci { font-size: 1.12rem; overflow-wrap: anywhere; }
 .card .names .ita { font-size: .95rem; }
+.card .names .sciline { overflow-wrap: anywhere; }
 .card .names .meta { color: var(--muted); font-size: .8rem; }
 .card.present { border-color: var(--ok); background: var(--ok-soft); }
 .card.move { border-color: var(--warn); background: var(--warn-soft); }
@@ -242,6 +243,24 @@ textarea { min-height: 96px; resize: vertical; }
 .sector .idx { font-family: var(--serif); font-weight: 700; color: var(--brick); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
 .sector .desc { color: var(--muted); font-size: .88rem; }
 .sector select { padding: 8px 10px; font-size: .95rem; }
+/* Commestibilità dal cartellino stampato: pallino colorato, teschio bianco su fondo scuro */
+:root { --ed-ok: #2a8a3a; --ed-no: #e2b400; --ed-cook: #1d64c8; --ed-tox: #d12c24; --ed-dead: #16130f; --ed-dead-fg: #ffffff; --ed-ring: rgba(0,0,0,.3); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ed-ok: #4fc463; --ed-no: #f3cf35; --ed-cook: #62a2ff; --ed-tox: #ff6157; --ed-dead: #000000; --ed-dead-fg: #ffffff; --ed-ring: rgba(255,255,255,.6); } }
+:root[data-theme="dark"] { --ed-ok: #4fc463; --ed-no: #f3cf35; --ed-cook: #62a2ff; --ed-tox: #ff6157; --ed-dead: #000000; --ed-dead-fg: #ffffff; --ed-ring: rgba(255,255,255,.6); }
+.edib { display: inline-block; width: .72rem; height: .72rem; border-radius: 50%; margin-left: .4em; vertical-align: .05em; box-shadow: inset 0 0 0 1px var(--ed-ring); flex: none; }
+.edib.commestibile { background: var(--ed-ok); }
+.edib.non-commestibile { background: var(--ed-no); }
+.edib.dopo-cottura { background: var(--ed-cook); }
+.edib.tossico { background: var(--ed-tox); }
+.edib.mortale { display: inline-grid; place-items: center; width: 1.1rem; height: 1.1rem; vertical-align: -.15em; background: var(--ed-dead); color: var(--ed-dead-fg); font: normal 400 .8rem/1 var(--sans); }
+.edtag { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 3px 10px 3px 7px; border-radius: 999px; background: var(--sunk); color: var(--fg); font: normal 700 .8rem/1.25 var(--sans); vertical-align: .15em; }
+.edtag .edib, .legend .edib { margin-left: 0; vertical-align: 0; }
+.legend { list-style: none; margin: 0; padding: 12px 14px; display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.legend li { display: flex; align-items: center; gap: 10px; }
+.legend li > span:first-child { display: inline-grid; place-items: center; width: 1.1rem; }
+.catfilter { align-items: end; }
+.catfilter .field { min-width: 0; }
+.catfilter select, .catfilter input { width: 100%; min-width: 0; }
 .prose { display: grid; gap: 10px; font-size: .95rem; }
 .prose ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
 
@@ -387,9 +406,23 @@ textarea { min-height: 96px; resize: vertical; }
 
   <!-- CATALOGO -->
   <section class="view" id="v-cat" hidden>
-    <div class="field">
-      <label for="filter">Filtra il catalogo</label>
-      <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="Nome, genere, famiglia">
+    <div class="row catfilter">
+      <div class="field" style="flex:1 1 180px">
+        <label for="filter">Filtra il catalogo</label>
+        <input id="filter" type="search" autocomplete="off" spellcheck="false" placeholder="Nome, genere, famiglia">
+      </div>
+      <div class="field" style="flex:0 1 120px">
+        <label for="filter-com">Commestibilità</label>
+        <select id="filter-com">
+          <option value="">Tutte</option>
+          <option value="commestibile">Commestibile</option>
+          <option value="non-commestibile">Non commestibile</option>
+          <option value="dopo-cottura">Dopo prolungata cottura</option>
+          <option value="tossico">Tossico</option>
+          <option value="mortale">Mortale</option>
+          <option value="nd">Non indicata</option>
+        </select>
+      </div>
     </div>
     <div class="row">
       <button class="btn" id="export">Scarica CSV</button>
@@ -400,6 +433,9 @@ textarea { min-height: 96px; resize: vertical; }
 
   <!-- SCHEMA -->
   <section class="view" id="v-schema" hidden>
+    <h2>Commestibilità</h2>
+    <p class="hint">Il cerchio colorato in fondo al cartellino stampato della mostra. Nell'app compare accanto al nome della specie; si imposta nella scheda della specie.</p>
+    <ul id="ed-legend" class="legend" aria-label="Legenda della commestibilità"></ul>
     <div class="prose">
       <h2>Ordine espositivo</h2>
       <p>Le mostre micologiche italiane, quelle dei gruppi AMB comprese, dispongono i funghi in ordine sistematico. Le specie dello stesso genere stanno vicine, i generi della stessa famiglia uno accanto all'altro e le famiglie seguono l'ordine tassonomico.</p>
@@ -433,7 +469,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 25;
+const APP_VERSION = 26;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1114,7 +1150,28 @@ function tidySci(s) {
   const parts = s.split(" ");
   return parts.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : (/^(var|subsp|f|fo|sp|spp)\.?$/i.test(w) ? w.toLowerCase() : w.toLowerCase())).join(" ");
 }
-function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, posto = null, note = "" }) {
+/* Commestibilità dal cartellino stampato (cerchio colorato in fondo): specie.commestibilita, assente = non indicata */
+const COMMEST = [
+  ["commestibile", "Commestibile"],
+  ["non-commestibile", "Non commestibile"],
+  ["dopo-cottura", "Commestibile solo dopo prolungata cottura"],
+  ["tossico", "Tossico"],
+  ["mortale", "Mortale"],
+];
+const COMMEST_LABEL = Object.fromEntries(COMMEST);
+const SKULL = "\u2620\uFE0E";
+const comOf = it => (it && Object.prototype.hasOwnProperty.call(COMMEST_LABEL, it.commestibilita)) ? it.commestibilita : "";
+const comLabel = it => COMMEST_LABEL[comOf(it)] || "";
+function edDot(it) {
+  const k = comOf(it); if (!k) return null;
+  const t = "Commestibilità: " + COMMEST_LABEL[k];
+  return el("span", { class: "edib " + k, role: "img", title: t, "aria-label": t }, k === "mortale" ? SKULL : null);
+}
+function edTag(it) {
+  const k = comOf(it); if (!k) return null;
+  return el("span", { class: "edtag" }, el("span", { class: "edib " + k, "aria-hidden": "true" }, k === "mortale" ? SKULL : null), COMMEST_LABEL[k]);
+}
+function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, posto = null, note = "", commestibilita = "" }) {
   scientifico = tidySci(scientifico);
   const ref = refOf(scientifico); /* anche da sinonimo: italiano e famiglia della voce di riferimento */
   if (ref) { italiano = italiano || ref.italiano; famiglia = famiglia || ref.famiglia; }
@@ -1122,7 +1179,7 @@ function makeItem({ scientifico, italiano = "", famiglia = "", corsia = null, po
   const settore = sectorOf(famiglia, scientifico);
   const now = new Date().toISOString();
   return { id: slug(scientifico), scientifico, italiano, genere: scientifico.split(" ")[0], famiglia, settore,
-           corsia: corsia || laneFor(settore), posto: posto || null, note, creato: now, aggiornato: now };
+           corsia: corsia || laneFor(settore), posto: posto || null, note, ...(comOf({ commestibilita }) ? { commestibilita } : {}), creato: now, aggiornato: now };
 }
 
 /* Cerca: prima il catalogo, poi il riferimento. */
@@ -1370,7 +1427,7 @@ function toast(msg, action) {
 }
 function names(it) {
   return el("div", { class: "names" },
-    el("span", { class: "sci" }, it.scientifico),
+    el("span", { class: "sciline" }, el("span", { class: "sci" }, it.scientifico), edDot(it)),
     it.italiano ? el("span", { class: "ita" }, it.italiano) : null,
     el("span", { class: "meta" }, [it.famiglia || "famiglia da verificare", (SECTORS[SEC_IDX[it.settore ?? sectorOf(it.famiglia, it.scientifico)]] || {}).nome].filter(Boolean).join(" · ")));
 }
@@ -1887,6 +1944,7 @@ function openEdit(it) {
   const sci = el("input", { type: "text", id: "e-sci", value: cur.scientifico, autocapitalize: "off", spellcheck: "false" });
   const ita = el("input", { type: "text", id: "e-ita", value: cur.italiano });
   const note = el("textarea", { id: "e-note", style: "min-height:70px" }, cur.note || "");
+  const com = el("select", { id: "e-com" }, el("option", { value: "" }, "Non indicata"), ...COMMEST.map(([k, l]) => el("option", { value: k, selected: k === comOf(cur) }, l)));
   const ph = it ? photoFor(it) : null;
   const delBtn = isNew ? null : el("button", { class: "btn danger", onclick: async () => {
     if (!confirmDel) { confirmDel = true; delBtn.textContent = "Tocca di nuovo per eliminare"; return; }
@@ -1895,18 +1953,23 @@ function openEdit(it) {
   async function save() {
     const s = sci.value.trim(); if (!s) { sci.focus(); return; }
     const fam = famSel.value;
-    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: ls.value || laneFor(sectorOf(fam, s)), posto: ps.value ? +ps.value : null, note: note.value.trim() });
+    const base = makeItem({ scientifico: s, italiano: ita.value.trim(), famiglia: fam, corsia: ls.value || laneFor(sectorOf(fam, s)), posto: ps.value ? +ps.value : null, note: note.value.trim(), commestibilita: com.value });
     if (isNew) { if (findExisting(s)) { toast(`${s} è già in mostra`); return; } await putItem(base); }
-    else { base.creato = it.creato || base.creato; if (base.id !== it.id) await removeItem(it.id); await putItem(base); }
+    else {
+      const fin = { ...it, ...base, creato: it.creato || base.creato };
+      if (!base.commestibilita) delete fin.commestibilita;
+      if (fin.id !== it.id) await removeItem(it.id); await putItem(fin);
+    }
     close(); toast(`Salvata · ${where(base)}`);
   }
   const close = sheet(
-    el("h2", { class: isNew ? "" : "sci" }, isNew ? "Nuova specie" : it.scientifico),
+    el("h2", { class: isNew ? "" : "sci" }, isNew ? "Nuova specie" : it.scientifico, isNew ? null : edTag(it)),
     isNew ? null : el("p", {}, el("b", {}, where(it)), it.posto ? null : el("span", { class: "hint" }, " · " + suggestion(it))),
     ph ? el("button", { class: "ph", style: "background:none;border:0;padding:0;justify-self:start", onclick: () => openPhoto(ph, it) }, photoThumb(ph, "thumb lg")) : null,
     el("div", { class: "field" }, el("label", { for: "e-sci" }, "Nome scientifico"), sci),
     el("div", { class: "field" }, el("label", { for: "e-ita" }, "Nome italiano"), ita),
     el("div", { class: "field" }, el("label", { for: "e-fam" }, "Famiglia"), famSel),
+    el("div", { class: "field" }, el("label", { for: "e-com" }, "Commestibilità"), com),
     el("div", { class: "row" }, el("div", { class: "field", style: "flex:2 1 200px" }, el("label", { for: "e-lane" }, "Zona"), ls),
       el("div", { class: "field", style: "flex:1 1 100px" }, el("label", { for: "e-posto" }, "Posto"), ps)),
     el("div", { class: "field" }, el("label", { for: "e-note" }, "Note"), note),
@@ -1966,7 +2029,7 @@ function renderMap() {
       strip.append(el("div", { class: "spot" + (hlSlot === p ? " hl" : ""), id: `spot-${selLane}-${p}` },
         el("span", { class: "no" }, p),
         ph ? el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, photoThumb(ph)) : el("button", { class: "ph", onclick: () => openSlot(selLane, p) }, el("span", { class: "noimg" }, "senza foto")),
-        el("div", { class: "who" }, here.length ? here.map(i => el("button", { onclick: () => openEdit(i) }, el("span", { class: "sci" }, i.scientifico), i.italiano ? el("span", { class: "ita" }, " · " + i.italiano) : null))
+        el("div", { class: "who" }, here.length ? here.map(i => el("button", { onclick: () => openEdit(i) }, el("span", { class: "sci" }, i.scientifico), edDot(i), i.italiano ? el("span", { class: "ita" }, " · " + i.italiano) : null))
                                                : el("span", { class: "hint" }, "vuoto"))));
     }
     kids.push(strip);
@@ -1985,6 +2048,8 @@ function renderCatalog() {
   const f = norm($("#filter").value), box = $("#catalog");
   let list = allItems().sort(cmp);
   if (f) list = list.filter(i => [i.scientifico, i.italiano, i.famiglia, i.genere].some(x => norm(x).includes(f)));
+  const fc = $("#filter-com").value;
+  if (fc) list = list.filter(i => fc === "nd" ? !comOf(i) : comOf(i) === fc);
   if (!state.items.size) { box.replaceChildren(el("div", { class: "empty" }, "Il catalogo è vuoto. Inizia da Registra: una zona alla volta, posto per posto.")); return; }
   if (!list.length) { box.replaceChildren(el("div", { class: "empty" }, "Nessuna specie corrisponde al filtro.")); return; }
   const groups = [], idx = photoIndex();
@@ -2077,12 +2142,12 @@ function goTab(v, hist = true) {
 /* ---------- Esportazione ---------- */
 function csv() {
   const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const rows = [["Zona","Posto","Settore","Famiglia","Nome scientifico","Nome italiano","Note","Aggiunta il"]];
-  for (const c of lanes()) laneItems(c.id).forEach(it => rows.push([c.nome, it.posto ?? "", SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
+  const rows = [["Zona","Posto","Settore","Famiglia","Nome scientifico","Nome italiano","Commestibilità","Note","Aggiunta il"]];
+  for (const c of lanes()) laneItems(c.id).forEach(it => rows.push([c.nome, it.posto ?? "", SECTORS[SEC_IDX[it.settore]]?.nome, it.famiglia, it.scientifico, it.italiano, comLabel(it), it.note, (it.creato || "").slice(0, 16).replace("T", " ")]));
   return "﻿" + rows.map(r => r.map(q).join(";")).join("\r\n");
 }
 function plainList() {
-  return lanes().map(c => `${c.nome} (${c.dove})\n` + laneItems(c.id).map(it => `${it.posto ? "posto " + it.posto : "senza posto"}: ${it.scientifico}${it.italiano ? " (" + it.italiano + ")" : ""}`).join("\n")).join("\n\n");
+  return lanes().map(c => `${c.nome} (${c.dove})\n` + laneItems(c.id).map(it => `${it.posto ? "posto " + it.posto : "senza posto"}: ${it.scientifico}${it.italiano ? " (" + it.italiano + ")" : ""}${comOf(it) ? " · " + comLabel(it) : ""}`).join("\n")).join("\n\n");
 }
 
 /* ---------- Eventi ---------- */
@@ -2235,6 +2300,8 @@ $("#q").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDef
 $("#ask-ai").addEventListener("click", onAskAI);
 $("#manual").addEventListener("click", () => openEdit(null));
 $("#filter").addEventListener("input", renderCatalog);
+$("#filter-com").addEventListener("change", renderCatalog);
+$("#ed-legend").replaceChildren(...COMMEST.map(([k, l]) => el("li", {}, el("span", {}, el("span", { class: "edib " + k, "aria-hidden": "true" }, k === "mortale" ? SKULL : null)), l)));
 $("#save-layout").addEventListener("click", async () => {
   const before = state.layout, next = draft;
   if (!await putLayout(next)) return;
