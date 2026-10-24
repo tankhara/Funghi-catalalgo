@@ -1,0 +1,266 @@
+[
+  {
+    "asset": "00113da0fa0a01d7c2446360677d50c6",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "00113da0fa0a01d7c2446360677d50c6",
+    "posti": [
+      5
+    ],
+    "specie": [
+      "tricoloma-sciodes"
+    ]
+  },
+  {
+    "asset": "0d1566144d4d5de7473ddccf47dc4042",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "0d1566144d4d5de7473ddccf47dc4042",
+    "posti": [
+      9
+    ],
+    "specie": [
+      "tricoloma-cedretorum"
+    ]
+  },
+  {
+    "asset": "126f4fae711f98be4397a0a3f949369c",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "126f4fae711f98be4397a0a3f949369c",
+    "posti": [
+      8
+    ],
+    "specie": [
+      "pleurotus-eringi"
+    ]
+  },
+  {
+    "asset": "27a8d8afca58eb98af990d4775e31f5d",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "27a8d8afca58eb98af990d4775e31f5d",
+    "posti": [
+      4
+    ],
+    "specie": [
+      "tricoloma-acerbum"
+    ]
+  },
+  {
+    "asset": "36bf756621cb756721a3a35622029bbb",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "36bf756621cb756721a3a35622029bbb",
+    "posti": [
+      15
+    ],
+    "specie": [
+      "tricolomopsis-rutilans"
+    ]
+  },
+  {
+    "asset": "45101c47c148eafd5effbaa558dac81a",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "45101c47c148eafd5effbaa558dac81a",
+    "posti": [
+      3
+    ],
+    "specie": [
+      "tricoloma-saponaceum-ardosiacum"
+    ]
+  },
+  {
+    "asset": "4775e0cc45fc6cacccc0ae22741fea56",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "4775e0cc45fc6cacccc0ae22741fea56",
+    "posti": [
+      12
+    ],
+    "specie": [
+      "tricoloma-pardinum"
+    ]
+  },
+  {
+    "asset": "50f0d0043aaab3e6d51be5bf48e0620c",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "50f0d0043aaab3e6d51be5bf48e0620c",
+    "posti": [
+      22
+    ],
+    "specie": [
+      "pleurotus-ostreatus"
+    ]
+  },
+  {
+    "asset": "52131443eb7d2741c43a9df6483c2e42",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "52131443eb7d2741c43a9df6483c2e42",
+    "posti": [
+      11
+    ],
+    "specie": [
+      "tricoloma-ustaloides"
+    ]
+  },
+  {
+    "asset": "54b3a635c048a3269a91020256a7ce6d",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "54b3a635c048a3269a91020256a7ce6d",
+    "posti": [
+      14
+    ],
+    "specie": [
+      "tricoloma-ecuestre"
+    ]
+  },
+  {
+    "asset": "55d92acfe5b2e92f2e08d7c873a6be59",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "55d92acfe5b2e92f2e08d7c873a6be59",
+    "posti": [
+      17
+    ],
+    "specie": [
+      "tricoloma-saponaceum-scuamosum"
+    ]
+  },
+  {
+    "asset": "626b2e45f7eb1fc0d42dd57a7b7932db",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "626b2e45f7eb1fc0d42dd57a7b7932db",
+    "posti": [
+      13
+    ],
+    "specie": [
+      "tricoloma-aurantium"
+    ]
+  },
+  {
+    "asset": "7209307a5eecf7c80dbaac5834c7aa81",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "7209307a5eecf7c80dbaac5834c7aa81",
+    "posti": [
+      7
+    ],
+    "specie": [
+      "tricoloma-seiuntum"
+    ]
+  },
+  {
+    "asset": "7a792db5ec486051da4b06c09c79bff3",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "7a792db5ec486051da4b06c09c79bff3",
+    "posti": [
+      19
+    ],
+    "specie": [
+      "tricoloma-colosus"
+    ]
+  },
+  {
+    "asset": "85610f198cf8a807bd8c1e6bf748d955",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "85610f198cf8a807bd8c1e6bf748d955",
+    "posti": [
+      16
+    ],
+    "specie": [
+      "tricoloma-tereum"
+    ]
+  },
+  {
+    "asset": "8e8d2c66c2b8e4ea6742c774cdb7d10e",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "8e8d2c66c2b8e4ea6742c774cdb7d10e",
+    "posti": [
+      21
+    ],
+    "specie": [
+      "tricoloma-populinum"
+    ]
+  },
+  {
+    "asset": "9609cccb14cb1cf4863cb9b062f9baff",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "9609cccb14cb1cf4863cb9b062f9baff",
+    "posti": [
+      6
+    ],
+    "specie": [
+      "tricoloma-saponaceum"
+    ]
+  },
+  {
+    "asset": "a306dbdb256c0a6094579028ef277844",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "a306dbdb256c0a6094579028ef277844",
+    "posti": [
+      18
+    ],
+    "specie": [
+      "tricoloma-ustale"
+    ]
+  },
+  {
+    "asset": "de51f6206ace77cadce9776b15e79d90",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "de51f6206ace77cadce9776b15e79d90",
+    "posti": [
+      1
+    ],
+    "specie": [
+      "tricoloma-focale"
+    ]
+  },
+  {
+    "asset": "e0814c98cb2573082ccd9f40b0a43f8f",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "e0814c98cb2573082ccd9f40b0a43f8f",
+    "posti": [
+      2
+    ],
+    "specie": [
+      "tricoloma-scuarulosum"
+    ]
+  },
+  {
+    "asset": "e5d399dc17ce9231c6cbc87e17b986d6",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "e5d399dc17ce9231c6cbc87e17b986d6",
+    "posti": [
+      20
+    ],
+    "specie": [
+      "tricoloma-bufonium"
+    ]
+  },
+  {
+    "asset": "eb2f5601eab74e2c78ccf99346c3e912",
+    "corsia": "c1",
+    "creato": "2026-10-24T12:01:04Z",
+    "id": "eb2f5601eab74e2c78ccf99346c3e912",
+    "posti": [
+      10
+    ],
+    "specie": [
+      "tricoloma-sulfureum"
+    ]
+  }
+]
