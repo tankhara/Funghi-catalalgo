@@ -477,7 +477,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 28;
+const APP_VERSION = 29;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1337,7 +1337,7 @@ const quotaErr = () => Object.assign(new Error(QUOTA_MSG), { code: "quota" });
 // Asset upload with only the retries the platform allows: store_unavailable once, rate_limited after a back-off (twice at most)
 async function upAsset(blob, type) {
   for (let a = 0; ; a++) {
-    try { return await state.assets.upload(blob, { type }); }
+    try { const r = await state.assets.upload(blob, { type }); spaceSeen.bytes += (r && r.sizeBytes) || blob.size; spaceSeen.files++; return r; }
     catch (e) {
       const c = e && e.code;
       if (c === "quota_or_state") throw quotaErr();
@@ -1356,32 +1356,61 @@ async function dbSet(path, rec) {
     throw e;
   }
 }
+// Archive usage for the frame budget: a fresh listing when it answers, else the last one plus what this page sent since
+const spaceSeen = { u: null, bytes: 0, files: 0 };
+async function spaceNow() {
+  try {
+    const u = (await withTimeout(state.assets.list(), 15000, "tempo scaduto")).usage;
+    if (u && u.maxBytes > 0) { spaceSeen.u = u; spaceSeen.bytes = spaceSeen.files = 0; return u; }
+  } catch {}
+  const u = spaceSeen.u;
+  return u ? { ...u, bytes: u.bytes + spaceSeen.bytes, files: u.files + spaceSeen.files } : null;
+}
+// Room video frames: native size up to 1920 px, about one every 1.2 s (120 at most), the sharpest of three nearby frames each.
+// They are sent while the next ones are read (at most 6 waiting), so the phone never holds the whole set.
+// Frames and the voice of this video must leave the archive under 80 percent full, otherwise fewer frames are taken.
+const ROOM_FR = { max: 120, every: 1.2, side: 1920, q: 0.88, share: 0.8 };
 async function sendRoomVideo(file, step = () => {}) {
   const st = $("#sala-status");
   if (!file) return { ok: false, msg: "nessun file scelto" };
   if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
-  let frames = null;
+  const out = [], wait = []; let chain = Promise.resolve(), upErr = null;
   try {
     st.textContent = "Leggo il video per le immagini dei cartellini…"; step("fotogrammi");
-    frames = await videoFrames(file, 40, st, 2, false);
-    const out = []; step(`invio ${frames.length} immagini`);
-    for (let i = 0; i < frames.length; i++) {
-      st.textContent = `Invio le immagini dei cartellini: ${i + 1} di ${frames.length}.`;
-      const r = await upAsset(frames[i].blob, "image/jpeg");
-      frames[i] = null;
-      out.push({ asset: r.id, url: r.url, ordine: i + 1 });
-    }
-    const rec = { frames: out, file: file.name, creato: new Date().toISOString() };
+    const sp = await spaceNow();
+    // 16 kHz mono WAV as base64 is about 43 kB per second, in 4 MB parts
+    const budget = sp ? d => { const audio = d * 43000 + 65536;
+      return { bytes: sp.maxBytes * ROOM_FR.share - sp.bytes - audio, files: sp.maxFiles * ROOM_FR.share - sp.files - Math.ceil(audio / 4194304) - 2 }; } : null;
+    const onFrame = async blob => {
+      if (upErr) throw upErr;
+      const p = chain = chain.then(async () => {
+        if (upErr) return;
+        try { const r = await upAsset(blob, "image/jpeg"); out.push({ asset: r.id, url: r.url, ordine: out.length + 1 }); }
+        catch (e) { upErr = e; }
+      });
+      wait.push(p);
+      while (wait.length > 6) await wait.shift();
+      if (upErr) throw upErr;
+    };
+    const fr = await videoFrames(file, ROOM_FR.max, st, ROOM_FR.every, false, { side: ROOM_FR.side, q: ROOM_FR.q, budget, onFrame });
+    const inf = fr.info || { n: 0 };
+    st.textContent = `Finisco di inviare le immagini dei cartellini (${inf.n})…`; step(`invio ${inf.n} immagini`);
+    await chain; wait.length = 0;
+    if (upErr) throw upErr;
+    const nota = inf.ridotti ? `ridotte a ${out.length} invece di ${inf.previsti} per non riempire l'archivio oltre l'80 per cento` + (sp ? ` (${Math.round(sp.bytes / 1048576)} di ${Math.round(sp.maxBytes / 1048576)} MB usati prima di questo video)` : "") : "";
+    if (nota) step(nota);
+    const rec = { frames: out, file: file.name, creato: new Date().toISOString(), lato: inf.lato, kbMedio: inf.kbMedio };
     // invii/ first: it is the proof of receipt the skip check reads
     await dbSet("invii/" + uploadId(file) + "-img", rec);
     await dbSet("config/sala", rec);
-    const msg = `${out.length} immagini dei cartellini inviate.`;
-    st.textContent = msg; return { ok: true, msg, n: out.length };
+    const msg = `${out.length} immagini dei cartellini inviate` + (nota ? ` (${nota})` : "") + ".";
+    st.textContent = msg; return { ok: true, msg, n: out.length, nota, info: { ...inf, n: out.length } };
   } catch (e) {
+    await chain;  // let frames already handed over finish (or fail) before reporting, so the next video starts clean
     const msg = errMsg(e);
     st.textContent = "Immagini dei cartellini non inviate: " + msg + ".";
     return { ok: false, msg, quota: !!(e && e.code === "quota") };
-  } finally { frames = null; }
+  } finally { wait.length = 0; }
 }
 
 // Audio track as 16 kHz mono WAV, base64 in text/plain assets (the asset store takes no audio types), listed in config/sala-audio
@@ -1608,11 +1637,37 @@ async function imageMax() { try { return Math.max(1, Math.min(20, (await state.s
 function withTimeout(p, ms, msg) {
   let t; return Promise.race([p, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(msg)), ms); })]).finally(() => clearTimeout(t));
 }
+// Sharpness of what a video (or canvas) shows now: variance of a 4-neighbour Laplacian on a small grayscale copy.
+// One small canvas and one buffer are reused for every frame, so scoring costs a few ms even on a phone.
+function sharpScorer(w, h, side = 320) {
+  const k = Math.min(1, side / Math.max(w, h)), aw = Math.max(8, Math.round(w * k)), ah = Math.max(8, Math.round(h * k));
+  let cv = document.createElement("canvas"); cv.width = aw; cv.height = ah;
+  const g = cv.getContext("2d", { willReadFrequently: true }), gray = new Float32Array(aw * ah);
+  return {
+    score(src) {
+      g.drawImage(src, 0, 0, aw, ah);
+      const d = g.getImageData(0, 0, aw, ah).data;
+      for (let i = 0, p = 0; i < gray.length; i++, p += 4) gray[i] = d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114;
+      let s = 0, s2 = 0, m = 0;
+      for (let y = 1; y < ah - 1; y++) for (let x = 1, i = y * aw + 1; x < aw - 1; x++, i++) {
+        const l = 4 * gray[i] - gray[i - 1] - gray[i + 1] - gray[i - aw] - gray[i + aw]; s += l; s2 += l * l; m++;
+      }
+      return m ? s2 / m - (s / m) * (s / m) : 0;
+    },
+    free() { if (cv) cv.width = cv.height = 0; cv = null; }
+  };
+}
 // Phones can leave a seek unanswered (no seeked, no error) for one stretch of a video. Each frame gets a short wait and one
 // retry at a slightly shifted time, then it is skipped and the video is reopened, so one bad spot never costs the whole file.
 // If seeking keeps failing, the rest is captured by playing the video through (muted, faster) instead of seeking.
-async function videoFrames(file, max, status = $("#run-status"), every = 3, urls = true) {
-  const url = URL.createObjectURL(file); let cv = null, v = null;
+// Frames keep the video's own size up to opt.side on the long side (never enlarged); videoWidth/videoHeight already carry the
+// rotation the browser applies, so frames come out upright. For each target time up to two more frames within plus or minus
+// 0.3 s are looked at and the sharpest is kept (opt.sharp). opt.budget(duration) -> {bytes, files} caps what this video may
+// add: the first frame's size sets how many fit, never fewer than 8. opt.onFrame(blob) takes each frame as soon as it is
+// ready (so a caller can send it while the next one is read) instead of keeping them all; out.info describes the run.
+async function videoFrames(file, max, status = $("#run-status"), every = 3, urls = true, opt = {}) {
+  const side = opt.side || 1280, q = opt.q || 0.8, onFrame = opt.onFrame || null, MIN_FR = 8;
+  const url = URL.createObjectURL(file); let cv = null, v = null, sc = null;
   const close = () => { if (!v) return; v.onerror = v.onseeked = v.onloadeddata = null; try { v.pause(); v.removeAttribute("src"); v.load(); } catch {} v = null; };
   const open = async () => {
     close(); v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto";
@@ -1631,58 +1686,113 @@ async function videoFrames(file, max, status = $("#run-status"), every = 3, urls
     v.onerror = () => rej(new Error("decode")); v.onseeked = () => res(); v.currentTime = t;
   }), ms, "seek").finally(() => { if (v) v.onerror = v.onseeked = null; });
   const info = () => v ? `${v.videoWidth}x${v.videoHeight}, stato ${v.readyState}${v.error ? ", errore " + v.error.code : ""}` : "chiuso";
+  const out = [];
   try {
     await open();
     if (!v.videoWidth || !v.videoHeight) throw new Error("il telefono legge il file ma non le immagini del video (formato non supportato, forse HEVC). Registra con la fotocamera normale e riprova");
     let d = v.duration;
     if (!isFinite(d) || d <= 0) { try { await seekTo(1e7, 10000); } catch {} d = v.duration; }
     if (!isFinite(d) || d <= 0) throw new Error("durata del video non leggibile");
-    const n = Math.max(4, Math.min(max, Math.round(d / every)));
-    const at = i => Math.min(d - 0.05, d * (i + 0.5) / n), shift = Math.min(0.5, d / n / 3);
-    const out = []; let run = 0, skipped = 0, i = 0;
-    const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+    let n = Math.max(4, Math.min(max, Math.round(d / every)));
+    const planned = n, lim = opt.budget ? opt.budget(d) : null;
+    const at = i => Math.min(d - 0.05, d * (i + 0.5) / n), shift = () => Math.min(0.5, d / n / 3), jit = () => Math.min(0.3, d / n / 4);
+    let run = 0, skipped = 0, i = 0, count = 0, bytes = 0, full = false, reduced = false, better = 0, played = false;
+    // Extras adapt to the phone: two while a target's seeks take under 1.5 s on average, one up to 3 s, none above
+    // A hung extra seek pauses extras for the next 5 targets; they stop for good only if more than 30 percent hang.
+    // Seeks that stay very slow (a video with few keyframes) switch to playing the rest through, which is faster then.
+    let extras = opt.sharp !== false, xTry = 0, xFail = 0, xPause = 0, ema = 0, slow = 0, slowSwitch = false;
+    const k = Math.min(1, side / Math.max(v.videoWidth, v.videoHeight));
     cv = document.createElement("canvas"); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
     const g = cv.getContext("2d");
-    const grab = async () => {
-      g.drawImage(v, 0, 0, cv.width, cv.height);
-      const blob = await withTimeout(new Promise(r => cv.toBlob(r, "image/jpeg", 0.8)), 10000, "toBlob").catch(() => null);
-      if (blob) out.push({ blob, url: urls ? URL.createObjectURL(blob) : null });
+    if (opt.sharp !== false) sc = sharpScorer(cv.width, cv.height);
+    // Candidate frames go to the one full-size canvas only when they beat the best so far for this target
+    let have = false, best = -1, bestMain = true;
+    const take = main => {
+      if (!sc) { if (!have || main) { g.drawImage(v, 0, 0, cv.width, cv.height); have = true; } return; }
+      const s = sc.score(v);
+      if (!have || s > best) { g.drawImage(v, 0, 0, cv.width, cv.height); best = s; have = true; bestMain = main; }
     };
-    for (; i < n; i++) {
+    const emit = async () => {
+      if (!have) return;
+      have = false; best = -1; if (!bestMain) better++; bestMain = true;
+      const blob = await withTimeout(new Promise(r => cv.toBlob(r, "image/jpeg", q)), 10000, "toBlob").catch(() => null);
+      if (!blob) return;
+      count++; bytes += blob.size;
+      if (onFrame) await onFrame(blob, count - 1); else out.push({ blob, url: urls ? URL.createObjectURL(blob) : null });
+      if (count === 1 && lim) {
+        // The first frame sets the expected size (plus 20 percent: frames differ); fewer frames if they would not fit
+        const fit = Math.min(Math.floor(lim.bytes / (blob.size * 1.2)), Math.floor(lim.files));
+        if (fit < n) { reduced = true; n = Math.max(Math.min(n, MIN_FR), fit); }
+      }
+      if (lim && count >= MIN_FR && count < n && (bytes + bytes / count * 1.1 > lim.bytes || count >= lim.files)) { full = true; reduced = true; }
+    };
+    for (; i < n && !full; i++) {
+      if (i >= 4 && ema > 3500 && ema / 1000 * (n - i) > 2 * ((d - at(i)) / 2 + 10)) { slowSwitch = true; break; }
       status.textContent = `Estraggo i fotogrammi: ${i + 1} di ${n}`;
-      const t = at(i), t2 = t + shift < d - 0.05 ? t + shift : Math.max(0, t - shift);
-      let ok = false;
+      const t = at(i), t2 = t + shift() < d - 0.05 ? t + shift() : Math.max(0, t - shift());
+      let ok = false; const t0 = Date.now();
       for (const [x, ms] of [[t, 6000], [t2, 4000]]) { try { await seekTo(x, ms); ok = true; break; } catch {} }
-      if (ok) { run = 0; await grab(); continue; }
+      if (ok) {
+        run = 0; take(true);
+        // Two more candidates, forward first (cheaper to decode); a seek that hangs here only ends this frame's extras
+        const paused = i < xPause, nx = !extras || paused ? 0 : i < 3 || ema < 1500 ? 2 : ema < 3000 ? 1 : 0;
+        if (nx < 2 && extras && !paused) slow++;
+        if (nx) for (const x of [t + jit(), t - jit()].slice(0, nx)) {
+          if (x < 0 || x > d - 0.05) continue;
+          xTry++;
+          try { await seekTo(x, 2500); take(false); }
+          catch { xFail++; xPause = i + 6; if (xFail >= 4 && xFail * 10 > xTry * 3) extras = false; break; }
+        }
+        const dt = Date.now() - t0; ema = ema ? ema * 0.7 + dt * 0.3 : dt;  // seeking only: waiting for the network is not the phone being slow
+        await emit(); continue;
+      }
       skipped++;
       if (++run >= 4) break;  // seeking is not working here: play the rest instead
       try { await open(); } catch { break; }
     }
-    if (i < n) {
-      // Play-through from the first frame not taken (or the start), grabbing each target as playback passes it
-      status.textContent = `Estraggo i fotogrammi riproducendo il video: ${out.length} di ${n}`;
+    if (i < n && !full) {
+      // Play-through from the first frame not taken (or the start): within each target's window keep the sharpest frame seen
+      played = true;
+      status.textContent = `Estraggo i fotogrammi riproducendo il video: ${count} di ${n}`;
       try { await open(); } catch {}
       if (v && !v.error) {
-        let j = i - run + 1; if (j < 0) j = 0;
+        let j = slowSwitch ? i : i - run + 1; if (j < 0) j = 0;
         try { v.playbackRate = 2; } catch {}
         try { if (j > 0) await seekTo(Math.max(0, at(j) - 1), 4000); } catch {}
         try { await withTimeout(v.play(), 5000, "play"); } catch {}
-        let last = v.currentTime, still = Date.now();
-        while (j < n && !v.ended && !v.error && Date.now() - still < 8000) {
-          await new Promise(r => setTimeout(r, 40));
-          if (v.currentTime !== last) { last = v.currentTime; still = Date.now(); }
-          if (v.currentTime >= at(j)) {
-            while (j + 1 < n && v.currentTime >= at(j + 1)) j++;
-            await grab(); j++;
-            status.textContent = `Estraggo i fotogrammi riproducendo il video: ${out.length} di ${n}`;
+        let last = -1, still = Date.now();
+        have = false; best = -1;
+        // Every decoded frame where the browser reports them (requestVideoFrameCallback), else a look every 40 ms
+        const rvfc = typeof v.requestVideoFrameCallback === "function";
+        const nextFrame = () => new Promise(r => { let done = false; const fin = () => { if (!done) { done = true; r(); } };
+          if (rvfc) { try { v.requestVideoFrameCallback(fin); } catch {} } setTimeout(fin, rvfc ? 250 : 40); });
+        while (j < n && !full && !v.ended && !v.error && Date.now() - still < 8000) {
+          await nextFrame();
+          const ct = v.currentTime;
+          if (ct === last) continue;
+          last = ct; still = Date.now();
+          while (j < n && !full) {
+            const J = jit();
+            if (ct > at(j) + J) {
+              // Window over: send the best frame seen in it; if playback jumped past it, take what is on screen now
+              if (!have) { while (j + 1 < n && ct > at(j + 1) + J) j++; take(true); await emit(); j++; break; }
+              await emit(); j++;
+              status.textContent = `Estraggo i fotogrammi riproducendo il video: ${count} di ${n}`;
+              continue;
+            }
+            if (ct >= at(j) - J) take(true);
+            break;
           }
         }
+        if (have && !full) await emit();
         try { v.pause(); } catch {}
       }
     }
-    if (!out.length) throw new Error(`il video si blocca mentre estraggo i fotogrammi (nessuno su ${n}; ${info()})`);
+    if (!count) throw new Error(`il video si blocca mentre estraggo i fotogrammi (nessuno su ${n}; ${info()})`);
+    out.info = { n: count, previsti: planned, lato: `${cv.width}x${cv.height}`, kbMedio: Math.round(bytes / count / 1024), mb: +(bytes / 1048576).toFixed(1),
+      secondi: Math.round(d), ridotti: reduced, nitidi: !sc ? "no" : !extras || xFail ? `in parte (${xFail} ricerche bloccate)` : slow ? `in parte (telefono lento: ${slow} con meno candidati)` : "sì, 3 candidati", sceltiMeglio: better, msRicerca: Math.round(ema), saltati: skipped, riproduzione: played ? (slowSwitch ? "ricerche lente" : "ricerche bloccate") : false };
     return out;
-  } finally { close(); URL.revokeObjectURL(url); if (cv) cv.width = cv.height = 0; }
+  } finally { close(); URL.revokeObjectURL(url); if (cv) cv.width = cv.height = 0; if (sc) sc.free(); }
 }
 function clearRun() { run.frames.forEach(f => URL.revokeObjectURL(f.url)); run.frames = []; run.rows = []; run.kind = null; $("#run-video").value = ""; $("#run-photos").value = ""; }
 async function onRunFiles(files, kind) {
@@ -1691,7 +1801,7 @@ async function onRunFiles(files, kind) {
   st.replaceChildren(el("span", { class: "spin" }), kind === "video" ? " Leggo il video…" : " Preparo le foto…");
   const max = await imageMax();
   try {
-    if (kind === "video") run.frames = await videoFrames(files[0], max);
+    if (kind === "video") run.frames = await videoFrames(files[0], max, $("#run-status"), 3, true, { side: 1600, q: 0.85 });
     else {
       for (const f of [...files].slice(0, max)) { const b = await compress(f); run.frames.push({ blob: b, url: URL.createObjectURL(b) }); }
       if (files.length > max) toast(`Uso le prime ${max} foto: è il massimo per un'analisi`);
@@ -2364,9 +2474,10 @@ $("#sala-video").addEventListener("change", async e => {
     const inv = await listDocs("invii"), logs = await listDocs("invii-log");
     try {
       const u = (await withTimeout(state.assets.list(), 20000, "tempo scaduto")).usage;
+      if (u && u.maxBytes > 0) { spaceSeen.u = u; spaceSeen.bytes = spaceSeen.files = 0; }
       const spazio = { usatiMB: Math.round(u.bytes / 1048576), maxMB: Math.round(u.maxBytes / 1048576), file: u.files, maxFile: u.maxFiles };
       progress({ spazio });
-      if (spazio.maxMB - spazio.usatiMB < 15 || spazio.maxFile - spazio.file < 60) toast(`Archivio quasi pieno (${spazio.usatiMB} di ${spazio.maxMB} MB, ${spazio.file} di ${spazio.maxFile} file): alcuni video potrebbero non entrare.`);
+      if (spazio.usatiMB > spazio.maxMB * 0.8 - 60 || spazio.maxFile - spazio.file < 300) toast(`Archivio quasi pieno (${spazio.usatiMB} di ${spazio.maxMB} MB, ${spazio.file} di ${spazio.maxFile} file): alcuni video potrebbero non entrare.`);
     } catch {}
     const look = async k => {
       if (sent[k]) return { st: "si", data: {} };
@@ -2395,7 +2506,7 @@ $("#sala-video").addEventListener("change", async e => {
           else if (img.st === "no") {
             worked = true;
             const r = await sendRoomVideo(f, fase => progress({ fase: "immagini: " + fase }));
-            if (r.ok) { mark(id + "-img"); log.immagini = r.n; ok.push(`${r.n} immagini inviate`); } else { bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+            if (r.ok) { mark(id + "-img"); log.immagini = r.n; if (r.info) log.fotogrammi = r.info; ok.push(`${r.n} immagini inviate` + (r.nota ? ` (${r.nota})` : "")); } else { bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
           } else if (isVid) ok.push("immagini già ricevute");
           if (stop) bad.push("voce non provata");
           else if (aud.st === "?") bad.push("voce: non riesco a controllare se è già arrivata, quindi non la reinvio");
