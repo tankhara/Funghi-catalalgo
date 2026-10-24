@@ -1,0 +1,1270 @@
+[
+ {
+  "asset": "00113da0fa0a01d7c2446360677d50c6",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "00113da0fa0a01d7c2446360677d50c6",
+  "posti": [
+   5
+  ],
+  "specie": [
+   "tricoloma-sciodes"
+  ]
+ },
+ {
+  "asset": "00b93b5e50b9bace09bc0ddbb3dfbac4",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "00b93b5e50b9bace09bc0ddbb3dfbac4",
+  "posti": [
+   26
+  ],
+  "specie": [
+   "igroforus-agatosmus"
+  ]
+ },
+ {
+  "asset": "010a604ccad013f62a2c0c7f681631df",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "010a604ccad013f62a2c0c7f681631df",
+  "posti": [
+   32
+  ],
+  "specie": [
+   "rusula-olivacea"
+  ]
+ },
+ {
+  "asset": "012823f6d66e78f69255ce23a24ab67e",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "012823f6d66e78f69255ce23a24ab67e",
+  "posti": [
+   45
+  ],
+  "specie": [
+   "rusula-nigricans"
+  ]
+ },
+ {
+  "asset": "0258a93f391eb1456c3be744053c1d5b",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "0258a93f391eb1456c3be744053c1d5b",
+  "posti": [
+   11
+  ],
+  "specie": [
+   "latarius-torminosus"
+  ]
+ },
+ {
+  "asset": "028055815539b3be41679440e0ba6efa",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "028055815539b3be41679440e0ba6efa",
+  "posti": [
+   42
+  ],
+  "specie": [
+   "liofilum-infumatum"
+  ]
+ },
+ {
+  "asset": "03fbedb328a0307e9aec02ac59f7ca70",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "03fbedb328a0307e9aec02ac59f7ca70",
+  "posti": [
+   2
+  ],
+  "specie": [
+   "amanita-prosima"
+  ]
+ },
+ {
+  "asset": "075d359a43e1140eea2f6ecd90c9813c",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:28:37Z",
+  "id": "075d359a43e1140eea2f6ecd90c9813c",
+  "posti": [
+   58
+  ],
+  "specie": [
+   "macrolepiota-mastoidea"
+  ]
+ },
+ {
+  "asset": "0ca6c12e038c44daa3795be66077c96e",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "0ca6c12e038c44daa3795be66077c96e",
+  "posti": [
+   41
+  ],
+  "specie": [
+   "liofilum-decastes"
+  ]
+ },
+ {
+  "asset": "0d1566144d4d5de7473ddccf47dc4042",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "0d1566144d4d5de7473ddccf47dc4042",
+  "posti": [
+   9
+  ],
+  "specie": [
+   "tricoloma-cedretorum"
+  ]
+ },
+ {
+  "asset": "11db263195e2cad0c2495dc2322c73bb",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "11db263195e2cad0c2495dc2322c73bb",
+  "posti": [
+   27,
+   28
+  ],
+  "specie": [
+   "lepista-flacida",
+   "clitocibe-dealbata"
+  ]
+ },
+ {
+  "asset": "124560f62999f29c12827a7373dd91d4",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "124560f62999f29c12827a7373dd91d4",
+  "posti": [
+   43
+  ],
+  "specie": [
+   "rusula-mairei"
+  ]
+ },
+ {
+  "asset": "126f4fae711f98be4397a0a3f949369c",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "126f4fae711f98be4397a0a3f949369c",
+  "posti": [
+   8
+  ],
+  "specie": [
+   "pleurotus-eringi"
+  ]
+ },
+ {
+  "asset": "194006fe7b342658a1c41f0ff35c4e1e",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "194006fe7b342658a1c41f0ff35c4e1e",
+  "posti": [
+   38
+  ],
+  "specie": [
+   "armilaria-melea"
+  ]
+ },
+ {
+  "asset": "1ac9dbf62b85bb18604aed1a3cc48948",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "1ac9dbf62b85bb18604aed1a3cc48948",
+  "posti": [
+   29
+  ],
+  "specie": [
+   "rusula-faginea"
+  ]
+ },
+ {
+  "asset": "1ee22902ecc49d22761b91d2a99202f1",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:28:37Z",
+  "id": "1ee22902ecc49d22761b91d2a99202f1",
+  "posti": [
+   52
+  ],
+  "specie": [
+   "lepiota-forcuignoni"
+  ]
+ },
+ {
+  "asset": "1fee4c8e47f91a35542eac2e2f3012dc",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "1fee4c8e47f91a35542eac2e2f3012dc",
+  "posti": [
+   30
+  ],
+  "specie": [
+   "lepista-nuda"
+  ]
+ },
+ {
+  "asset": "24017d3a34f20956542c71cdca33c829",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:28:37Z",
+  "id": "24017d3a34f20956542c71cdca33c829",
+  "posti": [
+   60
+  ],
+  "specie": [
+   "macrolepiota-procera"
+  ]
+ },
+ {
+  "asset": "26cb67bff2c111cd176af6ba5aead5b7",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "26cb67bff2c111cd176af6ba5aead5b7",
+  "posti": [
+   68
+  ],
+  "specie": [
+   "agaricus-silvaticus"
+  ]
+ },
+ {
+  "asset": "27a8d8afca58eb98af990d4775e31f5d",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "27a8d8afca58eb98af990d4775e31f5d",
+  "posti": [
+   4
+  ],
+  "specie": [
+   "tricoloma-acerbum"
+  ]
+ },
+ {
+  "asset": "28686e1c0791accc09fd00ef0225f4cb",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "28686e1c0791accc09fd00ef0225f4cb",
+  "posti": [
+   65
+  ],
+  "specie": [
+   "agaricus-silvicola"
+  ]
+ },
+ {
+  "asset": "2c9f66f020506d2e57d2e8bda954e971",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "2c9f66f020506d2e57d2e8bda954e971",
+  "posti": [
+   15,
+   16
+  ],
+  "specie": [
+   "latarius-rugatus",
+   "latarius-mairei"
+  ]
+ },
+ {
+  "asset": "2d861eae0cf8387fad697e50ea440fe3",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "2d861eae0cf8387fad697e50ea440fe3",
+  "posti": [
+   74,
+   75
+  ],
+  "specie": [
+   "amanita-franceti",
+   "amanita-rubescens"
+  ]
+ },
+ {
+  "asset": "305126cc9542688d5fa4dc06f5f224d8",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "305126cc9542688d5fa4dc06f5f224d8",
+  "posti": [
+   37
+  ],
+  "specie": [
+   "colibia-butiracea"
+  ]
+ },
+ {
+  "asset": "306d1b98621ed174ebc90bb99c7a1377",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "306d1b98621ed174ebc90bb99c7a1377",
+  "posti": [
+   9
+  ],
+  "specie": [
+   "coprinus-picaceus"
+  ]
+ },
+ {
+  "asset": "310d88e2c4084d9030029b1f57c9fc04",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "310d88e2c4084d9030029b1f57c9fc04",
+  "posti": [
+   33
+  ],
+  "specie": [
+   "rusula-ilicis"
+  ]
+ },
+ {
+  "asset": "31cbc2bf68f7917ce0412cce0eab0d51",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "31cbc2bf68f7917ce0412cce0eab0d51",
+  "posti": [
+   34
+  ],
+  "specie": [
+   "rusula-cloroides"
+  ]
+ },
+ {
+  "asset": "34cde467fc83a20346d5d624d309adbe",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "34cde467fc83a20346d5d624d309adbe",
+  "posti": [
+   28
+  ],
+  "specie": [
+   "leucopasilus-amarus"
+  ]
+ },
+ {
+  "asset": "36bf756621cb756721a3a35622029bbb",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "36bf756621cb756721a3a35622029bbb",
+  "posti": [
+   15
+  ],
+  "specie": [
+   "tricolomopsis-rutilans"
+  ]
+ },
+ {
+  "asset": "382b400da8cd0892602c08f0fda0b0c7",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "382b400da8cd0892602c08f0fda0b0c7",
+  "posti": [
+   32
+  ],
+  "specie": [
+   "clitocibe-odora"
+  ]
+ },
+ {
+  "asset": "3d44b8410e075d56f3f0a3fcf3cc8491",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "3d44b8410e075d56f3f0a3fcf3cc8491",
+  "posti": [
+   31
+  ],
+  "specie": [
+   "rusula-amenicolor"
+  ]
+ },
+ {
+  "asset": "43e058f38b3a13e898942cbe38c7450f",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "43e058f38b3a13e898942cbe38c7450f",
+  "posti": [
+   43
+  ],
+  "specie": [
+   "micena-pura"
+  ]
+ },
+ {
+  "asset": "45101c47c148eafd5effbaa558dac81a",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "45101c47c148eafd5effbaa558dac81a",
+  "posti": [
+   3
+  ],
+  "specie": [
+   "tricoloma-saponaceum-ardosiacum"
+  ]
+ },
+ {
+  "asset": "45b867a8e766fea31a9164694b990f03",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "45b867a8e766fea31a9164694b990f03",
+  "posti": [
+   66
+  ],
+  "specie": [
+   "agaricus-lanipes"
+  ]
+ },
+ {
+  "asset": "4775e0cc45fc6cacccc0ae22741fea56",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "4775e0cc45fc6cacccc0ae22741fea56",
+  "posti": [
+   12
+  ],
+  "specie": [
+   "tricoloma-pardinum"
+  ]
+ },
+ {
+  "asset": "48f941d31107e22ee248176da39c73a2",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "48f941d31107e22ee248176da39c73a2",
+  "posti": [
+   3
+  ],
+  "specie": [
+   "amanita-panterina"
+  ]
+ },
+ {
+  "asset": "4c1b69ebd96cee7aa71227823a63994f",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "4c1b69ebd96cee7aa71227823a63994f",
+  "posti": [
+   23
+  ],
+  "specie": [
+   "igroforopsis-aurantiaca"
+  ]
+ },
+ {
+  "asset": "4dc05cbd726f2b15c46a8fd7f165748d",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "4dc05cbd726f2b15c46a8fd7f165748d",
+  "posti": [
+   6
+  ],
+  "specie": [
+   "amanita-faloides"
+  ]
+ },
+ {
+  "asset": "4f55166c0a00c0d8244f64b0518141c1",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "4f55166c0a00c0d8244f64b0518141c1",
+  "posti": [
+   70
+  ],
+  "specie": [
+   "agaricus-augustus"
+  ]
+ },
+ {
+  "asset": "50f0d0043aaab3e6d51be5bf48e0620c",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "50f0d0043aaab3e6d51be5bf48e0620c",
+  "posti": [
+   22
+  ],
+  "specie": [
+   "pleurotus-ostreatus"
+  ]
+ },
+ {
+  "asset": "52131443eb7d2741c43a9df6483c2e42",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "52131443eb7d2741c43a9df6483c2e42",
+  "posti": [
+   11
+  ],
+  "specie": [
+   "tricoloma-ustaloides"
+  ]
+ },
+ {
+  "asset": "539b061cf3e30c53b3c5f15d5a149270",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "539b061cf3e30c53b3c5f15d5a149270",
+  "posti": [
+   21
+  ],
+  "specie": [
+   "latarius-blenius"
+  ]
+ },
+ {
+  "asset": "54b3a635c048a3269a91020256a7ce6d",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "54b3a635c048a3269a91020256a7ce6d",
+  "posti": [
+   14
+  ],
+  "specie": [
+   "tricoloma-ecuestre"
+  ]
+ },
+ {
+  "asset": "55cafec15e01ce857f67d07824361aa4",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "55cafec15e01ce857f67d07824361aa4",
+  "posti": [
+   49
+  ],
+  "specie": [
+   "marasmius-aliaceus"
+  ]
+ },
+ {
+  "asset": "55d92acfe5b2e92f2e08d7c873a6be59",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "55d92acfe5b2e92f2e08d7c873a6be59",
+  "posti": [
+   17
+  ],
+  "specie": [
+   "tricoloma-saponaceum-scuamosum"
+  ]
+ },
+ {
+  "asset": "5b207d5e7ef32612bcc547b334c8d9a3",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "5b207d5e7ef32612bcc547b334c8d9a3",
+  "posti": [
+   34
+  ],
+  "specie": [
+   "lacaria-ametistina"
+  ]
+ },
+ {
+  "asset": "5c61a8260433258c94d09acedafa82cd",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "5c61a8260433258c94d09acedafa82cd",
+  "posti": [
+   37,
+   39
+  ],
+  "specie": [
+   "rusula-carminipes",
+   "rusula-aurea"
+  ]
+ },
+ {
+  "asset": "5d605742363a52e0f22bd354d6378fed",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "5d605742363a52e0f22bd354d6378fed",
+  "posti": [
+   25
+  ],
+  "specie": [
+   "rusula-laurocerasi"
+  ]
+ },
+ {
+  "asset": "5dced2cf2beb689459f19a51e3cbdf31",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "5dced2cf2beb689459f19a51e3cbdf31",
+  "posti": [
+   39
+  ],
+  "specie": [
+   "serula-pudens"
+  ]
+ },
+ {
+  "asset": "5fe3576b2800dacfe90004bf81bb60b5",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "5fe3576b2800dacfe90004bf81bb60b5",
+  "posti": [
+   36
+  ],
+  "specie": [
+   "lacaria-lacata"
+  ]
+ },
+ {
+  "asset": "6058eb3d130c40ffa38c7a1dbab3423d",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "6058eb3d130c40ffa38c7a1dbab3423d",
+  "posti": [
+   67
+  ],
+  "specie": [
+   "agaricus-meleri"
+  ]
+ },
+ {
+  "asset": "622c2c4742a34182ac4b2f23c89e38fc",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "622c2c4742a34182ac4b2f23c89e38fc",
+  "posti": [
+   35
+  ],
+  "specie": [
+   "clitocibe-giba"
+  ]
+ },
+ {
+  "asset": "626b2e45f7eb1fc0d42dd57a7b7932db",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "626b2e45f7eb1fc0d42dd57a7b7932db",
+  "posti": [
+   13
+  ],
+  "specie": [
+   "tricoloma-aurantium"
+  ]
+ },
+ {
+  "asset": "691ff6aa0a7d70f474b377dc4bfb806b",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "691ff6aa0a7d70f474b377dc4bfb806b",
+  "posti": [
+   71
+  ],
+  "specie": [
+   "limacela-gutata"
+  ]
+ },
+ {
+  "asset": "69e8b0982a0e4036ec44a132867a1e40",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "69e8b0982a0e4036ec44a132867a1e40",
+  "posti": [
+   35
+  ],
+  "specie": [
+   "rusula-cianosanta"
+  ]
+ },
+ {
+  "asset": "6a359720be63db37dc297840222ec189",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "6a359720be63db37dc297840222ec189",
+  "posti": [
+   44
+  ],
+  "specie": [
+   "oudemansiela-mucida"
+  ]
+ },
+ {
+  "asset": "6be482f258633fa705cd2ebbdfb40aa2",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "6be482f258633fa705cd2ebbdfb40aa2",
+  "posti": [
+   77
+  ],
+  "specie": [
+   "amanita-ecinocefala"
+  ]
+ },
+ {
+  "asset": "7209307a5eecf7c80dbaac5834c7aa81",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "7209307a5eecf7c80dbaac5834c7aa81",
+  "posti": [
+   7
+  ],
+  "specie": [
+   "tricoloma-seiuntum"
+  ]
+ },
+ {
+  "asset": "77a6143bb5c05c5aa5ff1c6dbc1d6ab9",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "77a6143bb5c05c5aa5ff1c6dbc1d6ab9",
+  "posti": [
+   44
+  ],
+  "specie": [
+   "rusula-torulosa"
+  ]
+ },
+ {
+  "asset": "7a792db5ec486051da4b06c09c79bff3",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "7a792db5ec486051da4b06c09c79bff3",
+  "posti": [
+   19
+  ],
+  "specie": [
+   "tricoloma-colosus"
+  ]
+ },
+ {
+  "asset": "7bf09ee892337524a9c55c783b730837",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "7bf09ee892337524a9c55c783b730837",
+  "posti": [
+   72
+  ],
+  "specie": [
+   "amanita-cesarea"
+  ]
+ },
+ {
+  "asset": "7fce3ece921dc5477dff9c3d0220e3f7",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "7fce3ece921dc5477dff9c3d0220e3f7",
+  "posti": [
+   73
+  ],
+  "specie": [
+   "agaricus-santodermus"
+  ]
+ },
+ {
+  "asset": "81588e5198f83839311ec03f361f30a9",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "81588e5198f83839311ec03f361f30a9",
+  "posti": [
+   1
+  ],
+  "specie": [
+   "amanita-ovoidea"
+  ]
+ },
+ {
+  "asset": "82fb0bb545f4d3bf8c191fb682400227",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "82fb0bb545f4d3bf8c191fb682400227",
+  "posti": [
+   38
+  ],
+  "specie": [
+   "rusula-luteotata"
+  ]
+ },
+ {
+  "asset": "85610f198cf8a807bd8c1e6bf748d955",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "85610f198cf8a807bd8c1e6bf748d955",
+  "posti": [
+   16
+  ],
+  "specie": [
+   "tricoloma-tereum"
+  ]
+ },
+ {
+  "asset": "85e3c0ec729dcdc8e592d925a754cbbe",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "85e3c0ec729dcdc8e592d925a754cbbe",
+  "posti": [
+   46
+  ],
+  "specie": [
+   "cistoderma-terei"
+  ]
+ },
+ {
+  "asset": "8730a789228d29f564ee967689a3c408",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "8730a789228d29f564ee967689a3c408",
+  "posti": [
+   40
+  ],
+  "specie": [
+   "serula-radicata"
+  ]
+ },
+ {
+  "asset": "87e19ccd2f308b620b650d3f2dbf89d6",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "87e19ccd2f308b620b650d3f2dbf89d6",
+  "posti": [
+   13
+  ],
+  "specie": [
+   "latarius-salmonicolor"
+  ]
+ },
+ {
+  "asset": "89e77c7a5b7a97f496a630ce9393436e",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "89e77c7a5b7a97f496a630ce9393436e",
+  "posti": [
+   33
+  ],
+  "specie": [
+   "clitocibe-costata"
+  ]
+ },
+ {
+  "asset": "8a51fa829b311199c8a9583cc1a868c3",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "8a51fa829b311199c8a9583cc1a868c3",
+  "posti": [
+   36
+  ],
+  "specie": [
+   "rusula-lepida"
+  ]
+ },
+ {
+  "asset": "8bffc24b9d831e66c9a7823f5a9959c9",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "8bffc24b9d831e66c9a7823f5a9959c9",
+  "posti": [
+   8
+  ],
+  "specie": [
+   "coprinus-comatus"
+  ]
+ },
+ {
+  "asset": "8ccab7db4a9e18b1d13b8208e6a63aa5",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "8ccab7db4a9e18b1d13b8208e6a63aa5",
+  "posti": [
+   46
+  ],
+  "specie": [
+   "rusula-fetens"
+  ]
+ },
+ {
+  "asset": "8dab2ca0e1befe0f8ca4c5b328e190e6",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "8dab2ca0e1befe0f8ca4c5b328e190e6",
+  "posti": [
+   12
+  ],
+  "specie": [
+   "latarius-cuietus"
+  ]
+ },
+ {
+  "asset": "8e8d2c66c2b8e4ea6742c774cdb7d10e",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "8e8d2c66c2b8e4ea6742c774cdb7d10e",
+  "posti": [
+   21
+  ],
+  "specie": [
+   "tricoloma-populinum"
+  ]
+ },
+ {
+  "asset": "8ff1dd1dfe8530b087990802b8fc2689",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "8ff1dd1dfe8530b087990802b8fc2689",
+  "posti": [
+   29
+  ],
+  "specie": [
+   "lepista-glaucocana"
+  ]
+ },
+ {
+  "asset": "9609cccb14cb1cf4863cb9b062f9baff",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "9609cccb14cb1cf4863cb9b062f9baff",
+  "posti": [
+   6
+  ],
+  "specie": [
+   "tricoloma-saponaceum"
+  ]
+ },
+ {
+  "asset": "9b4856bd39276434af6e4bd90215e292",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "9b4856bd39276434af6e4bd90215e292",
+  "posti": [
+   25
+  ],
+  "specie": [
+   "igroforus-fagi"
+  ]
+ },
+ {
+  "asset": "9b5936a216982e18c337aee089791724",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "9b5936a216982e18c337aee089791724",
+  "posti": [
+   63
+  ],
+  "specie": [
+   "agaricus-campestris"
+  ]
+ },
+ {
+  "asset": "9d5c817c06fab34af44264cf309ae163",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "9d5c817c06fab34af44264cf309ae163",
+  "posti": [
+   27
+  ],
+  "specie": [
+   "rusula-albonigra"
+  ]
+ },
+ {
+  "asset": "9d83458e056da915bf603eaea6b4cc9b",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "9d83458e056da915bf603eaea6b4cc9b",
+  "posti": [
+   48
+  ],
+  "specie": [
+   "marasmius-scorodinus"
+  ]
+ },
+ {
+  "asset": "9e628c5d299c4e6ee6bc4b61721d7984",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "9e628c5d299c4e6ee6bc4b61721d7984",
+  "posti": [
+   23
+  ],
+  "specie": [
+   "latarius-deterimus"
+  ]
+ },
+ {
+  "asset": "a306dbdb256c0a6094579028ef277844",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "a306dbdb256c0a6094579028ef277844",
+  "posti": [
+   18
+  ],
+  "specie": [
+   "tricoloma-ustale"
+  ]
+ },
+ {
+  "asset": "a770ad3eb61a19d0497ac4e1f865652f",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "a770ad3eb61a19d0497ac4e1f865652f",
+  "posti": [
+   45
+  ],
+  "specie": [
+   "colibia-butiracea-asema"
+  ]
+ },
+ {
+  "asset": "ac11bab5b688aeace3b2726fa27a07fa",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "ac11bab5b688aeace3b2726fa27a07fa",
+  "posti": [
+   24
+  ],
+  "specie": [
+   "igroforus-eburneus"
+  ]
+ },
+ {
+  "asset": "b22f8c61115b7f79f4e9ffa48a4e4d98",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "b22f8c61115b7f79f4e9ffa48a4e4d98",
+  "posti": [
+   50
+  ],
+  "specie": [
+   "megacolibia-platifila"
+  ]
+ },
+ {
+  "asset": "becfb32de00ee02697ede0fcda57cb5b",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "becfb32de00ee02697ede0fcda57cb5b",
+  "posti": [
+   76
+  ],
+  "specie": [
+   "amanita-citrina"
+  ]
+ },
+ {
+  "asset": "cdf115035376d284cd87ad6a7a3994fe",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:28:37Z",
+  "id": "cdf115035376d284cd87ad6a7a3994fe",
+  "posti": [
+   55
+  ],
+  "specie": [
+   "macrolepiota-escoriata"
+  ]
+ },
+ {
+  "asset": "d5688f58240a8574a0a7560e7cf52338",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "d5688f58240a8574a0a7560e7cf52338",
+  "posti": [
+   22
+  ],
+  "specie": [
+   "latarius-vinosus"
+  ]
+ },
+ {
+  "asset": "d77ce609fc8ba4658b3e0c8a80ecd034",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "d77ce609fc8ba4658b3e0c8a80ecd034",
+  "posti": [
+   14
+  ],
+  "specie": [
+   "latarius-fuliginosus"
+  ]
+ },
+ {
+  "asset": "d79c96a49bc0f5150d1041dc3bba5391",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "d79c96a49bc0f5150d1041dc3bba5391",
+  "posti": [
+   10
+  ],
+  "specie": [
+   "latarius-velereus"
+  ]
+ },
+ {
+  "asset": "dbfb56a9405429620b02e2528afc03d8",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "dbfb56a9405429620b02e2528afc03d8",
+  "posti": [
+   7
+  ],
+  "specie": [
+   "amanita-muscaria"
+  ]
+ },
+ {
+  "asset": "ddf34ce42169512dcbbab30025295bf4",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "ddf34ce42169512dcbbab30025295bf4",
+  "posti": [
+   19
+  ],
+  "specie": [
+   "latarius-deliciosus"
+  ]
+ },
+ {
+  "asset": "de51f6206ace77cadce9776b15e79d90",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "de51f6206ace77cadce9776b15e79d90",
+  "posti": [
+   1
+  ],
+  "specie": [
+   "tricoloma-focale"
+  ]
+ },
+ {
+  "asset": "e0814c98cb2573082ccd9f40b0a43f8f",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "e0814c98cb2573082ccd9f40b0a43f8f",
+  "posti": [
+   2
+  ],
+  "specie": [
+   "tricoloma-scuarulosum"
+  ]
+ },
+ {
+  "asset": "e2101d7f9fc758040674e8bd8ce31f55",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "e2101d7f9fc758040674e8bd8ce31f55",
+  "posti": [
+   69
+  ],
+  "specie": [
+   "agaricus-santodermus-griseus"
+  ]
+ },
+ {
+  "asset": "e568496fcf568c979a8f2c7bacf71ffe",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "e568496fcf568c979a8f2c7bacf71ffe",
+  "posti": [
+   4
+  ],
+  "specie": [
+   "amanita-panterina-abietum"
+  ]
+ },
+ {
+  "asset": "e5d399dc17ce9231c6cbc87e17b986d6",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "e5d399dc17ce9231c6cbc87e17b986d6",
+  "posti": [
+   20
+  ],
+  "specie": [
+   "tricoloma-bufonium"
+  ]
+ },
+ {
+  "asset": "ea2418aca37dbc524ff6979650a37b7f",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "ea2418aca37dbc524ff6979650a37b7f",
+  "posti": [
+   31
+  ],
+  "specie": [
+   "clitocibe-nebularis"
+  ]
+ },
+ {
+  "asset": "eb2f5601eab74e2c78ccf99346c3e912",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:01:04Z",
+  "id": "eb2f5601eab74e2c78ccf99346c3e912",
+  "posti": [
+   10
+  ],
+  "specie": [
+   "tricoloma-sulfureum"
+  ]
+ },
+ {
+  "asset": "ee8f88b8a5bbba52e61a0a7feae4b951",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "ee8f88b8a5bbba52e61a0a7feae4b951",
+  "posti": [
+   18
+  ],
+  "specie": [
+   "latarius-semisanguiflus"
+  ]
+ },
+ {
+  "asset": "f2898b29cccef243477009433904ba65",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:20:00Z",
+  "id": "f2898b29cccef243477009433904ba65",
+  "posti": [
+   47
+  ],
+  "specie": [
+   "micena-rosea"
+  ]
+ },
+ {
+  "asset": "f735e292ac43c00d9ef0ec616b18ae86",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "f735e292ac43c00d9ef0ec616b18ae86",
+  "posti": [
+   62
+  ],
+  "specie": [
+   "agaricus-bitorcuis"
+  ]
+ },
+ {
+  "asset": "f8e7713e43e80e09a91b6c35d6980fc9",
+  "corsia": "c1",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "f8e7713e43e80e09a91b6c35d6980fc9",
+  "posti": [
+   64
+  ],
+  "specie": [
+   "agaricus-bruneolus"
+  ]
+ },
+ {
+  "asset": "f9301671c58ece7f7b58d3379823379b",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:19:37Z",
+  "id": "f9301671c58ece7f7b58d3379823379b",
+  "posti": [
+   5
+  ],
+  "specie": [
+   "amanita-mairei"
+  ]
+ },
+ {
+  "asset": "fb437514f25fa02c7799b48f84d84c9f",
+  "corsia": "c3",
+  "creato": "2026-10-24T12:45:00Z",
+  "id": "fb437514f25fa02c7799b48f84d84c9f",
+  "posti": [
+   26
+  ],
+  "specie": [
+   "rusula-fuscorubra"
+  ]
+ }
+]
