@@ -507,7 +507,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 33;
+const APP_VERSION = 34;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -1516,7 +1516,11 @@ async function sendRawVideo(file, step = () => {}, riuso = [], onLog = () => {})
   const codOf = x => x.cod || "binario", got = new Map();
   for (const x of riuso || []) if (x && x.asset && x.a > x.da) got.set(x.da + ":" + codOf(x), { ...x, cod: codOf(x) });
   let cod = [...got.values()].some(x => x.cod === "base64") ? "base64" : "binario";
-  const mine = () => [...got.values()].filter(x => x.cod === cod).sort((x, y) => x.da - y.da);
+  const mine = () => [...got.values()].sort((x, y) => x.da - y.da);  // every piece already stored, whatever its encoding
+  // Base64 only on an explicit refusal of the video type: a code naming the type, or a type-like refusal before any binary
+  // piece was accepted. Anything else is retried and, if it persists, set aside like any other failure.
+  const typeRefused = e => cod === "binario" && e && e.fase === "invio" && (/type|mime|media/i.test(e.code || "")
+    || (![...got.values()].some(x => x.cod === "binario") && (e.code === "invalid_argument" || /\b(type|mime|tipo)\b/i.test(e.message || ""))));
   const list = () => [...got.values()].sort((x, y) => (x.cod < y.cod ? -1 : x.cod > y.cod ? 1 : 0) || x.da - y.da).map((x, i) => ({ ...x, n: i + 1 }));
   const b64 = bl => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.onerror = () => rej(r.error); r.readAsDataURL(bl); });
   // slices still to send: the gaps between kept pieces, cut into slices; k numbers every piece of the file in order
@@ -1566,12 +1570,13 @@ async function sendRawVideo(file, step = () => {}, riuso = [], onLog = () => {})
           got.set(j.da + ":" + cod, { asset: r.id, url: r.url, da: j.da, a: j.a, cod, tentativi: j.tentativi, ...(j.errore ? { errore: j.errore, prove: j.prove } : {}) });
           fresh++; onLog(list()); return;
         } catch (e) {
-          if (e && e.code === "quota") throw e;
-          if (!transient(e) && e.fase !== "lettura") throw e;  // for example the video type refused
+          // every failed attempt is logged, also the one that stops the run or switches to base64
           j.errore = errMsg(e);
-          (j.prove = j.prove || []).push({ fase: e.fase || "invio", codice: e.code || "", ms: e.ms ?? null, byte: e.byte ?? j.a - j.da, quando: new Date().toISOString() });
+          (j.prove = j.prove || []).push({ fase: (e && e.fase) || "invio", codice: (e && e.code) || "", messaggio: String(e && e.message || e).slice(0, 200), ms: e && e.ms != null ? e.ms : null, byte: e && e.byte != null ? e.byte : j.a - j.da, cod, quando: new Date().toISOString() });
           if (j.prove.length > 10) j.prove.shift();
           onLog(list(), { pezzoInCorso: { da: j.da, a: j.a, tentativi: j.tentativi, errore: j.errore, prove: j.prove } });
+          if (e && e.code === "quota") throw e;
+          if (typeRefused(e)) throw Object.assign(e, { tipoRifiutato: true });
           if (info.tries >= RAW.tries || Date.now() - info.t0 > RAW.budget) { j.failed = true; return; }  // set aside, tried again later
           await sleep(Math.min(30000, RAW.back * 2 ** (info.tries - 1)) * (0.5 + Math.random()));
         }
@@ -1588,7 +1593,7 @@ async function sendRawVideo(file, step = () => {}, riuso = [], onLog = () => {})
     for (let pass = 0; ; ) {
       stopErr = null; await pool(jobs);
       if (stopErr) {
-        if (cod === "binario" && !transient(stopErr) && !["quota", "spazio"].includes(stopErr.code)) { cod = "base64"; jobs = plan(); await fits(jobs); total = fresh + jobs.length; continue; }  // video type refused: send as text
+        if (stopErr.tipoRifiutato) { onLog(list(), { passatoABase64: { quando: new Date().toISOString(), da: stopErr.da ?? null, codice: stopErr.code || "", messaggio: String(stopErr.message || "").slice(0, 200) } }); cod = "base64"; jobs = plan(); await fits(jobs); total = fresh + jobs.length; continue; }  // video type refused: the missing ranges go as text
         throw stopErr;
       }
       const left = jobs.filter(j => j.failed);
@@ -1599,13 +1604,14 @@ async function sendRawVideo(file, step = () => {}, riuso = [], onLog = () => {})
     // the pieces must cover the file exactly, in order
     const byDa = new Map(mine().map(x => [x.da, x])), out = [];
     for (let da = 0; da < file.size; ) { const x = byDa.get(da); if (!x) throw new Error("manca un pezzo del video (da " + da + ")"); out.push(x); da = x.a; }
-    const rec = { pezzi: out.map((p, i) => ({ n: i + 1, asset: p.asset, url: p.url, da: p.da, a: p.a })), codifica: cod === "base64" ? "base64 per pezzo" : "binario", size: file.size, type, name: file.name, lastModified: file.lastModified, creato: new Date().toISOString() };
+    const cods = new Set(out.map(p => p.cod));
+    const rec = { pezzi: out.map((p, i) => ({ n: i + 1, asset: p.asset, url: p.url, da: p.da, a: p.a, cod: p.cod })), codifica: cods.size > 1 ? "misto: vedi cod di ogni pezzo (binario o base64)" : cods.has("base64") ? "base64 per pezzo" : "binario", size: file.size, type, name: file.name, lastModified: file.lastModified, creato: new Date().toISOString() };
     await dbSet("invii/" + uploadId(file) + "-video", rec, true);
     const msg = `Video originale inviato: ${out.length} pezzi, ${MB(file.size)} MB.`;
     st.textContent = msg; return { ok: true, msg, pezzi: list() };
   } catch (e) {
     const msg = errMsg(e);
-    st.textContent = "Video originale non inviato: riprova. " + `${got.size} pezzi arrivati (` + msg + ").";
+    st.textContent = (got.size ? "Video originale incompleto: riprova. " : "Video originale non inviato: riprova. ") + `${got.size} pezzi arrivati (` + msg + ").";
     return { ok: false, msg, quota: !!(e && e.code === "quota"), spazio: e && e.code === "spazio" ? e.message : "", pezzi: list() };
   } finally { clearInterval(tick); }
 }
@@ -2841,13 +2847,14 @@ async function salaSend(picked, pianta, raw = false) {
               if (r.ok) delete log.pezzoInCorso;
               log.tipo = f.type || ""; if (r.pezzi && r.pezzi.length) log.pezzi = r.pezzi;
               if (r.ok) { delete salaPart["v" + id]; mark(id + "-video"); log.video = true; ok.push(`video originale inviato in ${r.pezzi.length} pezzi`); }
-              else if (r.spazio) {
-                // the whole file does not fit: the phone picks the frames instead (unless they already arrived)
-                log.videoNonEntra = r.spazio; ok.push(`${r.spazio}, quindi mando i fotogrammi scelti dal telefono`);
+              else if (r.spazio && !(r.pezzi && r.pezzi.length)) {
+                // nothing of the original sent and it does not fit: the phone picks the frames instead, if they are still missing
+                log.videoNonEntra = r.spazio;
                 const im = await look(id + "-img", f);
-                if (im.st === "si") ok.push("immagini già ricevute"); else if (im.st === "?") bad.push("immagini: non riesco a controllare se sono già arrivate, quindi non le reinvio"); else frames = true;
+                if (im.st === "no") { ok.push(`${r.spazio}, quindi mando i fotogrammi scelti dal telefono`); frames = true; }
+                else { log.videoFallito = true; bad.push(`video originale non inviato (${r.spazio})`); }
               }
-              else { salaPart["v" + id] = r.pezzi; log.videoFallito = true; bad.push(`video originale non inviato (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+              else { salaPart["v" + id] = r.pezzi; log.videoFallito = true; bad.push(`video originale ${r.pezzi && r.pezzi.length ? "incompleto" : "non inviato"} (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
             }
             if (frames) {
             const riuso = salaPart[id] || (prev && Array.isArray(prev.parziali) ? prev.parziali : []);
@@ -2887,7 +2894,7 @@ async function salaSend(picked, pianta, raw = false) {
     salaBusy = false;
   }
   const ko = out.filter(r => r.stato === "incompleto").length, imgKo = out.some(r => r.immaginiFallite || r.videoFallito);
-  const koMsg = out.some(r => r.videoFallito) ? "Video originale non inviato: riprova." : "Immagini non inviate: riprova.";
+  const koMsg = out.some(r => r.videoFallito && r.pezzi && r.pezzi.length) ? "Video originale incompleto: riprova." : out.some(r => r.videoFallito) ? "Video originale non inviato: riprova." : "Immagini non inviate: riprova.";
   // one-tap retry of the videos not complete, with the same File objects: received parts are skipped, stored frames reused
   const again = files.filter(f => out.some(r => r.stato === "incompleto" && r.file === f.name));
   if (ko && !stop && again.length) { salaRetry = () => salaSend(again, pianta, raw); $("#sala-retry").hidden = false; }
