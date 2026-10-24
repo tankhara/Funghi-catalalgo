@@ -251,6 +251,16 @@ textarea { min-height: 96px; resize: vertical; }
 .sector .idx { font-family: var(--serif); font-weight: 700; color: var(--brick); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
 .sector .desc { color: var(--muted); font-size: .88rem; }
 .sector select { padding: 8px 10px; font-size: .95rem; }
+/* Schema: percorso allestito, zona per zona */
+.pz { display: grid; gap: 8px; }
+.pz > .zhead { display: grid; gap: 2px; padding-top: 6px; border-top: 2px solid var(--line); }
+.pz > .zhead h3 { color: var(--brick); }
+.walkend { font-weight: 700; font-size: .92rem; }
+.sector .meta { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sector .anche { font-size: .85rem; overflow-wrap: anywhere; }
+.sector .anche i { font-family: var(--serif); }
+.sector.zsel { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 8px 12px; }
+.sector.zsel label { font-weight: 600; font-size: .92rem; }
 /* Commestibilità dal cartellino stampato: pallino colorato, teschio bianco su fondo scuro */
 :root { --ed-ok: #2a8a3a; --ed-no: #e2b400; --ed-cook: #1d64c8; --ed-tox: #d12c24; --ed-dead: #16130f; --ed-dead-fg: #ffffff; --ed-ring: rgba(0,0,0,.3); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ed-ok: #4fc463; --ed-no: #f3cf35; --ed-cook: #62a2ff; --ed-tox: #ff6157; --ed-dead: #000000; --ed-dead-fg: #ffffff; --ed-ring: rgba(255,255,255,.6); } }
@@ -407,6 +417,7 @@ textarea { min-height: 96px; resize: vertical; }
         <label class="btn primary wide" for="sala-video">Scegli video (anche più di uno)</label>
       </div>
       <input id="sala-video" type="file" accept="video/*,audio/*" multiple hidden>
+      <label class="row" style="gap:8px;align-items:flex-start;font-size:.9rem"><input type="checkbox" id="sala-pianta" style="margin-top:3px"> <span>È il video della pianta della sala: Claude lo usa per ridisegnare la mappa. Lascialo spento per i video dei cartellini.</span></label>
       <p class="hint" id="sala-status" style="white-space:pre-line"></p>
     </div>
     <div id="lane-view" class="stack"></div>
@@ -451,8 +462,11 @@ textarea { min-height: 96px; resize: vertical; }
         <li><b>Sistematica moderna</b>, per Ordine, Famiglia e Genere secondo Species Fungorum e la Checklist dei funghi italiani.</li>
         <li><b>Tradizionale morfologica</b>, per imenoforo e colore delle spore: lamelle bianche, rosa, ocra-brune e nere, poi tubuli, aculei, pori, gasteroidi e ascomiceti.</li>
       </ol>
-      <p>Lo schema qui sotto segue per ora l'ordine classico delle guide tradizionali: si parte da Igroforacee e Tricolomatacee, si passa per Amanite, Agaricacee e le famiglie a spore colorate, poi boleti e russule, gli Afilloforali, i gasteromiceti, i gelatinosi e gli ascomiceti. È provvisorio, in attesa dello schema ufficiale della mostra. Serve a proporre il posto per le specie nuove; dove sono davvero lo decidono zona e posto registrati.</p>
+      <p>Lo schema qui sotto mostra come la mostra è stata davvero allestita: zona per zona, nell'ordine di visita, i gruppi con i posti che occupano. Un gruppo diviso in due punti compare due volte. "Anche" indica le specie messe in mezzo a un gruppo diverso dal loro. Il posto di ogni specie resta quello registrato con zona e posto.</p>
     </div>
+    <div id="percorso" class="stack"></div>
+    <h2>Zona proposta per le specie nuove</h2>
+    <p class="hint">Quando registri una specie nuova senza scegliere la zona, l'app la propone qui secondo il suo gruppo.</p>
     <div id="sectors" class="stack"></div>
     <h2>Zone</h2>
     <p class="hint">Le zone sono numerate in ordine di visita. Il posto 1 è l'inizio della zona nel senso di visita.</p>
@@ -477,7 +491,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 <script>
 "use strict";
-const APP_VERSION = 29;
+const APP_VERSION = 30;
 /* ---------- Schema espositivo: settori in ordine, ognuno con le famiglie in ordine ---------- */
 const SECTORS = [
   { id: "igr", nome: "Igroforacee", desc: "Hygrophorus, Hygrocybe, Cuphophyllus",
@@ -531,13 +545,41 @@ const DEFAULT_LAYOUT = {
     { id: "c4", nome: "Zona 4 · U destra", dove: "U centrale, braccio destro: dal fondo verso l'uscita" },
     { id: "c5", nome: "Zona 5 · Parete", dove: "Parete destra, tratto di circa 3 metri prima dell'uscita" },
   ],
-  assegna: { igr: "c1", tri: "c1", ent: "c1", pol: "c2", ama: "c3", agr: "c3", plu: "c3", ner: "c3", cor: "c3", pax: "c4", bol: "c4", rus: "c4", can: "c5", gas: "c5", gel: "c5", asc: "c5", alt: "c5" },
+  /* zona proposta per le specie nuove di ogni gruppo: quella dove il gruppo è stato allestito (se diviso, dove ne ha di più) */
+  assegna: { igr: "c1", tri: "c1", ent: "c4", pol: "c2", ama: "c3", agr: "c1", plu: "c4", ner: "c4", cor: "c4", pax: "c4", bol: "c4", rus: "c4", can: "c5", gas: "c5", gel: "c5", asc: "c5", alt: "c5" },
+  /* Come la mostra è stata davvero allestita (specie, zona e posto verificati sui video del 24 ottobre 2026):
+     gruppi in ordine di visita, con i posti che occupano. Un gruppo diviso compare due volte;
+     "anche" elenca le specie messe in mezzo a un gruppo diverso dal loro. */
+  entrata: "Cartello ENTRATA all'inizio del braccio sinistro, accanto al primo Tricholoma: qui comincia la Zona 1.",
+  percorso: [
+    { corsia: "c1", settore: "tri", nome: "Tricholomatacee", da: 1, a: 23, generi: "Tricholoma, Tricholomopsis, Pleurotus", anche: "Hygrophoropsis aurantiaca (23)" },
+    { corsia: "c1", settore: "igr", nome: "Igroforacee", da: 24, a: 26, generi: "Hygrophorus" },
+    { corsia: "c1", settore: "tri", nome: "Tricholomatacee", da: 27, a: 50, generi: "Lepista, Clitocybe, Leucopaxillus, Laccaria, Collybia, Armillaria, Xerula, Lyophyllum, Mycena, Oudemansiella, Marasmius, Megacollybia", anche: "Cystoderma terreyi (46)" },
+    { corsia: "c1", settore: "agr", nome: "Lepiotacee e Agaricacee", da: 51, a: 70, generi: "Cystoderma, Lepiota, Echinoderma, Macrolepiota, Agaricus" },
+    { corsia: "c1", settore: "ama", nome: "Amanitacee", da: 71, a: 77, generi: "Limacella, Amanita", anche: "Agaricus xanthodermus (73)" },
+    { corsia: "c6", settore: "pol", nome: "Afilloforali: polipori e lignicoli", da: 1, a: 7, generi: "Lenzites, Hapalopilus, Fomitopsis, Trametes, Fomes, Daedalea" },
+    { corsia: "c2", settore: "pol", nome: "Afilloforali: polipori e lignicoli", da: 1, a: 15, generi: "Ganoderma, Meripilus, Phellinus, Polyporus, Postia, Albatrellus, Oligoporus, Fistulina, Pycnoporus, Laetiporus" },
+    { corsia: "c3", settore: "ama", nome: "Amanitacee", da: 1, a: 7, generi: "Amanita" },
+    { corsia: "c3", settore: "ner", nome: "Coprinus", da: 8, a: 9, generi: "Coprinus comatus, Coprinus picaceus" },
+    { corsia: "c3", settore: "rus", nome: "Russulacee", da: 10, a: 20, generi: "Lactarius" },
+    { corsia: "c4", settore: "rus", nome: "Russulacee", da: 1, a: 26, generi: "Lactarius, Russula" },
+    { corsia: "c4", settore: "ent", nome: "Entolomatacee", da: 27, a: 29, generi: "Clitopilus, Entoloma, Rhodocybe" },
+    { corsia: "c4", settore: "cor", nome: "Cortinariacee e Crepidotacee", da: 30, a: 44, generi: "Cortinarius, Hebeloma, Inocybe", anche: "Lactarius atlanticus (31), Pluteus atromarginatus (37), Gymnopus dryophilus (44)" },
+    { corsia: "c4", settore: "ner", nome: "Strofariacee", da: 45, a: 49, generi: "Hypholoma, Stropharia", anche: "Cortinarius splendens (47), Gymnopilus penetrans (48)" },
+    { corsia: "c4", settore: "pax", nome: "Paxillacee e Gomphidiacee", da: 50, a: 55, generi: "Paxillus, Tapinella, Chroogomphus", anche: "Agrocybe aegerita (53)" },
+    { corsia: "c4", settore: "bol", nome: "Boletacee", da: 56, a: 80, generi: "Suillus, Leccinum, Boletus, Aureoboletus, Xerocomus, Strobilomyces, Gyroporus, Hemileccinum", anche: "Chroogomphus rutilus (58), Boletopsis grisea (70)" },
+    { corsia: "c5", settore: "can", nome: "Afilloforali: gallinacci, idni e clavarie", da: 1, a: 21, generi: "Cantharellus, Craterellus, Clavariadelphus, Sarcodon, Hydnum, Ramaria, Clavulina", anche: "Pleurotus cornucopiae (3), Battarrea phalloides (8), Trametes pubescens (14), Calocera viscosa (20)" },
+    { corsia: "c5", settore: "gas", nome: "Gasteromiceti", da: 22, a: 38, generi: "Lycoperdon, Calvatia, Scleroderma, Geastrum, Clathrus, Phallus, Bovista, Mycenastrum, Astraeus, Pisolithus", anche: "Tremella aurantia (31), Sowerbyella imperialis (35), Hydnellum aurantiacum (38)" },
+    { corsia: "c5", settore: "asc", nome: "Ascomiceti", da: 39, a: 44, generi: "Helvella, Otidea, Tuber, Morchella" },
+  ],
 };
 
 /* Zone predefinite mancanti in uno schema salvato prima (es. c6 Tronchi): aggiunte nella posizione del percorso, nomi già salvati intatti */
 function withDefaultLanes(lay) {
   if (!lay || !Array.isArray(lay.corsie)) return structuredClone(DEFAULT_LAYOUT);
   const out = { ...lay, corsie: lay.corsie.slice(), assegna: { ...(lay.assegna || {}) } };
+  /* uno schema salvato senza percorso (prima della v30) prende quello dell'allestimento */
+  if (!Array.isArray(out.percorso)) { out.percorso = structuredClone(DEFAULT_LAYOUT.percorso); if (out.entrata == null) out.entrata = DEFAULT_LAYOUT.entrata; }
   DEFAULT_LAYOUT.corsie.forEach((d, i) => {
     if (out.corsie.some(c => c.id === d.id)) return;
     let at = 0;
@@ -1370,7 +1412,7 @@ async function spaceNow() {
 // They are sent while the next ones are read (at most 6 waiting), so the phone never holds the whole set.
 // Frames and the voice of this video must leave the archive under 80 percent full, otherwise fewer frames are taken.
 const ROOM_FR = { max: 120, every: 1.2, side: 1920, q: 0.88, share: 0.8 };
-async function sendRoomVideo(file, step = () => {}) {
+async function sendRoomVideo(file, step = () => {}, pianta = false) {
   const st = $("#sala-status");
   if (!file) return { ok: false, msg: "nessun file scelto" };
   if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
@@ -1402,7 +1444,7 @@ async function sendRoomVideo(file, step = () => {}) {
     const rec = { frames: out, file: file.name, creato: new Date().toISOString(), lato: inf.lato, kbMedio: inf.kbMedio };
     // invii/ first: it is the proof of receipt the skip check reads
     await dbSet("invii/" + uploadId(file) + "-img", rec);
-    await dbSet("config/sala", rec);
+    if (pianta) await dbSet("config/sala", rec);  // only the room-plan video, chosen on purpose, replaces the plan's frames
     const msg = `${out.length} immagini dei cartellini inviate` + (nota ? ` (${nota})` : "") + ".";
     st.textContent = msg; return { ok: true, msg, n: out.length, nota, info: { ...inf, n: out.length } };
   } catch (e) {
@@ -1415,7 +1457,7 @@ async function sendRoomVideo(file, step = () => {}) {
 
 // Audio track as 16 kHz mono WAV, base64 in text/plain assets (the asset store takes no audio types), listed in config/sala-audio
 // Decoded in a 16 kHz OfflineAudioContext: it resamples while decoding (a third of the memory) and opens no realtime audio device
-async function sendRoomAudio(file, step = () => {}) {
+async function sendRoomAudio(file, step = () => {}, pianta = false) {
   const st = $("#sala-status");
   if (!file) return { ok: false, msg: "nessun file scelto" };
   if (!state.assets || !state.db) return { ok: false, msg: "archivio non ancora collegato, ricarica la pagina" };
@@ -1458,7 +1500,7 @@ async function sendRoomAudio(file, step = () => {}) {
     b64 = null;
     const rec = { parti: parts, formato: `wav ${rate === 16000 ? "16 kHz" : rate + " Hz"} mono, base64`, secondi: sec, file: file.name, creato: new Date().toISOString() };
     await dbSet("invii/" + uploadId(file) + "-audio", rec);
-    await dbSet("config/sala-audio", rec);
+    if (pianta) await dbSet("config/sala-audio", rec);
     const msg = `Voce di ${sec} secondi inviata.`;
     st.textContent = msg; return { ok: true, msg, sec };
   } catch (e) {
@@ -2332,11 +2374,29 @@ function renderCatalog() {
 /* ---------- SCHEMA ---------- */
 let draft = null;
 function renderSchema(from = state.layout) {
-  draft = structuredClone(from);
-  $("#sectors").replaceChildren(...SECTORS.map((s, i) => el("div", { class: "sector" },
-    el("div", { class: "head" }, el("span", { class: "idx" }, i + 1), el("h2", {}, s.nome)),
-    el("p", { class: "desc" }, s.desc),
-    el("select", { id: "sec-" + s.id, "aria-label": "Zona per " + s.nome, onchange: e => { draft.assegna[s.id] = e.target.value; } },
+  draft = withDefaultLanes(structuredClone(from));
+  /* percorso allestito: zone nell'ordine di visita, in ognuna i gruppi in ordine di posto */
+  const blocks = Array.isArray(draft.percorso) ? draft.percorso : [];
+  let n = 0;
+  const nSpecie = b => allItems().filter(i => i.corsia === b.corsia && i.posto >= b.da && i.posto <= b.a).length;
+  const zones = draft.corsie.map(c => {
+    const bs = blocks.filter(b => b.corsia === c.id).sort((x, y) => (x.da ?? 0) - (y.da ?? 0));
+    return el("div", { class: "pz" },
+      el("div", { class: "zhead" }, el("h3", {}, c.nome), c.dove ? el("span", { class: "hint" }, c.dove) : null),
+      ...(bs.length ? bs.map(b => { n++; const sec = SECTORS[SEC_IDX[b.settore]], k = nSpecie(b);
+        return el("div", { class: "sector" },
+          el("div", { class: "head" }, el("span", { class: "idx" }, n), el("h2", {}, b.nome || (sec || {}).nome || "Gruppo")),
+          el("span", { class: "meta" }, (b.da === b.a ? `posto ${b.da}` : `posti ${b.da}-${b.a}`) + ` · ${k === 1 ? "1 specie" : k + " specie"}`),
+          b.generi ? el("p", { class: "desc" }, b.generi) : null,
+          b.anche ? el("p", { class: "anche" }, el("b", {}, "Anche: "), b.anche) : null); })
+        : [el("p", { class: "hint" }, "Nessun gruppo indicato per questa zona.")]));
+  });
+  $("#percorso").replaceChildren(
+    draft.entrata ? el("p", { class: "walkend" }, "Entrata. " + draft.entrata) : null,
+    ...zones, el("p", { class: "walkend" }, "Uscita."));
+  $("#sectors").replaceChildren(...SECTORS.map(s => el("div", { class: "sector zsel" },
+    el("label", { for: "sec-" + s.id }, s.nome),
+    el("select", { id: "sec-" + s.id, onchange: e => { draft.assegna[s.id] = e.target.value; } },
       ...draft.corsie.map(c => el("option", { value: c.id, selected: (draft.assegna || {})[s.id] === c.id }, c.nome))))));
   $("#lanes-edit").replaceChildren(...draft.corsie.map((c, i) => el("div", { class: "sector" },
     el("div", { class: "field" }, el("label", { for: "ln-" + c.id }, "Nome"), el("input", { type: "text", id: "ln-" + c.id, value: c.nome, oninput: e => { draft.corsie[i].nome = e.target.value; } })),
@@ -2449,6 +2509,8 @@ $("#sala-video").addEventListener("change", async e => {
   if (!files.length) return;
   if (salaBusy) { toast("Sto ancora inviando i video scelti prima: aspetta \"Fatto\"."); return; }
   if (!state.assets || !state.db) { inp.value = ""; st.textContent = "Archivio non ancora collegato: aspetta qualche secondo o ricarica la pagina, poi scegli di nuovo i video."; return; }
+  const pianta = $("#sala-pianta").checked;
+  if (pianta && files.length !== 1) { inp.value = ""; st.textContent = "Per la pianta della sala scegli un solo video, oppure togli il segno da \"video della pianta\"."; return; }
   salaBusy = true; inp.disabled = true;
   const lab = $('label[for="sala-video"]'); lab.style.opacity = ".5"; lab.style.pointerEvents = "none";
   const keep = " Tieni aperta questa pagina finché non leggi \"Fatto\".", batch = new Date().toISOString();
@@ -2499,20 +2561,26 @@ $("#sala-video").addEventListener("change", async e => {
         const aud = done || await look(id + "-audio");
         if (isVid && img.st === "si") log.immagini = Array.isArray(img.data.frames) ? img.data.frames.length : prev ? prev.immagini ?? null : null;
         if (aud.st === "si") log.voce = aud.data.secondi ?? (prev ? prev.voce ?? null : null);
-        if (img.st === "si" && aud.st === "si") { log.stato = "saltato"; log.motivo = "già ricevuto"; }
+        if (pianta && img.st === "si") {
+          // already received: make that copy the room plan, without sending it again
+          const r = await partState("invii/" + id + "-img"), a = await partState("invii/" + id + "-audio");
+          if (r.st === "si" && Array.isArray(r.data.frames)) { await dbSet("config/sala", r.data); log.pianta = true; }
+          if (a.st === "si" && Array.isArray(a.data.parti)) await dbSet("config/sala-audio", a.data);
+        }
+        if (img.st === "si" && aud.st === "si") { log.stato = "saltato"; log.motivo = "già ricevuto" + (log.pianta ? ", ora usato come pianta della sala" : ""); }
         else {
           const bad = [], ok = [];
           if (img.st === "?") bad.push("immagini: non riesco a controllare se sono già arrivate, quindi non le reinvio");
           else if (img.st === "no") {
             worked = true;
-            const r = await sendRoomVideo(f, fase => progress({ fase: "immagini: " + fase }));
-            if (r.ok) { mark(id + "-img"); log.immagini = r.n; if (r.info) log.fotogrammi = r.info; ok.push(`${r.n} immagini inviate` + (r.nota ? ` (${r.nota})` : "")); } else { bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
+            const r = await sendRoomVideo(f, fase => progress({ fase: "immagini: " + fase }), pianta);
+            if (r.ok) { mark(id + "-img"); if (pianta) log.pianta = true; log.immagini = r.n; if (r.info) log.fotogrammi = r.info; ok.push(`${r.n} immagini inviate` + (r.nota ? ` (${r.nota})` : "")); } else { bad.push(`immagini non inviate (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
           } else if (isVid) ok.push("immagini già ricevute");
           if (stop) bad.push("voce non provata");
           else if (aud.st === "?") bad.push("voce: non riesco a controllare se è già arrivata, quindi non la reinvio");
           else if (aud.st === "no") {
             worked = true;
-            const r = await sendRoomAudio(f, fase => progress({ fase: "voce: " + fase }));
+            const r = await sendRoomAudio(f, fase => progress({ fase: "voce: " + fase }), pianta);
             if (r.ok) { mark(id + "-audio"); log.voce = r.sec; ok.push(`voce di ${r.sec} s inviata`); } else { bad.push(`voce non inviata (${r.msg})`); if (r.quota) stop = QUOTA_MSG; }
           } else ok.push("voce già ricevuta");
           log.stato = bad.length ? "incompleto" : "inviato"; log.motivo = [...bad, ...ok].join("; ");
@@ -2528,13 +2596,13 @@ $("#sala-video").addEventListener("change", async e => {
     await progress({ fase: "fatto" });
   } catch (err) { progress({ fase: "interrotto", ultimoErrore: errMsg(err) }); }
   finally {
-    mo.disconnect(); inp.value = ""; inp.disabled = false; lab.style.opacity = ""; lab.style.pointerEvents = "";
+    mo.disconnect(); inp.value = ""; inp.disabled = false; $("#sala-pianta").checked = false; lab.style.opacity = ""; lab.style.pointerEvents = "";
     window.removeEventListener("error", onErr); window.removeEventListener("unhandledrejection", onErr);
     try { wl && wl.release(); } catch {}
     salaBusy = false;
   }
   const ko = out.filter(r => r.stato === "incompleto").length;
-  const esito = r => r.stato === "saltato" ? "già ricevuto, saltato" : r.stato === "inviato" ? "inviato" + (/già ricevut/.test(r.motivo) ? ` (${r.motivo})` : "") : "incompleto: " + r.motivo;
+  const esito = r => (r.stato === "saltato" ? "già ricevuto, saltato" : r.stato === "inviato" ? "inviato" + (/già ricevut/.test(r.motivo) ? ` (${r.motivo})` : "") : "incompleto: " + r.motivo) + (r.pianta ? "; ora è la pianta della sala" : "");
   st.textContent = ["Risultato:", ...out.map(r => `- ${r.file}: ${esito(r)}`),
     stop ? stop.charAt(0).toUpperCase() + stop.slice(1) + "." : "",
     ko && !stop ? "Riprova scegliendo di nuovo gli stessi video: quelli già ricevuti vengono saltati." : "",
