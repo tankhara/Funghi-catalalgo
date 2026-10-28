@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prova sul telefono</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1f1d1a;--muted:#6b665e;--card:#fff;--line:#e3dfd6;--accent:#2f6b3a;--warn:#9a4a00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#171614;--fg:#ece8e1;--muted:#a39d93;--card:#211f1c;--line:#38342e;--accent:#7cc48a;--warn:#f0a050}}
+:root[data-theme="dark"]{--bg:#171614;--fg:#ece8e1;--muted:#a39d93;--card:#211f1c;--line:#38342e;--accent:#7cc48a;--warn:#f0a050}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:680px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:.2rem 0 .3rem}
+h2{font-size:1.1rem;margin:0 0 .5rem}
+p{margin:.3rem 0}
+.muted{color:var(--muted);font-size:.92rem}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+label{display:block;margin:.5rem 0 .2rem;font-weight:600}
+select,input[type=file]{width:100%;font-size:1rem;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+button{font-size:1rem;padding:10px 16px;border-radius:8px;border:0;background:var(--accent);color:#fff;margin-top:10px;width:100%}
+button:disabled{opacity:.5}
+pre,textarea{white-space:pre-wrap;word-break:break-word;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:320px;overflow:auto;width:100%;color:var(--fg)}
+textarea{height:220px}
+.status{color:var(--warn);font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>Prova sul telefono</h1>
+<p class="muted">Misura quanto è veloce il riconoscimento di cartellini e voce su questo telefono. Le foto e l'audio che scegli restano sul telefono: la pagina scarica solo i modelli dai CDN pubblici e non invia nulla.</p>
+<p class="muted" id="dev"></p>
+
+<section>
+<h2>1. Cartellino</h2>
+<p class="muted">Scegli una o più foto di cartellini (il cartellino deve riempire quasi tutta la foto). Primo avvio: circa 70 MB da scaricare.</p>
+<label for="cardFiles">Foto dei cartellini</label>
+<input id="cardFiles" type="file" accept="image/*" multiple>
+<button id="cardRun">Leggi i cartellini</button>
+<p class="status" id="cardStatus"></p>
+<pre id="cardOut" hidden></pre>
+</section>
+
+<section>
+<h2>2. Voce</h2>
+<p class="muted">Scegli una registrazione breve (meglio 30 s a 2 min). Base: circa 100 MB. Small: circa 270 MB, più lento.</p>
+<label for="asrModel">Modello Whisper</label>
+<select id="asrModel"><option value="base">base</option><option value="small">small</option></select>
+<label for="asrSrc">Da dove scaricare i pesi</label>
+<select id="asrSrc"><option value="hf">Hugging Face (Xenova)</option><option value="npm">npm tramite jsDelivr (sts-whisper)</option></select>
+<label for="audioFile">Registrazione</label>
+<input id="audioFile" type="file" accept="audio/*,video/*">
+<button id="asrRun">Trascrivi</button>
+<p class="status" id="asrStatus"></p>
+<pre id="asrOut" hidden></pre>
+</section>
+
+<section>
+<h2>3. Risultati da copiare</h2>
+<textarea id="result" readonly></textarea>
+<button id="copy">Copia i risultati</button>
+</section>
+</main>
+
+<script>const NAMES=[["Tricholoma focale", "(Fr.) Ricken"], ["Tricholoma squarrulosum", "Bresadola"], ["Tricholoma saponaceum var. ardosiacum", "(Fr.: Fr.) Kummer"], ["Tricholoma acerbum", "(Bull.: Fr.) Quélet"], ["Tricholoma sciodes", "(Persoon) Martin"], ["Tricholoma saponaceum", "(Fr.: Fr.) Kummer"], ["Tricholoma sejunctum", "(Sow.: Fr.) Quélet"], ["Pleurotus eryngii", "(De Cand.: Fr.) Quélet"], ["Tricholoma cedretorum", "Bon"], ["Tricholoma sulphureum", "(Bull.: Fr.) Kummer"], ["Tricholoma ustaloides", "Romagnesi"], ["Tricholoma pardinum", "(Pers.) Quél."], ["Tricholoma aurantium", "(Schaeffer: Fr.) Ricken"], ["Tricholoma equestre", "(L.: Fr.) Kummer"], ["Tricholomopsis rutilans", "(Schaeff.: Fr.) Singer"], ["Tricholoma terreum", "(Sch.: Fr.) Kummer"], ["Tricholoma saponaceum var. squamosum", "(Fr.: Fr.) Kummer"], ["Tricholoma ustale", "(Fr.: Fr.) Kummer"], ["Tricholoma colossus", "(Fr.) Quélet"], ["Tricholoma bufonium", "(Pers.: Fr.) Gillet"], ["Tricholoma populinum", "Lange"], ["Pleurotus ostreatus", "(Jacq.: Fr.) Kummer"], ["Hygrophoropsis aurantiaca", "(Wulfen) Maire"], ["Hygrophorus eburneus", "(Bull.: Fr.) Fries"], ["Hygrophorus fagi", "Becker et Bon"], ["Hygrophorus agathosmus", "(Fr.) Fries"], ["Lepista flaccida", "(Sow.: Fr.) Patouillard"], ["Clitocybe dealbata", "(Sow.: Fr.) Kummer"], ["Leucopaxillus amarus", "(Alb. & Schw.: Fr.) Sch."], ["Lepista glaucocana", "(Bresadola) Singer"], ["Lepista nuda", "(Bull.: Fr.) Cooke"], ["Clitocybe nebularis", "(Batsch: Fr.) Kummer"], ["Clitocybe odora", "(Bull.: Fr.) Kummer"], ["Clitocybe costata", "Kühner et Romagnesi"], ["Laccaria amethystina", "Cooke"], ["Clitocybe gibba", "(Pers.: Fr.) Kummer"], ["Laccaria laccata", "(Scop.: Fr.) Bk. et Br."], ["Collybia butyracea", "(Bull.: Fr.) Kummer"], ["Armillaria mellea", "(Vahl.: Fr.) P. Kumm."], ["Xerula pudens", "(Pers.) Pegler & Young"], ["Xerula radicata", "(Relhan: Fr.) Sing."], ["Lyophyllum decastes", "(Fr.) Singer"], ["Lyophyllum infumatum", "(Britzelm.) Kreisel"], ["Mycena pura", "(Pers.: Fr.) Kummer"], ["Oudemansiella mucida", "(Schrad.) Höhn."], ["Collybia butyracea var. asema", "(Fr.: Fr.) Quélet"], ["Cystoderma terreyi", "(Berk et Br.) Harmaja"], ["Mycena rosea", "(Bulliard) Gramberg"], ["Marasmius scorodinus", "(Fr.: Fr.) Fr."], ["Marasmius alliaceus", "(Jacq.) Fr."], ["Megacollybia platyphylla", "(Pers.: Fr.) Kotlaba et Pouz."], ["Cystoderma carcharias", "(Persoon) Fayod"], ["Lepiota forquignonii", "Quélet"], ["Echinoderma asperum", "(Pers.: Fr.) Bon"], ["Lepiota clypeolaria", "(Bull.: Fr.) Kummer"], ["Macrolepiota excoriata", "(Fr.: Fr.) Wasser"], ["Lepiota ignivolvata", "Josserandii"], ["Lepiota ventriosospora", "Reid"], ["Macrolepiota mastoidea", "(Fr.: Fr.) Singer"], ["Macrolepiota rhacodes", "(Vittadini) Singer"], ["Macrolepiota procera", "(Scop.: Fr.) Singer"], ["Macrolepiota procera var. fuliginosa", "(Scop.: Fr.) Singer"], ["Agaricus bisporus", "(Lange) Imbach"], ["Agaricus bitorquis", "(Quélet) Saccardo"], ["Agaricus campestris", "L.: Fr."], ["Agaricus brunneolus", "(J.E. Lange) Pilat"], ["Agaricus silvicola", "(Vitt.) Saccardo"], ["Agaricus lanipes", "(Möller et Schäffer) Sing."], ["Agaricus moelleri", "Wasser"], ["Agaricus silvaticus", "Schaeffer: Fries"], ["Agaricus xanthodermus var. griseus", "Génevier"], ["Agaricus augustus", "Fr."], ["Limacella guttata", "(Pers.: Fr.) Konrad e Maubl."], ["Amanita caesarea", "(Scop.: Fr.) Pers."], ["Agaricus xanthodermus", "Génevier"], ["Amanita franchetii", "(Boud.) Fayod"], ["Amanita rubescens", "(Pers.: Fr.) S.F. Gray"], ["Amanita citrina", "(Schaeffer) Persoon"], ["Amanita echinocephala", "(Vitt.) Quélet"], ["Amanita vittadinii", "(Moretti) Vittadini"], ["Chlorophyllum molybdites", "(G. Mey.) Massee"], ["Lenzites betulina", "(L.: Fr.) Fries"], ["Hapalopilus nidulans", "(Fr.: Fr.) P. Karst."], ["Fomitopsis pinicola", "(Solariz: Fr.) Karsten"], ["Trametes gibbosa", "(Pers.: Fr.) Fr."], ["Trametes versicolor", "(L.) Lloyd"], ["Fomes fomentarius", "(L.: Fr.) Fr."], ["Daedalea quercina", "(L.: Fr.) Fries"], ["Ganoderma resinaceum", "Boudier Patouillard"], ["Ganoderma lucidum", "(Leyss.: Fr.) Karsten"], ["Meripilus giganteus", "(Pers.: Fr.) Karsten"], ["Phellinus torulosus", "(Pers.) Bourd. e Galz."], ["Polyporus melanopus", "(Pers.: Fr.) Fr."], ["Polyporus varius", "(Pers.) Fr."], ["Postia caesia", "(Schrad.) P. Karst."], ["Albatrellus pes-caprae", "(Persoon: Fr.) Pouzard"], ["Oligoporus caesius", "(Schrad.) Gilb. e Ryvarden"], ["Fistulina hepatica", "(Schaeff.: Fr.) Fries"], ["Pycnoporus cinnabarinus", "(Jacq.: Fr.) Karsten"], ["Laetiporus sulphureus", "(Bull.: Fr.) Murrill"], ["Phaeolus schweinizii", ""], ["Amanita ovoidea", "(Bulliard: Fr.) Link"], ["Amanita proxima", "Dumée"], ["Amanita pantherina", ""], ["Amanita pantherina var. abietum", "(De Cand.: Fr.) Krombh."], ["Amanita mairei", "Foley"], ["Amanita phalloides", "(Vail.: Fr.) Link"], ["Amanita muscaria", "(L.: Fr.) Hooker"], ["Coprinus comatus", "(Müll.: Fr.) Persoon"], ["Coprinus picaceus", "(Bull.) Gray"], ["Lactarius vellereus", "(Fr.: Fr.) Fries"], ["Lactarius torminosus", "(Schaeff.: Fr.) S.F. Gray"], ["Lactarius chrysorrheus", "Fries"], ["Lactarius quietus", "(Fr.: Fr.) Fries"], ["Lactarius salmonicolor", "Heim e Leclair"], ["Lactarius fuliginosus", "(Fr.: Fr.) Fr."], ["Lactarius rugatus", "Kühn. et Romagnesi"], ["Lactarius mairei", "Malençon"], ["Lactarius zonarius", "(Bull.:) Fries"], ["Lactarius semisanguifluus", "Heim e Leclair"], ["Lactarius deliciosus", "(L.: Fr.) S.F. Gray"], ["Lactarius mediterraneensis", "Luzenga e Bellù"], ["Lactarius blennius", "(Fr.: Fr.) Fries"], ["Lactarius vinosus", "Quélet"], ["Lactarius deterrimus", "Gröger"], ["Lactarius scrobiculatus", "(Scop.: Fr.) Fries"], ["Russula laurocerasi", "Melzer"], ["Russula fuscorubra", "(Bres.) Singer"], ["Russula albonigra", "Krombholz"], ["Russula faginea", "Romagnesi"], ["Russula turci", "Bresadola"], ["Russula amoenicolor", "Romagnesi"], ["Russula anthracina var. carneifolia", "Romagnesi"], ["Russula olivacea", "(Sch.) Persoon"], ["Russula ilicis", "Romagnesi, Chevassut e Privat"], ["Russula chloroides", "(Krombholz) Bresadola"], ["Russula cyanoxantha", "(Sch.) Fries"], ["Russula lepida", "(Fr.: Fr.) Fries"], ["Russula carminipes", "J. Blum"], ["Russula luteotacta", "Rea"], ["Russula aurea", "Persoon"], ["Russula maculata", ""], ["Russula cyanoxantha f. peltereaui", "(Sch.) Fries"], ["Russula delica", "Fries"], ["Russula mairei", "Singer"], ["Russula torulosa", "Bresadola"], ["Russula nigricans", "(Bull.) Fries"], ["Russula foetens", "Persoon: Fries"], ["Clitopilus prunulus", "(Scop.: Fr.) Quélet"], ["Entoloma rhodopolium f. nidorosum", "(Fries) P. Kummer"], ["Rhodocybe gemina", "(Fr.) Kuyper"], ["Cortinarius turgidus", "Fries"], ["Lactarius atlanticus", "Bon"], ["Cortinarius brunneus", "(Pers.: Fr.) Fries"], ["Hebeloma sinapizans", "(Paulet) Gillet"], ["Cortinarius infractus", "(Pers.: Fr.) Fries"], ["Cortinarius triumphans", "Fries"], ["Cortinarius variecolor", "(Pers.: Fr.) Fr."], ["Pluteus atromarginatus", "(Konrad) Kühner"], ["Cortinarius varius", "Fries"], ["Hebeloma crustuliniforme", "(Bull.) Quélet"], ["Inocybe adaequata", ""], ["Inocybe fraudans", "(Pers.: Fr.) Kummer"], ["Inocybe rimosa", "(Bull.: Fr.) Kummer"], ["Inocybe splendens", "Heim"], ["Gymnopus dryophilus", "(Bull.) Murrill"], ["Hypholoma sublateritium", "(Fr.) Quélet"], ["Hypholoma fasciculare", "(Huds.: Fr.) Kummer"], ["Cortinarius splendens", "Rob. Henry"], ["Gymnopilus penetrans", "(Fr.: Fr.) Murrill"], ["Stropharia aeruginosa", "(Curt.: Fr.) Quélet"], ["Paxillus involutus", "(Batsch: Fr.) Fr."], ["Paxillus ammoniavirescens", "Contu e Dessì"], ["Paxillus rubicundulus", "P.D. Orton"], ["Agrocybe aegerita", "(Brigantì) Fayod"], ["Tapinella atrotomentosa", "(Batsch) Šutara"], ["Chroogomphus helveticus", "(Singer) Moser"], ["Suillus collinitus", "(Fr.) Kuntze"], ["Leccinum versipelle", "(Fr.) Snell"], ["Chroogomphus rutilus", "(Schaeff.: Fr.) O.K. Mill."], ["Leccinum aurantiacum", "(Bull.) S.F. Gray"], ["Boletus satanas", "Lenz"], ["Suillus granulatus", "(L.) Roussel"], ["Suillus luteus", "(L.: Fr.) Roussel"], ["Leccinum scabrum", "(Bull.: Fr.) S.F. Gray"], ["Boletus erythropus", "Persoon"], ["Boletus calopus", "Pers.: Fr."], ["Boletus aestivalis", "(Paulet) Fries"], ["Boletus edulis", "Bull.: Fr."], ["Aureoboletus gentilis", "(Quélet) Pouzar"], ["Leccinum vulpinum", "Watling"], ["Boletus rhodoxanthus", "(Krombh.) Kallenb."], ["Boletopsis grisea", "(Peck) Bondartsev e Singer"], ["Xerocomus subtomentosus", "(L.: Fr.) Quélet"], ["Xerocomus porosporus", "Imler"], ["Strobilomyces strobilaceus", "(Scop.: Fr.) Berk."], ["Gyroporus castaneus", "(Bull.) Quél."], ["Xerocomus parassitata da Hypomyces aureum", ""], ["Xerocomus persicolor", "Engel, Klofac, H. e R. Grünet"], ["Xerocomus ferrugineus", "(Sch.) Bon"], ["Xerocomus communis", ""], ["Xerocomus rubellus", "Vizzini, Simonini e Gelardi"], ["Hemileccinum impolitum", "(Fr.) Šutara"], ["Boletus radicans", "Persoon : Fries"], ["Rhodocybe nitellina", "(Fr.) Sing."], ["Tapinella panuoides", ""], ["Suillus bellini", "(Inzenga) O. Kuntze"], ["Lactarius sezione Dapetes parassitati da Peckiella deformans Maire", ""], ["Boletopsis leucomelaena", "(Pers.) Fayod"], ["Cantharellus cibarius var. bicolor", "(Fr.: Fr.) Fries"], ["Craterellus cornucopioides", "(L.: Fr.) Pers."], ["Pleurotus cornucopiae", "(Paulet) Rolland"], ["Clavariadelphus pistillaris", "(L.: Fr.) Donk"], ["Cantharellus ferruginascens", "(P.D.Orton) Cortec."], ["Sarcodon laevigatum", "(Swartz) Quélet"], ["Hydnum magnorufescens", ""], ["Battarrea phalloides", "(Dicks.: Pers.) Pers."], ["Clavariadelphus flavoimmaturus", "(L.: Fr) Donk"], ["Sarcodon imbricatus", "(L.: Fr.) Karst"], ["Cantharellus lilacinopruinatus", "Hermitte, Eyssart. e Poumarat"], ["Cantharellus cibarius", "(Fr.: Fr.) Fries"], ["Hydnum rufescens", "Sch.: Fr."], ["Trametes pubescens", "(Schum.: Fr.) Pilát"], ["Ramaria bataillei", "(Maire) Corner"], ["Ramaria quercus-ilicis", "Schild"], ["Clavulina cinerea", ""], ["Ramaria aurea", "Quélet"], ["Ramaria stricta", "(Pers.: Fr.) Quélet"], ["Ramaria formosa", "(Pers.: Fr.) Quélet"], ["Calocera viscosa", "(Pers.: Fr.) Fries"], ["Ramaria flava", "(Sch.: Fr.) Quélet"], ["Ramaria fennica", "(Karst.) Ricken"], ["Lycoperdon piriforme", "(Sch.: Pers.)"], ["Calvatia utriformis", "(Bull.: Pers.) Jaap"], ["Scleroderma polyrhizum", "(Gmelin) Lev."], ["Scleroderma citrinum", "Pers.: Pers."], ["Lycoperdon perlatum", "Pers.: Pers."], ["Lycoperdon umbrinum", "Persoon: Persoon"], ["Geastrum triplex", "Junghuhn"], ["Scleroderma verrucosum", "(Bull.: Pers.) Pers."], ["Clathrus ruber", "Mich. ex Pers.: Pers."], ["Phallus impudicus", "L.: Persoon"], ["Tremella aurantia", "Schwein.: Fr."], ["Bovista plumbea", "Pers.: Pers."], ["Scleroderma cepa", "Persoon"], ["Mycenastrum corium", "(Guets.) Desv."], ["Sowerbyella imperialis", "(Peck) Korf"], ["Astraeus hygrometricus", "(Pers.: Pers.) Morgan"], ["Pisolithus arhizus", "(Scop.) S. Raus"], ["Hydnellum aurantiacum", "(Batsch: Fr.) P. Karst."], ["Helvella pityophila", "Boudier"], ["Otidea onotica", "(Pers.: Fr.) Fuckel"], ["Tuber rufum", "Pico: Fries"], ["Tuber uncinatum", "Chatin"], ["Morchella vulgaris", ""], ["Morchella esculenta", "(L.: Fr.) Pers."], ["Morchella conica", "Persoon"], ["Morchella elata", "Fr.: Fr."], ["Tuber aestivum", "Vittadini"]];</script>
+<script>// JS port of freetest/scripts/score_cards.py parse() and rank(), with rapidfuzz ratio / partial_ratio.
+// Used by the test pages and copied into the phone benchmark page. Verified against Python (see verify_match.py).
+(function (g) {
+  const norm = s => s.toUpperCase().replace(/[^A-Z]/g, '');
+  function lcs(a, b) { // length of longest common subsequence
+    const m = a.length, n = b.length; if (!m || !n) return 0;
+    let prev = new Uint16Array(n + 1), cur = new Uint16Array(n + 1);
+    for (let i = 1; i <= m; i++) {
+      const ca = a.charCodeAt(i - 1);
+      for (let j = 1; j <= n; j++) cur[j] = ca === b.charCodeAt(j - 1) ? prev[j - 1] + 1 : (prev[j] > cur[j - 1] ? prev[j] : cur[j - 1]);
+      const t = prev; prev = cur; cur = t; cur.fill(0);
+    }
+    return prev[n];
+  }
+  // rapidfuzz fuzz.ratio: normalized Indel similarity * 100
+  function ratio(a, b) {
+    const L = a.length + b.length; if (!L) return 100;
+    const dist = L - 2 * lcs(a, b);
+    return 100 * (1 - dist / L);
+  }
+  // rapidfuzz fuzz.partial_ratio (brute force over all alignments of the shorter string)
+  function partialRatio(a, b) {
+    if (!a.length || !b.length) return (!a.length && !b.length) ? 100 : 0;
+    let s1 = a, s2 = b; if (s1.length > s2.length) { s1 = b; s2 = a; }
+    const m = s1.length, n = s2.length;
+    let best = 0;
+    const tryw = w => { const r = ratio(s1, w); if (r > best) best = r; };
+    for (let i = 1; i < m; i++) tryw(s2.slice(0, i));
+    for (let i = 0; i <= n - m; i++) { tryw(s2.slice(i, i + m)); if (best === 100) return 100; }
+    for (let i = n - m + 1; i < n; i++) tryw(s2.slice(i));
+    if (m === n) { // rapidfuzz also tries the swapped direction when lengths are equal
+      for (let i = 1; i < m; i++) { const r = ratio(s2, s1.slice(0, i)); if (r > best) best = r; }
+      for (let i = 1; i < m; i++) { const r = ratio(s2, s1.slice(i)); if (r > best) best = r; }
+    }
+    return best;
+  }
+  const HDR = ['GRUPPO', 'MICOLOG', 'BUDA', 'SIRACUSA'];
+  const LAB = { gen: ['GENERE'], spe: ['SPECIE'], aut: ['AUTORI'], not: ['NOTE'] };
+  const words = t => t.split(/\s+/).filter(Boolean);
+  const strip = (s, ch) => { let i = 0, j = s.length; while (i < j && ch.includes(s[i])) i++; while (j > i && ch.includes(s[j - 1])) j--; return s.slice(i, j); };
+  function parse(lines) {
+    const isHdr = t => {
+      if (HDR.some(h => t.toUpperCase().includes(h))) return true;
+      return words(t).some(w => norm(w).length >= 4 && ['GRUPPO', 'MICOLOGICO', 'SIRACUSA', 'BUDA'].some(h => ratio(norm(w), h) >= 70));
+    };
+    const L = lines.filter(l => !isHdr(l.t) && norm(l.t).length >= 3);
+    const labs = {}, rest = [], order = [];
+    for (const l of L) {
+      const t = l.t; const head = (t.includes(':') ? norm(t.split(':')[0]) : norm(t)).slice(0, 7);
+      let best = null;
+      for (const k of Object.keys(LAB)) {
+        const sc = head ? Math.max(...LAB[k].map(w => ratio(head.slice(0, w.length), w))) : 0;
+        if (sc >= 67 && (best === null || sc > best[1])) best = [k, sc];
+      }
+      if (best && !(best[0] in labs)) {
+        let val = t.includes(':') ? t.slice(t.indexOf(':') + 1) : t.slice(LAB[best[0]][0].length);
+        if (!t.includes(':')) val = val.replace(/^[^A-Za-z(]*(?:ere|cie|ori|ori|ri|re|e)?\s*[:.]\s*/, '');
+        labs[best[0]] = { y: l.y, h: l.h, v: [strip(val, ' .:')] }; order.push(best[0]);
+      } else rest.push(l);
+    }
+    for (const l of rest) {
+      const ks = order;
+      if (ks.length) {
+        let k = ks[0]; for (const kk of ks) if (Math.abs(labs[kk].y - l.y) < Math.abs(labs[k].y - l.y)) k = kk;
+        if (Math.abs(labs[k].y - l.y) < 0.9 * Math.max(labs[k].h, l.h)) { labs[k].v.push(strip(l.t, ' .:')); continue; }
+      }
+      if (!labs.free) { labs.free = { y: 0, h: 0, v: [] }; order.push('free'); }
+      labs.free.v.push(strip(l.t, ' .:'));
+    }
+    const f = {}; for (const k of order) f[k] = strip(labs[k].v.filter(x => x).join(' '), ' \t\n\r\x0b\x0c');
+    let gg = f.gen || '', e = f.spe || '', a = f.aut || '';
+    const free = words(f.free || '');
+    if (!gg && free.length) gg = free.shift();
+    if (!e && free.length) e = free.shift();
+    return [gg, e, a, L.map(l => l.t).join(' ')];
+  }
+  // names: array of [name, author]; returns top k [score, name]
+  function rank(gn, e, a, names, k = 3, bag = '') {
+    const out = []; const nb = norm(bag);
+    for (const [n, au] of names) {
+      const p = n.split(' ').filter(Boolean); const cg = p[0], ce = p.slice(1).join(' ');
+      const sg = gn ? ratio(norm(gn), norm(cg)) : 0;
+      const se = e ? ratio(norm(e), norm(ce)) : 0;
+      const sa = a && au ? ratio(norm(a), norm(au)) : 0;
+      const fs = 0.4 * sg + 0.6 * se + 0.1 * sa;
+      const bs = nb.length >= 6 ? 0.9 * partialRatio(norm(n), nb) : 0;
+      out.push([Math.max(fs, bs), n]);
+    }
+    out.sort((x, y) => (y[0] - x[0]) || (y[1] < x[1] ? -1 : y[1] > x[1] ? 1 : 0));
+    return out.slice(0, k);
+  }
+  g.Match = { norm, ratio, partialRatio, parse, rank };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// Plain JavaScript port of freetest/scripts/circle2.py (edibility circle colour), no libraries.
+// Re-implements the OpenCV pieces it uses: cubic resize, BGR->Lab/HSV (8-bit), Gaussian blur, Sobel,
+// Canny, HoughCircles (HOUGH_GRADIENT), morphology open, connected components, contour perimeter.
+(function (G) {
+  const SLOT = { 1: 'commestibile', 2: 'non-commestibile', 3: 'dopo-cottura', 4: 'tossico', 5: 'mortale' };
+  const P = { red_hi: 12, yel_hi: 33, grn_hi: 100, blu_hi: 140, de_min: 14, chroma_min: 5, a_red: 55, a_yel: 110, a_grn: 235, a_blu: 320 };
+  function angCls(a, p = P) {
+    if (a < p.a_red || a >= p.a_blu) return 'tossico';
+    if (a < p.a_yel) return 'non-commestibile';
+    if (a < p.a_grn) return 'commestibile';
+    return 'dopo-cottura';
+  }
+  const sat8 = v => v < 0 ? 0 : v > 255 ? 255 : Math.round(v);
+  const pyInt = v => (v < 0 ? Math.ceil(v) : Math.floor(v));
+  // cvRound: round half to even
+  const cvRound = v => { const r = Math.round(v); return (Math.abs(v % 1) === 0.5 && r % 2 !== 0) ? r - 1 : r; };
+
+  // ---- cubic resize (OpenCV INTER_CUBIC, A=-0.75), RGBA in -> RGB Float out as Uint8 3-channel
+  function cubicW(x) {
+    const A = -0.75; const w0 = ((A * (x + 1) - 5 * A) * (x + 1) + 8 * A) * (x + 1) - 4 * A;
+    const w1 = ((A + 2) * x - (A + 3)) * x * x + 1; const w2 = ((A + 2) * (1 - x) - (A + 3)) * (1 - x) * (1 - x) + 1;
+    return [w0, w1, w2, 1 - w0 - w1 - w2];
+  }
+  function resizeCubic(src, sw, sh, ch, f) {
+    const dw = Math.round(sw * f), dh = Math.round(sh * f), out = new Uint8ClampedArray(dw * dh * ch);
+    const xi = new Int32Array(dw), xw = [];
+    for (let x = 0; x < dw; x++) { const fx = (x + 0.5) / f - 0.5; const ix = Math.floor(fx); xi[x] = ix; xw.push(cubicW(fx - ix)); }
+    const tmp = new Float32Array(dw * sh * ch);
+    for (let y = 0; y < sh; y++) for (let x = 0; x < dw; x++) {
+      const w = xw[x]; for (let c = 0; c < ch; c++) {
+        let s = 0; for (let k = 0; k < 4; k++) { let sx = xi[x] - 1 + k; sx = sx < 0 ? 0 : sx >= sw ? sw - 1 : sx; s += w[k] * src[(y * sw + sx) * ch + c]; }
+        tmp[(y * dw + x) * ch + c] = s;
+      }
+    }
+    for (let y = 0; y < dh; y++) {
+      const fy = (y + 0.5) / f - 0.5, iy = Math.floor(fy), w = cubicW(fy - iy);
+      for (let x = 0; x < dw; x++) for (let c = 0; c < ch; c++) {
+        let s = 0; for (let k = 0; k < 4; k++) { let sy = iy - 1 + k; sy = sy < 0 ? 0 : sy >= sh ? sh - 1 : sy; s += w[k] * tmp[(sy * dw + x) * ch + c]; }
+        out[(y * dw + x) * ch + c] = sat8(s);
+      }
+    }
+    return { data: out, w: dw, h: dh };
+  }
+  // ---- colour conversions (OpenCV 8-bit conventions)
+  const lin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const LIN = new Float64Array(256); for (let i = 0; i < 256; i++) LIN[i] = lin(i);
+  function rgb2lab(r, g, b) {
+    const R = LIN[r], Gg = LIN[g], B = LIN[b];
+    let X = (0.412453 * R + 0.357580 * Gg + 0.180423 * B) / 0.950456, Y = 0.212671 * R + 0.715160 * Gg + 0.072169 * B, Z = (0.019334 * R + 0.119193 * Gg + 0.950227 * B) / 1.088754;
+    const fn = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+    const L = Y > 0.008856 ? 116 * Math.cbrt(Y) - 16 : 903.3 * Y;
+    const a = 500 * (fn(X) - fn(Y)), bb = 200 * (fn(Y) - fn(Z));
+    return [sat8(L * 255 / 100), sat8(a + 128), sat8(bb + 128)];
+  }
+  function rgb2hsv(r, g, b) {
+    const v = Math.max(r, g, b), mn = Math.min(r, g, b), d = v - mn;
+    const s = v === 0 ? 0 : sat8(d * 255 / v);
+    let h = 0;
+    if (d !== 0) { if (v === r) h = 60 * (g - b) / d; else if (v === g) h = 120 + 60 * (b - r) / d; else h = 240 + 60 * (r - g) / d; if (h < 0) h += 360; }
+    let H = Math.round(h / 2); if (H >= 180) H -= 180;
+    return [H, s, v];
+  }
+  // ---- filters
+  function gauss5(img, w, h) { // sigma 1.1 (OpenCV for ksize 5), BORDER_REFLECT_101
+    const s = 1.1, k = [-2, -1, 0, 1, 2].map(i => Math.exp(-i * i / (2 * s * s))); const ks = k.reduce((a, b) => a + b); for (let i = 0; i < 5; i++) k[i] /= ks;
+    const refl = (i, n) => i < 0 ? -i : i >= n ? 2 * n - 2 - i : i;
+    const t = new Float32Array(w * h), o = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let a = 0; for (let j = 0; j < 5; j++) a += k[j] * img[y * w + refl(x + j - 2, w)]; t[y * w + x] = a; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let a = 0; for (let j = 0; j < 5; j++) a += k[j] * t[refl(y + j - 2, h) * w + x]; o[y * w + x] = sat8(a); }
+    return o;
+  }
+  function sobel(img, w, h) { // 3x3, BORDER_REPLICATE
+    const dx = new Int16Array(w * h), dy = new Int16Array(w * h);
+    const at = (x, y) => img[(y < 0 ? 0 : y >= h ? h - 1 : y) * w + (x < 0 ? 0 : x >= w ? w - 1 : x)];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      dx[y * w + x] = (at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x - 1, y) + at(x - 1, y + 1));
+      dy[y * w + x] = (at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x, y - 1) + at(x + 1, y - 1));
+    }
+    return [dx, dy];
+  }
+  function canny(dx, dy, w, h, low, high) { // L1 magnitude, OpenCV-style NMS and 8-connected hysteresis
+    const mag = new Int32Array(w * h); for (let i = 0; i < w * h; i++) mag[i] = Math.abs(dx[i]) + Math.abs(dy[i]);
+    const map = new Uint8Array(w * h); // 0 none, 1 weak, 2 strong
+    const TG22 = 13573; const st = [];
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+      const i = y * w + x, m = mag[i]; if (m <= low) continue;
+      const xs = Math.abs(dx[i]), ys = Math.abs(dy[i]) * 32768, tg22x = xs * TG22; let ok = false;
+      if (ys < tg22x) ok = m > mag[i - 1] && m >= mag[i + 1];
+      else { const tg67x = tg22x + xs * 65536; if (ys > tg67x) ok = m > mag[i - w] && m >= mag[i + w]; else { const s = (dx[i] ^ dy[i]) < 0 ? -1 : 1; ok = m > mag[i - w - s] && m > mag[i + w + s]; } }
+      if (ok) { if (m > high) { map[i] = 2; st.push(i); } else map[i] = 1; }
+    }
+    const edges = new Uint8Array(w * h);
+    for (const i of st) edges[i] = 255;
+    while (st.length) { const i = st.pop(); for (const o of [-w - 1, -w, -w + 1, -1, 1, w - 1, w, w + 1]) { const j = i + o; if (map[j] === 1 && !edges[j]) { edges[j] = 255; st.push(j); } } }
+    return edges;
+  }
+  function houghCircles(gray, w, h, dp, minDist, param1, param2, minR, maxR) {
+    const [dx, dy] = sobel(gray, w, h); const edges = canny(dx, dy, w, h, Math.max(1, Math.floor(param1 / 2)), param1);
+    const idp = 1 / dp, acols = Math.ceil(w * idp), arows = Math.ceil(h * idp), AW = acols + 2;
+    const acc = new Int32Array((arows + 2) * AW); const SHIFT = 10, ONE = 1 << SHIFT; const nz = [];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x; if (!edges[i]) continue; const vx = dx[i], vy = dy[i]; if (!vx && !vy) continue;
+      const mag = Math.sqrt(vx * vx + vy * vy); if (mag < 1) continue; nz.push([x, y]);
+      let sx = cvRound(vx * idp * ONE / mag), sy = cvRound(vy * idp * ONE / mag);
+      const x0 = cvRound(x * idp * ONE), y0 = cvRound(y * idp * ONE);
+      for (let k = 0; k < 2; k++) {
+        let x1 = x0 + minR * sx, y1 = y0 + minR * sy;
+        for (let r = minR; r <= maxR; x1 += sx, y1 += sy, r++) { const x2 = x1 >> SHIFT, y2 = y1 >> SHIFT; if (x2 < 0 || x2 >= acols || y2 < 0 || y2 >= arows) break; acc[(y2 + 1) * AW + x2 + 1]++; }
+        sx = -sx; sy = -sy;
+      }
+    }
+    const centers = [];
+    for (let y = 1; y <= arows; y++) for (let x = 1; x <= acols; x++) {
+      const b = y * AW + x, v = acc[b];
+      if (v > param2 && v > acc[b - 1] && v >= acc[b + 1] && v > acc[b - AW] && v >= acc[b + AW]) centers.push([x - 1, y - 1, v]);
+    }
+    centers.sort((a, b) => b[2] - a[2] || (a[1] * AW + a[0]) - (b[1] * AW + b[0]));
+    const minR2 = minR * minR, maxR2 = maxR * maxR, circles = [];
+    for (const [cxa, cya, v] of centers) {
+      const cx = (cxa + 0.5) * dp, cy = (cya + 0.5) * dp; const d = [];
+      for (const [px, py] of nz) { const ddx = cx - px, ddy = cy - py, r2 = ddx * ddx + ddy * ddy; if (r2 >= minR2 && r2 <= maxR2) d.push(Math.sqrt(r2)); }
+      if (!d.length) continue; d.sort((a, b) => a - b);
+      const n = d.length; let rBest = 0, maxCount = 0, startIdx = 0, startDist = d[0];
+      for (let j = 1; j < n; j++) {
+        const dd = d[j]; if (dd > maxR) break;
+        if (dd - startDist > dp) {
+          const rCur = d[Math.floor((j + startIdx) / 2)];
+          if ((j - startIdx) * rBest >= maxCount * rCur || (rBest < 1.1920929e-7 && j - startIdx >= maxCount)) { rBest = rCur; maxCount = j - startIdx; }
+          startDist = dd; startIdx = j;
+        }
+      }
+      if (maxCount > param2) circles.push([cx, cy, rBest, maxCount]);
+    }
+    circles.sort((a, b) => b[3] - a[3]);
+    const out = [], md2 = minDist * minDist;
+    for (const c of circles) if (out.every(o => (o[0] - c[0]) ** 2 + (o[1] - c[1]) ** 2 >= md2)) out.push(c);
+    return out.length ? out.map(c => [c[0], c[1], c[2]]) : null;
+  }
+  function morphOpen5(m, w, h) {
+    const er = new Uint8Array(w * h), di = new Uint8Array(w * h);
+    // erosion (outside pixels ignored), separable 5x5 rect
+    const t = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 255; for (let k = -2; k <= 2; k++) { const xx = x + k; if (xx >= 0 && xx < w && m[y * w + xx] < v) v = m[y * w + xx]; } t[y * w + x] = v; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 255; for (let k = -2; k <= 2; k++) { const yy = y + k; if (yy >= 0 && yy < h && t[yy * w + x] < v) v = t[yy * w + x]; } er[y * w + x] = v; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 0; for (let k = -2; k <= 2; k++) { const xx = x + k; if (xx >= 0 && xx < w && er[y * w + xx] > v) v = er[y * w + xx]; } t[y * w + x] = v; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 0; for (let k = -2; k <= 2; k++) { const yy = y + k; if (yy >= 0 && yy < h && t[yy * w + x] > v) v = t[yy * w + x]; } di[y * w + x] = v; }
+    return di;
+  }
+  function components(m, w, h) { // 8-connectivity
+    const lab = new Int32Array(w * h); const comps = [null]; let n = 0;
+    for (let i = 0; i < w * h; i++) {
+      if (!m[i] || lab[i]) continue; n++; const st = [i]; lab[i] = n; let x0 = w, y0 = h, x1 = -1, y1 = -1, a = 0, sx = 0, sy = 0; const px = [];
+      while (st.length) {
+        const j = st.pop(), x = j % w, y = (j - x) / w; a++; sx += x; sy += y; px.push(j); if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue; const k = yy * w + xx; if (m[k] && !lab[k]) { lab[k] = n; st.push(k); } }
+      }
+      comps.push({ bx: x0, by: y0, bw: x1 - x0 + 1, bh: y1 - y0 + 1, a, cx: sx / a, cy: sy / a, px });
+    }
+    return { lab, comps };
+  }
+  function outerPerimeter(lab, id, w, h, startIdx) { // Moore boundary tracing of outer contour, closed arc length
+    const inside = (x, y) => x >= 0 && y >= 0 && x < w && y < h && lab[y * w + x] === id;
+    const DX = [1, 1, 0, -1, -1, -1, 0, 1], DY = [0, 1, 1, 1, 0, -1, -1, -1];
+    const sx = startIdx % w, sy = (startIdx - sx) / w; let x = sx, y = sy, dir = 7, per = 0, steps = 0;
+    // check isolated pixel
+    let any = false; for (let k = 0; k < 8; k++) if (inside(x + DX[k], y + DY[k])) any = true; if (!any) return 0;
+    while (true) {
+      let k = (dir + 6) % 8, found = false;
+      for (let t = 0; t < 8; t++, k = (k + 1) % 8) if (inside(x + DX[k], y + DY[k])) { found = true; break; }
+      if (!found) break;
+      per += (k % 2) ? Math.SQRT2 : 1; x += DX[k]; y += DY[k]; dir = k; steps++;
+      if ((x === sx && y === sy && steps > 1 && isStartDir(k)) || steps > 4 * w * h) break;
+    }
+    function isStartDir() { return true; }
+    return per;
+  }
+  function circHue(hs) { let s = 0, c = 0; for (const v of hs) { const a = v / 180 * 2 * Math.PI; s += Math.sin(a); c += Math.cos(a); } s /= hs.length; c /= hs.length; let d = (Math.atan2(s, c) * 180 / Math.PI) / 2; d = ((d % 180) + 180) % 180; return d; }
+  function percentile(arr, q) { const a = Float64Array.from(arr).sort(); const pos = (a.length - 1) * q / 100, lo = Math.floor(pos), hi = Math.ceil(pos); return a[lo] + (a[hi] - a[lo]) * (pos - lo); }
+  const median = arr => percentile(arr, 50);
+
+  // frame: {data: RGBA Uint8ClampedArray, width, height}; bbox [x,y,w,h]
+  function detect(frame, bbox, p = P) {
+    const [x, y, w, h] = bbox, Wf = frame.width, Hf = frame.height;
+    const x0 = x + pyInt(0.5 * w), x1 = Math.min(Wf, x + pyInt(1.05 * w)), y0 = Math.max(0, y - pyInt(0.05 * h)), y1 = Math.min(Hf, y + pyInt(1.15 * h));
+    const cw = x1 - x0, chh = y1 - y0, crop = new Uint8Array(cw * chh * 3);
+    for (let yy = 0; yy < chh; yy++) for (let xx = 0; xx < cw; xx++) { const s = ((y0 + yy) * Wf + x0 + xx) * 4, d = (yy * cw + xx) * 3; crop[d] = frame.data[s]; crop[d + 1] = frame.data[s + 1]; crop[d + 2] = frame.data[s + 2]; }
+    const R = resizeCubic(crop, cw, chh, 3, 3); const RW = R.w, RH = R.h, N = RW * RH; const H = 3 * h;
+    const L = new Uint8Array(N), A = new Uint8Array(N), B = new Uint8Array(N), HH = new Uint8Array(N), S = new Uint8Array(N), V = new Uint8Array(N), gray = new Uint8Array(N);
+    for (let i = 0; i < N; i++) {
+      const r = R.data[i * 3], g = R.data[i * 3 + 1], b = R.data[i * 3 + 2];
+      const lab = rgb2lab(r, g, b); L[i] = lab[0]; A[i] = lab[1]; B[i] = lab[2];
+      const hsv = rgb2hsv(r, g, b); HH[i] = hsv[0]; S[i] = hsv[1]; V[i] = hsv[2];
+      gray[i] = sat8(0.299 * r + 0.587 * g + 0.114 * b);
+    }
+    const thr = percentile(L, 60); const bgL = [], bgA = [], bgB = [], bgS = [];
+    for (let i = 0; i < N; i++) if (L[i] >= thr) { bgL.push(L[i]); bgA.push(A[i]); bgB.push(B[i]); bgS.push(S[i]); }
+    const bg = [median(bgL), median(bgA), median(bgB)];
+    const g5 = gauss5(gray, RW, RH);
+    const hc = houghCircles(g5, RW, RH, 1.2, pyInt(0.09 * H), 80, 20, pyInt(0.035 * H), pyInt(0.12 * H));
+    const cand = []; let col = [], xm = null, rm = null;
+    const meanOver = idx => { let l = 0, a = 0, b = 0; for (const i of idx) { l += L[i]; a += A[i]; b += B[i]; } const n = idx.length; return [l / n, a / n, b / n]; };
+    const mk = (cx, cy, r, idx, src) => { const m = meanOver(idx); return { cx, cy, r, de: Math.hypot(m[0] - bg[0], m[1] - bg[1], m[2] - bg[2]), chroma: Math.hypot(m[1] - bg[1], m[2] - bg[2]), L: m[0], hue: circHue(idx.map(i => HH[i])), ang: (((Math.atan2(m[2] - bg[2], m[1] - bg[1]) * 180 / Math.PI) % 360) + 360) % 360, src }; };
+    if (hc) {
+      const xs = hc.map(c => c[0]), rs = hc.map(c => c[2]); xm = median(xs); rm = median(rs);
+      col = hc.filter(c => Math.abs(c[0] - xm) < rm * 0.9).sort((a, b) => a[1] - b[1]);
+      for (const c of col) {
+        const idx = []; const rr = (0.6 * c[2]) ** 2;
+        for (let yy = Math.max(0, Math.floor(c[1] - c[2])); yy < Math.min(RH, Math.ceil(c[1] + c[2]) + 1); yy++) for (let xx = Math.max(0, Math.floor(c[0] - c[2])); xx < Math.min(RW, Math.ceil(c[0] + c[2]) + 1); xx++) if ((xx - c[0]) ** 2 + (yy - c[1]) ** 2 <= rr) idx.push(yy * RW + xx);
+        if (idx.length < 10) continue; cand.push(mk(c[0], c[1], c[2], idx, 'hough'));
+      }
+    }
+    const sb = median(bgS); const msk = new Uint8Array(N); for (let i = 0; i < N; i++) msk[i] = (S[i] >= sb + 30 && V[i] >= 50) ? 255 : 0;
+    const op = morphOpen5(msk, RW, RH); const { lab, comps } = components(op, RW, RH);
+    for (let i = 1; i < comps.length; i++) {
+      const c = comps[i]; const a = c.a;
+      if (!((0.04 * H) ** 2 * 0.785 <= a && a <= (0.25 * H) ** 2 * 0.785 && 0.6 <= c.bw / Math.max(c.bh, 1) && c.bw / Math.max(c.bh, 1) <= 1.7)) continue;
+      const start = Math.min(...c.px); const pp = outerPerimeter(lab, i, RW, RH, start); const ci = 4 * Math.PI * a / Math.max(pp * pp, 1);
+      if (ci < 0.6) continue;
+      cand.push(mk(c.cx, c.cy, Math.sqrt(a / Math.PI), c.px, 'blob'));
+    }
+    const res = { n_outlines: col.length, cls_hue: null, hue: null, slot: null, cls_slot: null };
+    if (!cand.length) return res;
+    let cs = cand; if (col.length) { const near = cand.filter(c => Math.abs(c.cx - xm) < rm * 1.2); cs = near.length ? near : cand; }
+    let b = cs[0]; for (const c of cs) if (c.chroma > b.chroma) b = c;
+    if (b.de < p.de_min) return res;
+    Object.assign(res, { ang: Math.round(b.ang), hue: Math.round(b.hue * 10) / 10, chroma: Math.round(b.chroma * 10) / 10, de: Math.round(b.de * 10) / 10, src: b.src });
+    res.cls_hue = b.chroma >= p.chroma_min ? angCls(b.ang, p) : 'mortale?';
+    if (col.length >= 3) {
+      const ys = col.map(c => c[1]); const gap = median(ys.slice(1).map((v, i) => v - ys[i]));
+      if (gap > 0) { const k = cvRound((b.cy - ys[0]) / gap) + 1; if (k >= 1 && k <= 5) { res.slot = k; res.cls_slot = SLOT[k]; } }
+    }
+    return res;
+  }
+  G.Circle = { detect, angCls, SLOT };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+const LOCAL = new URLSearchParams(location.search).get('local') === '1';
+const L = location.origin;
+const URLS = LOCAL ? {
+  ort: L + '/pkgs/onnxruntime-web/dist/ort.min.mjs', ortWasm: L + '/pkgs/onnxruntime-web/dist/',
+  yaml: L + '/pkgs/js-yaml/dist/js-yaml.mjs', clipper: L + '/pkgs/clipper-lib/clipper.js',
+  opencv: L + '/pkgs/@paddleocr/paddleocr-js/node_modules/@techstark/opencv-js/dist/opencv.js',
+  paddle: L + '/pkgs/@paddleocr/paddleocr-js/dist/index.mjs',
+  tf: L + '/pkgs/@huggingface/transformers/dist/transformers.min.js', tfWasm: L + '/pkgs/@huggingface/transformers/dist/',
+  whisper: { npm: m => L + '/wm/sts-whisper-' + m + '/package/models/', hf: null }
+} : {
+  ort: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.min.mjs', ortWasm: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/',
+  yaml: 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs', clipper: 'https://cdn.jsdelivr.net/npm/clipper-lib@6.4.2/clipper.js',
+  opencv: 'https://cdn.jsdelivr.net/npm/@techstark/opencv-js@4.10.0-release.1/dist/opencv.js',
+  paddle: 'https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/dist/index.mjs',
+  tf: 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js', tfWasm: 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/',
+  whisper: { npm: m => 'https://cdn.jsdelivr.net/npm/sts-whisper-' + m + '@1.0.0/models/', hf: null }
+};
+// Local test only: the cloud test machine cannot reach the official PaddleOCR model host, so it uses the same
+// PP-OCRv6 small models taken from the rapidocr wheel on PyPI. On the phone the official PaddleOCR.js default is used.
+const LOCAL_OCR_MODELS = LOCAL ? { textDetectionModelName: 'PP-OCRv6_small_det', textDetectionModelAsset: { url: L + '/tars/PP-OCRv6_small_det.tar' },
+  textRecognitionModelName: 'PP-OCRv6_small_rec', textRecognitionModelAsset: { url: L + '/tars/PP-OCRv6_small_rec.tar' } } : null;
+
+const $ = id => document.getElementById(id);
+const R = { page: 'Prova sul telefono v1', started: new Date().toISOString(), device: {}, cards: null, voice: null };
+const mem = () => performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null;
+function dev() {
+  R.device = { ua: navigator.userAgent, cores: navigator.hardwareConcurrency || null, deviceMemoryGB: navigator.deviceMemory || null,
+    crossOriginIsolated: self.crossOriginIsolated, jsHeapLimitMB: performance.memory ? Math.round(performance.memory.jsHeapSizeLimit / 1048576) : null };
+  $('dev').textContent = `Telefono: ${R.device.cores || '?'} core, memoria ${R.device.deviceMemoryGB || '?'} GB, più thread ${R.device.crossOriginIsolated ? 'sì' : 'no (1 thread)'}.`;
+}
+function show() { $('result').value = JSON.stringify(R, null, 1); }
+function loadScript(src) { return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.crossOrigin = 'anonymous'; s.onload = ok; s.onerror = () => ko(new Error('non riesco a scaricare ' + src)); document.head.appendChild(s); }); }
+function bytesSince(t0) { return performance.getEntriesByType('resource').filter(e => e.startTime >= t0).reduce((a, e) => a + (e.transferSize || e.encodedBodySize || 0), 0); }
+
+// ---------- cards ----------
+let OCR = null, ocrLoadMs = null, ocrBytes = null;
+async function loadOcr() {
+  if (OCR) return OCR;
+  const t0 = performance.now();
+  // The SDK imports js-yaml, clipper-lib, @techstark/opencv-js and onnxruntime-web by bare name: give it an import map.
+  await loadScript(URLS.clipper); await loadScript(URLS.opencv);
+  const shim = code => URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+  const map = { imports: { 'js-yaml': URLS.yaml, 'onnxruntime-web': URLS.ort, 'clipper-lib': shim('export default window.ClipperLib;'), '@techstark/opencv-js': shim('export default window.cv;') } };
+  const im = document.createElement('script'); im.type = 'importmap'; im.textContent = JSON.stringify(map); document.head.appendChild(im);
+  const { PaddleOCR } = await import(URLS.paddle);
+  const opts = { ortOptions: { backend: 'wasm', wasmPaths: URLS.ortWasm } };
+  Object.assign(opts, LOCAL_OCR_MODELS || { ocrVersion: 'PP-OCRv6', lang: 'ch' });
+  OCR = await PaddleOCR.create(opts);
+  ocrLoadMs = Math.round(performance.now() - t0); ocrBytes = bytesSince(t0);
+  return OCR;
+}
+async function fileBitmap(f) { return await createImageBitmap(f, { imageOrientation: 'from-image', colorSpaceConversion: 'none' }); }
+function scaled(bm, longSide) { const s = longSide / Math.max(bm.width, bm.height); const c = document.createElement('canvas'); c.width = Math.round(bm.width * s); c.height = Math.round(bm.height * s); const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingQuality = 'high'; x.drawImage(bm, 0, 0, c.width, c.height); return c; }
+$('cardRun').onclick = async () => {
+  const files = [...$('cardFiles').files]; if (!files.length) { $('cardStatus').textContent = 'Scegli prima una foto.'; return; }
+  $('cardRun').disabled = true; const out = $('cardOut'); out.hidden = false; out.textContent = '';
+  try {
+    $('cardStatus').textContent = 'Scarico il modello di lettura...';
+    await loadOcr(); $('cardStatus').textContent = `Modello pronto in ${(ocrLoadMs / 1000).toFixed(1)} s. Leggo...`;
+    const per = [];
+    for (const f of files) {
+      const bm = await fileBitmap(f);
+      // Same size as the tested crops after their 3x enlargement (long side about 900 px).
+      const cv = scaled(bm, 900);
+      const t = performance.now();
+      const [r] = await OCR.predict(cv, { textDetLimitSideLen: 736, textDetLimitType: 'min', textDetThresh: 0.3, textDetBoxThresh: 0.5, textDetUnclipRatio: 1.6, textRecScoreThresh: 0.5 });
+      const ocrMs = performance.now() - t;
+      const lines = r.items.map(it => { const xs = it.poly.map(p => p[0]), ys = it.poly.map(p => p[1]); return { t: it.text, s: +it.score.toFixed(3), x: Math.min(...xs), y: ys.reduce((a, b) => a + b, 0) / ys.length, h: Math.max(...ys) - Math.min(...ys) }; });
+      const t2 = performance.now(); const [g, e, a, bag] = Match.parse(lines); const top = Match.rank(g, e, a, NAMES, 3, bag); const matchMs = performance.now() - t2;
+      // Circle: the tested code expects the card at about 150 px high, inside a frame.
+      const small = scaled(bm, Math.round(150 * Math.max(bm.width, bm.height) / bm.height));
+      const id = small.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, small.width, small.height);
+      const t3 = performance.now(); const circ = Circle.detect(id, [0, 0, small.width, small.height]); const circMs = performance.now() - t3;
+      const rec = { file: f.name, px: [bm.width, bm.height], ocrMs: Math.round(ocrMs), matchMs: Math.round(matchMs), circleMs: Math.round(circMs), lines: lines.map(l => l.t), read: [g, e, a], top3: top.map(x => [x[1], Math.round(x[0])]), cerchio: circ.cls_hue, heapMB: mem() };
+      per.push(rec);
+      out.textContent += `${f.name}: ${rec.ocrMs} ms\n  letto: ${lines.map(l => l.t).join(' | ')}\n  migliori: ${rec.top3.map(x => x[0] + ' (' + x[1] + ')').join(', ')}\n  cerchio: ${circ.cls_hue || 'non trovato'}\n\n`;
+    }
+    const ms = per.map(p => p.ocrMs);
+    R.cards = { engine: 'PaddleOCR.js 0.4.2, PP-OCRv6 small', loadMs: ocrLoadMs, downloadedMB: +(ocrBytes / 1048576).toFixed(1), n: per.length, msPerCardMean: Math.round(ms.reduce((a, b) => a + b, 0) / ms.length), msFirst: ms[0], msRestMean: ms.length > 1 ? Math.round(ms.slice(1).reduce((a, b) => a + b, 0) / (ms.length - 1)) : null, heapMB: mem(), cards: per };
+    $('cardStatus').textContent = `Fatto: ${per.length} cartellini, ${R.cards.msPerCardMean} ms in media.`;
+  } catch (err) { $('cardStatus').textContent = 'Errore: ' + err.message; R.cards = { error: String(err && err.stack || err) }; }
+  $('cardRun').disabled = false; show();
+};
+
+// ---------- voice ----------
+const ASR = {};
+async function decodeAudio(file) {
+  const buf = await file.arrayBuffer(); const ctx = new AudioContext(); const a = await ctx.decodeAudioData(buf); ctx.close();
+  const off = new OfflineAudioContext(1, Math.ceil(a.duration * 16000), 16000); const src = off.createBufferSource(); src.buffer = a; src.connect(off.destination); src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+function norm2(s) { return s.toUpperCase().replace(/À/g, 'A').replace(/[^A-Z]/g, ''); }
+function extractSpecies(text) { // port of score_asr.py extract(): fuzzy match 2 to 5 word spans to the checklist, ratio >= 80
+  text = text.replace(/variet[aà]/gi, 'var'); const toks = text.match(/[A-Za-zÀ-ÿ]+/g) || []; const NN = NAMES.map(([n]) => [n, norm2(n.replace('var.', 'var'))]);
+  const c = [];
+  for (let i = 0; i < toks.length; i++) for (let Ln = 2; Ln < 6 && i + Ln <= toks.length; Ln++) { const q = norm2(toks.slice(i, i + Ln).join('')); for (const [n, nn] of NN) { if (Math.abs(q.length - nn.length) > 6) continue; const s = Match.ratio(q, nn); if (s >= 80) c.push([s, Ln, i, n]); } }
+  c.sort((a, b) => b[0] - a[0] || b[1] - a[1]); const used = new Set(), got = [];
+  for (const [s, Ln, i, n] of c) { let clash = false; for (let k = i; k < i + Ln; k++) if (used.has(k)) clash = true; if (clash) continue; for (let k = i; k < i + Ln; k++) used.add(k); if (!got.includes(n)) got.push(n); }
+  return got;
+}
+$('asrRun').onclick = async () => {
+  const f = $('audioFile').files[0]; if (!f) { $('asrStatus').textContent = 'Scegli prima una registrazione.'; return; }
+  const m = $('asrModel').value, src = $('asrSrc').value; $('asrRun').disabled = true; const out = $('asrOut'); out.hidden = false; out.textContent = '';
+  try {
+    $('asrStatus').textContent = 'Preparo l\'audio...'; const x = await decodeAudio(f); const dur = x.length / 16000;
+    const key = m + src; let loadMs = 0, bytes = 0;
+    if (!ASR[key]) {
+      $('asrStatus').textContent = `Scarico Whisper ${m}...`; const t0 = performance.now();
+      const { pipeline, env } = await import(URLS.tf);
+      env.backends.onnx.wasm.wasmPaths = URLS.tfWasm;
+      if (src === 'npm' || LOCAL) { env.allowRemoteModels = false; env.allowLocalModels = true; env.localModelPath = URLS.whisper.npm(m); } else { env.allowRemoteModels = true; env.allowLocalModels = false; }
+      ASR[key] = await pipeline('automatic-speech-recognition', 'Xenova/whisper-' + m, { dtype: 'q8', device: 'wasm' });
+      loadMs = Math.round(performance.now() - t0); bytes = bytesSince(t0);
+    }
+    const sr = 16000, step = 29 * sr, segs = []; const t = performance.now(); let n = 0;
+    const total = Math.ceil(x.length / step) + Math.ceil(Math.max(0, x.length - 14 * sr) / step);
+    for (const offs of [0, 14 * sr]) for (let i = offs; i < x.length; i += step) {
+      $('asrStatus').textContent = `Trascrivo il pezzo ${++n} di ${total}...`;
+      const r = await ASR[key](x.subarray(i, i + step), { language: 'english', task: 'transcribe' });
+      segs.push([offs / sr, i / sr, (r.text || '').trim()]);
+    }
+    const secs = (performance.now() - t) / 1000;
+    const main = segs.filter(s => s[0] === 0).map(s => s[2]).join(' '), second = segs.filter(s => s[0] !== 0).map(s => s[2]).join(' ');
+    const species = [...new Set([...extractSpecies(main), ...extractSpecies(second)])];
+    R.voice = { model: 'whisper-' + m + ' q8 (transformers.js 3.7.6)', source: src, loadMs: loadMs || null, downloadedMB: bytes ? +(bytes / 1048576).toFixed(1) : null, audioS: +dur.toFixed(1), windows: segs.length, transcribeS: +secs.toFixed(1), rtf: +(secs / dur).toFixed(2), heapMB: mem(), species, text: main };
+    out.textContent = `Testo (passata principale):\n${main}\n\nSpecie riconosciute (${species.length}): ${species.join(', ')}`;
+    $('asrStatus').textContent = `Fatto: ${dur.toFixed(0)} s di audio in ${secs.toFixed(0)} s (fattore ${R.voice.rtf}; sotto 1 vuol dire più veloce del parlato).`;
+  } catch (err) { $('asrStatus').textContent = 'Errore: ' + err.message; R.voice = { error: String(err && err.stack || err) }; }
+  $('asrRun').disabled = false; show();
+};
+$('copy').onclick = async () => { show(); try { await navigator.clipboard.writeText($('result').value); $('copy').textContent = 'Copiato'; } catch (e) { $('result').select(); document.execCommand('copy'); $('copy').textContent = 'Copiato'; } setTimeout(() => $('copy').textContent = 'Copia i risultati', 2000); };
+dev(); show();
+</script>
+</body>
+</html>
