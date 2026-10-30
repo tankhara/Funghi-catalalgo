@@ -10,3 +10,7 @@ Working style: the main session is the steer and must stay free to reply to Patr
 - Edibility on the printed cards (from 24 Oct 2026): the filled circle at the bottom of each card gives `commestibilita` on the species. Green = commestibile, yellow = non commestibile, blue = commestibile solo dopo prolungata cottura, red = tossico, skull = mortale. Read it from the card; if the colour is unclear, ask Patrick rather than guess.
 - Never guess what Patrick has already shown or told us. Before building or asking, brief every agent to use the existing evidence first: config/layout, config/sala, the room-walk videos (142241, 142710), the backups and the earlier findings in the scratchpad. Ask Patrick only what that evidence truly cannot answer.
 - Verify before stating a cause, a speed, a count or a status. Check the logs, the db and the store first, and give the numbers. If it cannot be checked yet, say "I do not know yet" and say how you will check. Never offer a guess as an explanation.
+
+## Project registry
+
+Project facts (links, accounts, key names, costs) are kept in a separate private "ops" registry repo, not here. When you add or change a service, domain, key, account or paid dependency, tell the user so the registry is updated in the same session. Never write secret values in this repo: it is public.
