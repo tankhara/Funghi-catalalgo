@@ -14,3 +14,7 @@ Working style: the main session is the steer and must stay free to reply to Patr
 ## Project registry
 
 Project facts (links, accounts, key names, costs) are kept in a separate private "ops" registry repo, not here. When you add or change a service, domain, key, account or paid dependency, tell the user so the registry is updated in the same session. Never write secret values in this repo: it is public.
+
+## Reporting to ops (standing rule)
+
+The owner keeps a private ops registry and an ops driver session. At the end of any session that changed something material (deploy, new or changed service, domain, account, cost, status, decision, blocker), report it to the ops session using the send_message tool; ask the owner for the ops session id, or read it in the private repo funghi-handover CLAUDE.md. Never write secret values or key names in this public repo. The ops session may message you for a status; answer briefly.
