@@ -19,6 +19,8 @@ Project facts (links, accounts, key names, costs) are kept in a separate private
 
 The owner keeps a private ops registry and an ops driver session. At the end of any session that changed something material (deploy, new or changed service, domain, account, cost, status, decision, blocker), report it to the ops session using the send_message tool; ask the owner for the ops session id, or read it in the private repo funghi-handover CLAUDE.md. Never write secret values or key names in this public repo. The ops session may message you for a status; answer briefly.
 
+- Time display: show Malta time only (same as Italy time, Sicily/Europe/Rome), never UTC. Keep speaking in Patrick's local time.
+
 ## Interview format (standing rule)
 
 Whenever you have a question or need a decision from the owner, ask it with the AskUserQuestion tool (short options, recommended option first), never as plain-text questions or lists in the reply. After the owner answers, act on the answers without re-asking.
