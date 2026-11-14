@@ -11,15 +11,11 @@ Working style: the main session is the steer and must stay free to reply to Patr
 - Never guess what Patrick has already shown or told us. Before building or asking, brief every agent to use the existing evidence first: config/layout, config/sala, the room-walk videos (142241, 142710), the backups and the earlier findings in the scratchpad. Ask Patrick only what that evidence truly cannot answer.
 - Verify before stating a cause, a speed, a count or a status. Check the logs, the db and the store first, and give the numbers. If it cannot be checked yet, say "I do not know yet" and say how you will check. Never offer a guess as an explanation.
 
-## Project registry
-
-Project facts (links, accounts, key names, costs) are kept in a separate private "ops" registry repo, not here. When you add or change a service, domain, key, account or paid dependency, tell the user so the registry is updated in the same session. Never write secret values in this repo: it is public.
-
 ## Reporting to ops (standing rule)
 
-The owner keeps a private ops registry and an ops driver session. At the end of any session that changed something material (deploy, new or changed service, domain, account, cost, status, decision, blocker), report it to the ops session using the send_message tool; ask the owner for the ops session id, or read it in the private repo funghi-handover CLAUDE.md. Never write secret values or key names in this public repo. The ops session may message you for a status; answer briefly.
+Project facts live in the private ops registry repo. When you add or change a service, domain, key, account or paid dependency, tell the ops session (ask the owner for its id) with send_message: project, what changed, status, cost change EUR, open items for the owner. Never write key names or secret values in this public repo. If send_message is unavailable, tell the owner. The ops session may message you for a status; answer briefly.
 
-- Time display: show Malta time only (same as Italy time, Sicily/Europe/Rome), never UTC. Keep speaking in Patrick's local time.
+Time display: Malta time only, never UTC or Z; new stored timestamps carry the Europe/Malta offset (+01:00 winter, +02:00 summer). Keep speaking in Patrick's local time (Sicily).
 
 ## Interview format (standing rule)
 
