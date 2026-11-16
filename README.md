@@ -40,3 +40,7 @@ A planned public site built from the same data: the species list, the photos of 
 - possibly a short description per species and the collector or place found, if wanted.
 
 Nothing private (working notes, the editing tools) would be exposed. The public site would read an exported copy, not the working database.
+
+## Licence
+
+Content is licensed under CC BY 4.0. Code is licensed under EUPL-1.2 (see LICENSE).
